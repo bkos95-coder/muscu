@@ -1,0 +1,2646 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#161616">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Muscu">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Muscu">
+<title>Mon Programme Muscu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#E30613; --red-dark:#b30410;
+    --ink:#161616; --ink-2:#3a3a3a;
+    --paper:#f4f2ee; --card:#fff; --line:#e2ded7;
+    --grey:#8a857d; --ok:#1f9d55;
+    --shadow:0 1px 0 rgba(0,0,0,.04), 0 12px 30px -18px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;line-height:1.45;padding-bottom:86px}
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px}
+  button{font-family:inherit}
+
+  header{background:var(--ink);color:#fff;padding:18px 0 16px;border-bottom:5px solid var(--red)}
+  .head-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+  .kicker{font-family:"Barlow Condensed",sans-serif;font-weight:600;letter-spacing:.26em;text-transform:uppercase;font-size:11px;color:var(--red);margin:0 0 2px}
+  h1{font-family:"Barlow Condensed",sans-serif;font-weight:800;text-transform:uppercase;font-size:clamp(28px,7vw,42px);line-height:.9;margin:0}
+  .streak{text-align:right;font-family:"Barlow Condensed",sans-serif}
+  .streak b{display:block;font-size:26px;line-height:1}
+  .streak span{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#b8b4ac}
+
+  nav{position:fixed;bottom:0;left:0;right:0;background:var(--ink);display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+  nav button{flex:1;background:none;border:none;color:#9b968e;padding:11px 2px 9px;cursor:pointer;font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.05em;font-size:13px;border-top:3px solid transparent}
+  nav button.active{color:#fff;border-top-color:var(--red)}
+
+  h2{font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.05em;font-size:20px;display:flex;align-items:center;gap:9px;margin:20px 0 12px}
+  h2::before{content:"";width:12px;height:12px;background:var(--red);transform:skewX(-12deg);flex:0 0 auto}
+  .muted{color:var(--grey);font-size:13px}
+
+  .freq{display:flex;gap:6px;margin:4px 0 6px}
+  .freq button{flex:1;padding:12px 2px;border:1.5px solid var(--line);background:#fff;border-radius:10px;cursor:pointer;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:15px;color:var(--ink-2);min-width:0}
+  .freq button.sel{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:inset 0 -3px 0 var(--red)}
+  .freq span{display:block;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:inherit;opacity:.65}
+
+  .plan-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);display:flex;align-items:center;gap:13px;cursor:pointer}
+  .plan-card:active{transform:scale(.99)}
+  .pc-letter{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:26px;color:#fff;background:var(--red);width:46px;height:46px;display:flex;align-items:center;justify-content:center;border-radius:10px;flex:0 0 auto}
+  .pc-letter.alt{background:var(--ink)}
+  .pc-title{font-weight:600;font-size:15.5px}
+  .pc-sub{font-size:12.5px;color:var(--grey)}
+  .pc-done{margin-left:auto;font-size:12px;color:var(--ok);font-weight:600;white-space:nowrap}
+  .pc-go{margin-left:auto;color:var(--grey);font-size:20px}
+  .weekrecap{margin:0 0 14px}
+  .wr-head{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ok);margin-bottom:6px}
+  .wr-line{font-size:16px;color:var(--ink);margin-bottom:2px}
+  .wr-line b{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:18px;color:var(--red)}
+  .wr-time{font-size:12.5px;color:var(--grey)}
+  .wr-empty{background:#faf9f6;border:1px dashed var(--line);border-radius:10px;padding:12px 14px;font-size:13.5px;color:var(--grey);text-align:center}
+  .srvbox{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-top:12px;box-shadow:var(--shadow)}
+  .srvbox .lab{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin-bottom:6px}
+  .srvbox p{margin:0 0 10px;font-size:13px;line-height:1.45}
+  .srvbox p b{color:var(--ink)}
+  .backupwarn{background:#fffbe6;border:1px solid #f0dfa0;border-left:4px solid #e0a800;border-radius:10px;padding:11px 14px;margin-bottom:12px;font-size:13px;color:var(--ink-2);line-height:1.45}
+  .backupwarn.urgent{background:#fff5f5;border-color:#f3c6c9;border-left-color:var(--red)}
+  .backupwarn b{color:var(--ink)}
+  .suggbox{background:#fff5f5;border:1px solid #f3c6c9;border-left:4px solid var(--red);border-radius:10px;padding:11px 14px;margin-bottom:12px;font-size:13.5px;color:var(--ink-2)}
+  .suggbox b{color:var(--ink)}
+  .plan-card.next{border-color:var(--red);box-shadow:0 0 0 2px rgba(227,6,19,.12),var(--shadow)}
+  .pc-next{margin-left:auto;color:var(--red);font-weight:700;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;font-size:14px;letter-spacing:.04em;white-space:nowrap}
+  .xpress{display:inline-block;background:var(--red);color:#fff;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:10px;letter-spacing:.06em;padding:1px 6px;border-radius:5px;vertical-align:middle;margin-left:4px}
+
+  .sess-head{display:flex;align-items:center;gap:12px;margin:18px 0 8px}
+  .sess-letter{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:32px;color:#fff;background:var(--red);width:52px;height:52px;display:flex;align-items:center;justify-content:center;border-radius:11px;flex:0 0 auto}
+  .sess-title{font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;font-size:22px;line-height:1;margin:0}
+  .sess-sub{font-size:12.5px;color:var(--grey);margin:2px 0 0}
+
+  /* Circuit bar */
+  .circuit{background:var(--ink);color:#fff;border-radius:12px;padding:13px 15px;margin:0 0 12px;box-shadow:var(--shadow)}
+  .circ-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .circ-label{font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:15px}
+  .circ-label small{display:block;font-size:10.5px;color:#b8b4ac;letter-spacing:.04em;font-family:"IBM Plex Sans";text-transform:none;font-weight:400}
+  .rest-opts{display:flex;gap:6px}
+  .rest-opts button{background:#2a2a2a;border:1.5px solid #444;color:#ccc;border-radius:8px;padding:6px 9px;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:13px;cursor:pointer}
+  .rest-opts button.sel{background:var(--red);border-color:var(--red);color:#fff}
+  .timer-row{display:flex;align-items:center;gap:12px;margin-top:11px}
+  .timer-display{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:42px;line-height:1;min-width:104px;font-variant-numeric:tabular-nums}
+  .timer-display.running{color:var(--red)}
+  .btn-timer{flex:1;background:var(--red);border:none;color:#fff;border-radius:10px;padding:13px;font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:16px;cursor:pointer}
+  .btn-timer.stop{background:#3a3a3a}
+  .autorest{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:#b8b4ac}
+  .autorest input{width:16px;height:16px;accent-color:var(--red)}
+
+  .ex{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin-bottom:9px;box-shadow:var(--shadow)}
+  .ex-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ex-name{font-weight:600;font-size:15px}
+  .ex-scheme{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:18px;white-space:nowrap}
+  .ex-var{font-size:12.5px;color:var(--ink-2);margin:3px 0 0}
+  .ex-var b{color:var(--red-dark);font-weight:600}
+  .gtoggle{background:none;border:none;color:var(--red-dark);font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:13px;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;padding:6px 0 0;display:block}
+  .ex-guide{display:none;margin-top:8px;padding:10px 12px;background:var(--paper);border-radius:9px;font-size:13px;color:var(--ink-2);line-height:1.5}
+  .ex.showg .ex-guide{display:block}
+  .ex.finisher .ex-guide{background:#2a2a2a;color:#cfcbc3}
+  .ex.finisher .gtoggle{color:#fff}
+  .ex-track{display:flex;align-items:center;gap:12px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);flex-wrap:wrap}
+  .sets{display:flex;gap:7px}
+  .setbox{width:30px;height:30px;border:2px solid var(--line);border-radius:7px;cursor:pointer;background:#fff;display:flex;align-items:center;justify-content:center;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:14px;color:var(--grey);-webkit-tap-highlight-color:transparent}
+  .setbox.done{background:var(--ink);border-color:var(--ink);color:#fff}
+  .setbox.done::after{content:"✓"}
+  .uphint{background:#eaf7ee;border:1.5px solid #8fd3a4;color:#1d7a3e;border-radius:9px;padding:8px 11px;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:14px;letter-spacing:.03em;cursor:pointer;white-space:nowrap}
+  .uphint.applied{background:#1d7a3e;border-color:#1d7a3e;color:#fff}
+  .ex.finisher .uphint{background:#1e3a26;border-color:#2f6b41;color:#8fd3a4}
+  .sets-ctrl{display:flex;gap:5px}
+  .sc-btn{width:30px;height:30px;border:1.5px solid var(--line);background:#fff;border-radius:7px;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:17px;color:var(--grey);cursor:pointer;line-height:1;flex:0 0 auto;padding:0}
+  .sc-btn:active{background:var(--red);color:#fff;border-color:var(--red)}
+  .ex.finisher .sc-btn{background:#2a2a2a;border-color:#444;color:#aaa}
+  .setbox:active{transform:scale(.9)}
+  .charge{display:flex;align-items:center;gap:6px;margin-left:auto}
+  .charge label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
+  .charge input{width:64px;padding:7px 6px;border:1px solid var(--line);border-radius:7px;font-family:"IBM Plex Sans";font-size:15px;font-weight:600;text-align:center}
+  .charge input:focus{outline:2px solid var(--red);border-color:var(--red)}
+  .lastw{font-size:11px;color:var(--grey)}
+  .lastw b{color:var(--ink-2)}
+
+  .ex.finisher{background:var(--ink);border-color:var(--ink);color:#fff}
+  .ex.finisher .ex-name{color:#fff}
+  .ex.finisher .ex-scheme{color:var(--red)}
+  .ex.finisher .ex-var{color:#bdb9b1}
+  .ex.finisher .ex-track{border-top-color:#333}
+  .ex.finisher .setbox{background:#2a2a2a;border-color:#444;color:#aaa}
+  .ex.finisher .setbox.done{background:var(--red);border-color:var(--red);color:#fff}
+  .ex.dos{border-left:4px solid var(--red)}
+
+  .btn{font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:15px;border:none;border-radius:10px;padding:13px 18px;cursor:pointer;background:var(--ink);color:#fff}
+  .btn.red{background:var(--red)}
+  .btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+  .btn.block{width:100%;display:block}
+  .btn:active{transform:translateY(1px)}
+  .row-btns{display:flex;gap:10px;margin:16px 0}
+  .row-btns .btn{flex:1}
+
+  .groups{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .gbtn{padding:14px 6px;border:1.5px solid var(--line);background:#fff;border-radius:11px;cursor:pointer;text-align:center;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.03em;color:var(--ink-2)}
+  .gbtn.sel{background:var(--red);border-color:var(--red);color:#fff}
+  .lib-ex{background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;margin:8px 0;display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer}
+  .lib-ex.added{border-color:var(--ink);background:#faf9f6}
+  .lib-ex .n{font-weight:600;font-size:14px}
+  .lib-ex .s{font-size:12px;color:var(--grey)}
+  .lib-ex .add{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:20px;color:var(--red);width:30px;text-align:center;flex:0 0 auto}
+  .lib-card{margin:8px 0}
+  .lib-card .lib-ex{margin:0}
+  .lib-card.added .lib-ex{border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom:none}
+  .lib-tune{display:flex;gap:10px;background:#faf9f6;border:1.5px solid var(--ink);border-top:none;border-radius:0 0 10px 10px;padding:10px 12px}
+  .tune-box{display:flex;align-items:center;gap:6px;flex:1}
+  .tune-lab{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);flex:1}
+  .tune-btn{width:30px;height:30px;border:1.5px solid var(--line);background:#fff;border-radius:8px;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:18px;color:var(--ink);cursor:pointer;line-height:1;flex:0 0 auto}
+  .tune-btn:active{background:var(--red);color:#fff;border-color:var(--red)}
+  .tune-val{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:17px;min-width:32px;text-align:center}
+  .basket{position:sticky;bottom:64px;margin-top:14px}
+
+  .h-card{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin-bottom:10px;overflow:hidden}
+  .h-head{display:flex;align-items:center;gap:12px;padding:13px 15px;cursor:pointer}
+  .h-date{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:15px;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:6px 9px;text-align:center;line-height:1.05;min-width:52px}
+  .h-date span{display:block;font-size:10px;font-weight:600;color:var(--grey);text-transform:uppercase}
+  .h-title{font-weight:600;font-size:14.5px}
+  .h-sub{font-size:12px;color:var(--grey)}
+  .h-del{margin-left:auto;background:none;border:none;color:var(--grey);font-size:17px;cursor:pointer;padding:6px}
+  .h-body{display:none;border-top:1px dashed var(--line);padding:11px 15px;font-size:13px}
+  .h-card.open .h-body{display:block}
+  .h-line{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #f1eee9}
+  .h-line:last-child{border-bottom:none}
+  .h-line .c{font-weight:600}
+  .h-card.act .h-date{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .h-card.act .h-date span{color:#b8b4ac}
+  .h-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:#f0d9b5;color:#8a5a00;border-radius:5px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+  .empty{text-align:center;color:var(--grey);padding:34px 10px;font-size:14px}
+
+  /* Formulaire activité */
+  .actform{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px;margin:0 0 14px;box-shadow:var(--shadow);display:none}
+  .actform.open{display:block}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 12px}
+  .chip{padding:8px 14px;border:1.5px solid var(--line);border-radius:99px;background:#fff;cursor:pointer;font-size:13.5px;font-weight:500}
+  .chip.sel{background:var(--ink);border-color:var(--ink);color:#fff}
+  .frow{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .frow>div{flex:1;min-width:120px}
+  .actform label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--grey);margin-bottom:4px}
+  .actform input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-family:"IBM Plex Sans";font-size:14px}
+  .actform input:focus{outline:2px solid var(--red);border-color:var(--red)}
+  .dur-row{display:flex;align-items:center;gap:6px}
+  .dur-row input{width:100%;min-width:0;text-align:center}
+  .dur-u{font-size:12px;color:var(--grey);font-weight:600;flex:0 0 auto;margin-right:4px}
+
+  .notes{margin:20px 0 0;background:#fff;border:1px solid var(--line);border-left:4px solid var(--red);border-radius:12px;padding:15px 17px;box-shadow:var(--shadow);font-size:13.5px}
+  .notes h3{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.05em;margin:0 0 8px;font-size:17px}
+  .notes ul{margin:0;padding-left:18px}
+  .notes li{margin:5px 0;color:var(--ink-2)}
+  .notes b{color:var(--ink)}
+
+  .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 20px;border-radius:10px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:all .25s ease;z-index:60;border-bottom:3px solid var(--red);white-space:nowrap}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  .prog{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 15px;margin:0 0 14px;box-shadow:var(--shadow)}
+  .prog select{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;font-family:"IBM Plex Sans";font-size:14px;font-weight:600;background:#fff;margin-bottom:10px}
+  .prog canvas{width:100%;height:180px;display:block}
+  .prog .pstats{display:flex;gap:18px;margin-top:8px;font-family:"Barlow Condensed",sans-serif}
+  .prog .pstats b{display:block;font-size:22px;line-height:1}
+  .prog .pstats span{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
+  .rpe-block{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin:14px 0 0;box-shadow:var(--shadow)}
+  .rpe-block .lab{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin-bottom:8px}
+  .sess-clock{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:26px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:5px 11px;line-height:1;font-variant-numeric:tabular-nums;flex:0 0 auto}
+  .sess-clock.run{color:var(--red)}
+  .sprog{margin:0 0 12px}
+  .sprog-bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:5px}
+  .sprog-bar i{display:block;height:100%;width:0;background:var(--red);border-radius:99px;transition:width .3s ease}
+  .sprog-txt{display:flex;justify-content:space-between;font-size:12px;color:var(--grey);font-weight:500}
+  .sprog-txt #sprogEnd{color:var(--ink-2);font-weight:600}
+  .moods{display:flex;gap:8px}
+  .moods button{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:9px 0;font-size:24px;cursor:pointer;line-height:1;filter:grayscale(1) opacity(.55);transition:none}
+  .moods button.sel{border-color:var(--red);background:#fff5f5;filter:none}
+  .notefield{width:100%;min-height:58px;padding:10px;border:1px solid var(--line);border-radius:9px;font-family:"IBM Plex Sans";font-size:14px;resize:vertical}
+  .notefield:focus{outline:2px solid var(--red);border-color:var(--red)}
+  .volcard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 15px;margin:0 0 14px;box-shadow:var(--shadow)}
+  .volcard .lab{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin-bottom:8px}
+  .vstats{display:flex;gap:18px;margin-bottom:10px;font-family:"Barlow Condensed",sans-serif}
+  .vstats b{display:block;font-size:24px;line-height:1}
+  .vstats span{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
+  .volcard canvas{width:100%;height:90px;display:block}
+  .exhist{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+  .exhist .eh-line{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:13px;border-bottom:1px solid #f1eee9}
+  .exhist .eh-line:last-child{border-bottom:none}
+  .exhist .eh-date{color:var(--grey);font-size:12px}
+  .exhist .eh-charge{font-weight:600;font-family:"Barlow Condensed",sans-serif;font-size:16px}
+  .exhist .pr{color:var(--red-dark)}
+  .autosave{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2);margin-top:12px;justify-content:center}
+  .autosave input{width:17px;height:17px;accent-color:var(--red)}
+  .h-mood{font-size:15px;margin-left:4px}
+  .pain{display:flex;gap:6px}
+  .pain button{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:9px;padding:9px 0;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:17px;cursor:pointer;color:var(--ink-2);line-height:1}
+  .pain button.sel{color:#fff;border-color:transparent}
+  .pain button.sel[data-p="0"]{background:#1f9d55}
+  .pain button.sel[data-p="1"]{background:#7cb342}
+  .pain button.sel[data-p="2"]{background:#f5b301}
+  .pain button.sel[data-p="3"]{background:#f57c00}
+  .pain button.sel[data-p="4"]{background:#e8590c}
+  .pain button.sel[data-p="5"]{background:#c62828}
+  .tpl-item{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:8px}
+  .tpl-item .tn{font-weight:600;font-size:14px;flex:1}
+  .tpl-item .ts{font-size:12px;color:var(--grey)}
+  .tpl-item .tgo{background:var(--red);border:none;color:#fff;border-radius:8px;padding:8px 13px;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;cursor:pointer}
+  .tpl-item .tdel{background:none;border:none;color:var(--grey);font-size:16px;cursor:pointer;padding:4px}
+  .h-pain{font-size:11px;color:var(--grey)}
+
+  .view{display:none}
+  .view.active{display:block}
+
+  /* Chrono plein écran */
+  .chrono-btn{background:var(--red);border:none;color:#fff;border-radius:8px;padding:8px 13px;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:14px;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;margin-left:auto}
+  .ex.finisher .chrono-btn{background:#fff;color:var(--ink)}
+  .overlay{position:fixed;inset:0;background:var(--ink);color:#fff;z-index:100;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px;text-align:center}
+  .overlay.open{display:flex}
+  .ov-label{font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:20px;color:#b8b4ac}
+  .ov-time{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:clamp(120px,38vw,240px);line-height:1;color:#fff;font-variant-numeric:tabular-nums}
+  .ov-time.warn{color:var(--red)}
+  .ov-bar{width:min(80vw,420px);height:8px;background:#333;border-radius:99px;overflow:hidden}
+  .ov-bar i{display:block;height:100%;background:var(--red);width:100%;transition:width 1s linear}
+  .ov-close{margin-top:22px;background:#2a2a2a;border:1.5px solid #444;color:#fff;border-radius:10px;padding:13px 30px;font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:16px;cursor:pointer}
+  .ov-done{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:34px;color:var(--red);text-transform:uppercase;display:none}
+  .overlay.finished .ov-done{display:block}
+  .ov-restart{display:none;background:var(--red);border:none;color:#fff;border-radius:12px;padding:15px 40px;font-family:"Barlow Condensed",sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:19px;cursor:pointer;margin-top:6px}
+  .overlay.finished .ov-restart{display:block}
+  /* Player HIIT */
+  .h-phase{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:20px;letter-spacing:.2em;text-transform:uppercase;color:var(--red)}
+  #hiitOverlay.rest .h-phase{color:#4caf50}
+  #hiitOverlay.rest .ov-time{color:#4caf50}
+  .h-exname{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:clamp(28px,8vw,44px);text-transform:uppercase;line-height:1;text-align:center}
+  .h-tip{font-size:14px;color:#b8b4ac;max-width:34ch;text-align:center;min-height:38px}
+  .h-next{font-size:14px;color:#8a857d}
+  .h-next b{color:#fff}
+  .h-round{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:#8a857d}
+  .h-btns{display:flex;gap:10px;margin-top:14px}
+  #hiitOverlay.paused .h-phase{color:#f5b301}
+  .hiit-prev{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 6px;margin-top:8px;box-shadow:var(--shadow)}
+  .hp-title{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);padding:6px 10px 8px}
+  .hp-row{border-bottom:1px solid #f1eee9}
+  .hp-row:last-child{border-bottom:none}
+  .hp-head{display:flex;align-items:center;gap:10px;padding:10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .hp-num{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:14px;color:#fff;background:var(--red);width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .hp-name{font-weight:600;font-size:14px;flex:1}
+  .hp-arrow{color:var(--grey);font-size:13px}
+  .hp-body{display:none;padding:0 10px 12px 42px;font-size:13px;color:var(--ink-2);line-height:1.5}
+  .hp-row.open .hp-body{display:block}
+  .hp-add{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:17px;color:#fff;background:var(--grey);width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;cursor:pointer}
+  .hp-row.inbasket .hp-add{background:var(--red)}
+  .hp-row.inbasket .hp-name{color:var(--red-dark);font-weight:700}
+  .hc-chip{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:6px;cursor:pointer}
+  .hc-chip.sel{border-color:var(--red);background:#fff5f5}
+  .hc-chip .hc-name{flex:1;font-weight:600;font-size:14px}
+  .hc-chip .hc-count{color:var(--grey);font-weight:400;font-size:12px}
+  .hc-chip .hc-del{background:none;border:none;color:var(--grey);font-size:15px;cursor:pointer;padding:2px 4px}
+  .overlay.finished .ov-time{display:none}
+  .ov-hint{font-size:12px;color:#8a857d}
+  .ov-adjust{display:none;align-items:center;gap:16px}
+  .overlay.ready .ov-adjust{display:flex}
+  .ov-adjust button{background:#2a2a2a;border:1.5px solid #444;color:#fff;border-radius:10px;width:64px;height:48px;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:18px;cursor:pointer}
+  .ov-start{display:none;background:var(--red);border:none;color:#fff;border-radius:12px;padding:16px 46px;font-family:"Barlow Condensed",sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:20px;cursor:pointer}
+  .overlay.ready .ov-start{display:block}
+  .overlay.ready .ov-bar{visibility:hidden}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap head-inner">
+    <div>
+      <p class="kicker">Renforcement · Home Gym</p>
+      <h1>Mon Programme</h1>
+    </div>
+    <div class="streak"><b id="totalCount">0</b><span>séances muscu</span></div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ VUE SEMAINE ============ -->
+  <div class="view active" id="view-plan">
+    <h2>Séances cette semaine</h2>
+    <div class="weekrecap" id="weekRecap"></div>
+    <div class="freq" id="freqSel">
+      <button data-f="1"><span>1 / sem</span>Full-body</button>
+      <button data-f="2"><span>2 / sem</span>FB 1 · FB 2</button>
+      <button data-f="3"><span>3 / sem</span>A · B · C</button>
+      <button data-f="4"><span>4 / sem</span>A·B·C·Dos</button>
+      <button data-f="5"><span>5 / sem</span>+ Bras</button>
+    </div>
+    <p class="muted" id="freqHint"></p>
+    <div class="lab" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin:14px 0 6px">⏱ Temps dispo ce soir</div>
+    <div class="freq" id="durSel">
+      <button data-d="20"><span>express</span>20 min</button>
+      <button data-d="30"><span>court</span>30 min</button>
+      <button data-d="35"><span>·</span>35 min</button>
+      <button data-d="40"><span>·</span>40 min</button>
+      <button data-d="45"><span>complet</span>45 min</button>
+    </div>
+    <p class="muted" id="durHint" style="margin-top:6px"></p>
+    <div class="lab" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin:14px 0 6px">🔥 Style du soir</div>
+    <div class="freq" id="modeSel">
+      <button data-m="force"><span>repos longs</span>Force</button>
+      <button data-m="equilibre"><span>standard</span>Équilibré</button>
+      <button data-m="cardio"><span>repos courts</span>Cardio / sueur</button>
+    </div>
+    <p class="muted" id="modeHint" style="margin-top:6px"></p>
+    <button class="btn ghost block" id="redoBtn" style="display:none;margin:12px 0"></button>
+    <div class="suggbox" id="suggBox" style="display:none"></div>
+    <div id="planCards"></div>
+
+    <div class="notes">
+      <h3>Règles du jeu</h3>
+      <ul>
+        <li><b>Format :</b> 5 × 12 sur les exercices de force. Quand les 5 × 12 passent proprement, monte le poids.</li>
+        <li><b>Circuit :</b> active le mode circuit en séance — 1 série de chaque exo à la suite = 1 tour, repos chronométré entre les tours, 5 tours au total.</li>
+        <li><b>Équilibre :</b> chaque séance travaille le haut ET le bas du corps.</li>
+        <li><b>Dos (imagerie 12/2025) :</b> programme adapté à ta discopathie lombaire — pas de soulevé de terre ni de rowing penché chargé, pas de sit-ups, squat en version goblet, charges axiales modérées, gainage type McGill à chaque séance. Fais valider l'ensemble par ton kiné.</li>
+        <li><b>Signal stop :</b> une douleur qui descend dans la fesse ou la jambe pendant un exercice = on arrête cet exercice immédiatement. Une courbature musculaire c'est normal ; une douleur qui irradie, non.</li>
+        <li><b>Récup :</b> 48h entre deux séances qui sollicitent les mêmes groupes.</li>
+        <li><b>Sécu :</b> butées du rack à hauteur de poitrine au couché, clips vérifiés avant chaque série.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ VUE SEANCE EN COURS ============ -->
+  <div class="view" id="view-session">
+    <div class="sess-head">
+      <div class="sess-letter" id="sLetter">A</div>
+      <div style="flex:1">
+        <h3 class="sess-title" id="sTitle"></h3>
+        <p class="sess-sub" id="sSub"></p>
+      </div>
+      <div class="sess-clock" id="sessClock">0:00</div>
+    </div>
+
+    <div class="sprog" id="sprogWrap">
+      <div class="sprog-bar"><i id="sprogBar"></i></div>
+      <div class="sprog-txt"><span id="sprogSets">0 / 0 séries</span><span id="sprogEnd"></span></div>
+    </div>
+
+    <div class="circuit">
+      <div class="circ-top">
+        <div class="circ-label">Repos entre séries<small>1 tour = 1 série de chaque exo · 5 tours</small></div>
+        <div class="rest-opts" id="restOpts">
+          <button data-r="60">60s</button>
+          <button data-r="90" class="sel">90s</button>
+          <button data-r="120">2min</button>
+        </div>
+      </div>
+      <div class="timer-row">
+        <div class="timer-display" id="timerDisplay">1:30</div>
+        <button class="btn-timer" id="timerBtn">▶ Lancer le repos</button>
+      </div>
+      <label class="autorest"><input type="checkbox" id="autoRest" checked> Lancer le repos automatiquement quand je coche une série</label>
+    </div>
+
+    <div id="sExercises"></div>
+    <div class="rpe-block">
+      <div class="lab">🩹 Mal de dos avant la séance <span style="text-transform:none;letter-spacing:0;color:var(--grey)">(0 = rien)</span></div>
+      <div class="pain" id="painBefore"></div>
+      <div class="lab" style="margin-top:14px">🩹 Mal de dos après la séance</div>
+      <div class="pain" id="painAfter"></div>
+      <div class="lab" style="margin-top:14px">Ressenti de la séance</div>
+      <div class="chips" id="rpeChips" style="margin:0"></div>
+      <div class="lab" style="margin-top:14px">Humeur du jour</div>
+      <div class="moods" id="moodRow"></div>
+      <div class="lab" style="margin-top:14px">Note libre</div>
+      <textarea id="sessNote" class="notefield" placeholder="Ex : dos un peu raide au début, mieux à la fin…"></textarea>
+    </div>
+    <div class="row-btns">
+      <button class="btn ghost" id="backBtn">Annuler</button>
+      <button class="btn red" id="finishBtn">Enregistrer la séance ✓</button>
+    </div>
+    <p class="muted" style="text-align:center;margin:-4px 0 0">Tu peux t'arrêter quand tu veux : seules les séries cochées sont enregistrées.</p>
+  </div>
+
+  <!-- ============ VUE LIBRE ============ -->
+  <div class="view" id="view-libre">
+    <h2>Composer ma séance</h2>
+    <p class="muted">Choisis tes groupes, coche les exercices que tu veux, lance ta séance (en circuit si tu veux) ou enregistre-la comme modèle réutilisable.</p>
+    <div id="tplWrap" style="display:none">
+      <div class="lab" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin:0 0 8px">Mes modèles</div>
+      <div id="tplList"></div>
+    </div>
+    <div class="groups" id="groupBtns"></div>
+    <div id="libList"></div>
+    <div class="basket" id="basketWrap" style="display:none">
+      <div class="frow" style="display:flex;gap:8px;margin-bottom:8px">
+        <input type="text" id="tplName" placeholder="Nom du modèle (optionnel)" style="flex:1;padding:11px;border:1px solid var(--line);border-radius:9px;font-family:'IBM Plex Sans';font-size:14px">
+        <button class="btn ghost" id="saveTpl" style="white-space:nowrap">💾 Modèle</button>
+      </div>
+      <button class="btn red block" id="startLibre">Lancer la séance (<span id="basketCount">0</span> exos + planche 50s)</button>
+    </div>
+  </div>
+
+  <!-- ============ VUE DOS ============ -->
+  <div class="view" id="view-dos">
+    <h2>Dos solide</h2>
+    <p class="muted">Vu ton imagerie (discopathie étagée L4-L5/L5-S1, pincement C5-C6), cette routine type McGill est ta base : elle renforce le corset lombaire sans charger les disques. Idéale quotidiennement, même les jours off. Montre-la à ton kiné pour la personnaliser — et si une douleur irradie dans la jambe, on suspend l'exercice et on consulte.</p>
+    <button class="btn red block" id="startDos" style="margin:6px 0 14px">Lancer la routine Dos express</button>
+    <div class="prog" id="painWrap" style="display:none;margin-bottom:14px">
+      <div class="lab" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin-bottom:8px">🩹 Évolution de ton mal de dos</div>
+      <canvas id="painCanvas"></canvas>
+      <div class="pstats">
+        <div><b id="painAvgB">—</b><span>moy. avant</span></div>
+        <div><b id="painAvgA">—</b><span>moy. après</span></div>
+        <div><b id="painTrend">—</b><span>tendance</span></div>
+      </div>
+      <div class="muted" style="text-align:center;font-size:11px;margin-top:4px">Note ton dos avant/après chaque séance pour nourrir cette courbe · précieux à montrer au kiné</div>
+    </div>
+    <div class="notes">
+      <h3>Pourquoi ces exercices</h3>
+      <ul>
+        <li><b>Bird-dog & Superman :</b> renforcent les érecteurs du rachis sans charge sur les disques.</li>
+        <li><b>Gainage latéral :</b> le carré des lombes, muscle clé anti-mal de dos.</li>
+        <li><b>Hip thrust :</b> des fessiers forts soulagent directement les lombaires.</li>
+        <li><b>Chat-vache :</b> mobilité de la colonne, lentement, en respirant.</li>
+        <li>Dans tes séances, le <b>soulevé de terre</b> et le <b>rowing</b> construisent aussi ce dos — technique avant charge.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ VUE HIIT ============ -->
+  <div class="view" id="view-hiit">
+    <h2>HIIT 7 minutes</h2>
+    <p class="muted">Circuit poids de corps auto-enchaîné : 12 exercices × 30s d'effort + 10s de transition ≈ 7 min par tour. <b>Adapté à ton pied droit et ton dos</b> : appuis talons, pompes sur genoux, et pour les fentes et jumping jacks chaque fiche indique l'adaptation hallux (cou-de-pied, step jacks). Pas de squats sautés : trop de compression pour tes disques.</p>
+
+    <div class="lab" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin:14px 0 6px">Circuit</div>
+    <div class="freq" id="hiitCircSel">
+      <button data-c="0"><span>complet</span>Full-body</button>
+      <button data-c="1"><span>transpirer</span>Cardio & gainage</button>
+    </div>
+    <div id="hiitCustomList" style="margin-top:8px"></div>
+    <button class="btn ghost block" id="hiitBuildBtn" style="margin-top:8px">➕ Composer mon circuit</button>
+
+    <div id="hiitBuilder" style="display:none;margin-top:10px">
+      <div class="frow" style="display:flex;gap:8px;margin:8px 0">
+        <input type="text" id="hiitTplName" placeholder="Nom du circuit (ex : Mon 7 min pecs)" style="flex:1;padding:11px;border:1px solid var(--line);border-radius:9px;font-family:'IBM Plex Sans';font-size:14px">
+      </div>
+      <div id="hiitLibList"></div>
+      <div class="row-btns" style="margin:10px 0 0">
+        <button class="btn ghost" id="hiitBuildCancel">Annuler</button>
+        <button class="btn" id="hiitBuildSave">💾 Sauvegarder (<span id="hiitBuildCount">0</span>)</button>
+      </div>
+    </div>
+
+    <div class="lab" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin:14px 0 6px">Tours</div>
+    <div class="freq" id="hiitToursSel">
+      <button data-t="1"><span>~7 min</span>1 tour</button>
+      <button data-t="2"><span>~15 min</span>2 tours</button>
+      <button data-t="3"><span>~23 min</span>3 tours</button>
+    </div>
+
+    <button class="btn red block" id="startHiit" style="margin:14px 0">⚡ Lancer le HIIT</button>
+
+    <div id="hiitPreview"></div>
+
+    <div class="notes">
+      <h3>Sécurité pied & dos</h3>
+      <ul>
+        <li><b>Pied droit :</b> tout se fait talons ancrés ou sur genoux — jamais en appui sur le gros orteil. Si le pied proteste quand même sur un exo, marche sur place pendant les 30s à la place.</li>
+        <li><b>Dos :</b> aucun crunch, aucune torsion chargée. Le dead bug et la planche remplacent tout ça.</li>
+        <li><b>Intensité :</b> le HIIT c'est TON rythme max du jour — un jour de forme tu accélères, un jour de chaleur tu ralentis. L'important c'est de bouger 30s.</li>
+        <li><b>Signal stop :</b> douleur au pied opéré ou irradiation dans la jambe = on s'arrête, pas de héros.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ VUE HISTORIQUE ============ -->
+  <div class="view" id="view-histo">
+    <h2>Historique</h2>
+    <p class="muted" id="histoStats"></p>
+    <button class="btn ghost block" id="addActBtn" style="margin-bottom:12px">+ Ajouter une autre activité</button>
+
+    <div class="actform" id="actForm">
+      <label>Activité</label>
+      <div class="chips" id="actChips"></div>
+      <div class="frow">
+        <div><label>Nom (si autre)</label><input type="text" id="actName" placeholder="Ex : padel, marche…"></div>
+      </div>
+      <div class="frow">
+        <div><label>Date</label><input type="date" id="actDate"></div>
+      </div>
+      <div class="frow">
+        <div><label>Durée</label>
+          <div class="dur-row">
+            <input type="text" inputmode="numeric" id="actH" placeholder="0"><span class="dur-u">h</span>
+            <input type="text" inputmode="numeric" id="actMin" placeholder="45"><span class="dur-u">min</span>
+            <input type="text" inputmode="numeric" id="actS" placeholder="0"><span class="dur-u">s</span>
+          </div>
+        </div>
+      </div>
+      <div class="frow" id="actDistRow">
+        <div><label>Distance (km)</label><input type="text" inputmode="decimal" id="actDist" placeholder="Ex : 5.2"></div>
+        <div id="actDplusCol"><label>Dénivelé D+ (m)</label><input type="text" inputmode="numeric" id="actDplus" placeholder="Ex : 350"></div>
+      </div>
+      <div class="frow">
+        <div><label>Note (optionnel)</label><input type="text" id="actNote" placeholder="Ex : match gagné 6-4…"></div>
+      </div>
+      <div class="row-btns" style="margin:4px 0 0">
+        <button class="btn ghost" id="actCancel">Annuler</button>
+        <button class="btn red" id="actSave">Enregistrer</button>
+      </div>
+    </div>
+
+    <div class="volcard" id="weightCard">
+      <div class="lab">⚖️ Poids de corps</div>
+      <div class="frow" style="display:flex;gap:8px;align-items:flex-end;margin-bottom:4px">
+        <div style="flex:1"><input type="text" inputmode="decimal" id="weightInput" placeholder="Ex : 80" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;font-family:'IBM Plex Sans';font-size:15px;font-weight:600;text-align:center"></div>
+        <button class="btn" id="weightSave" style="white-space:nowrap">+ Noter</button>
+      </div>
+      <div class="vstats" id="weightStats" style="display:none">
+        <div><b id="wLast">—</b><span>actuel</span></div>
+        <div><b id="wStart">—</b><span>1er relevé</span></div>
+        <div><b id="wDelta">—</b><span>évolution</span></div>
+      </div>
+      <canvas id="weightCanvas" style="display:none"></canvas>
+      <div class="muted" id="weightEmpty" style="font-size:12px;text-align:center;margin-top:2px">Note ton poids de temps en temps (1×/semaine suffit) pour suivre l'évolution.</div>
+    </div>
+
+    <div class="volcard" id="volCard" style="display:none">
+      <div class="lab">Volume cette semaine</div>
+      <div class="vstats">
+        <div><b id="vSeries">0</b><span>séries</span></div>
+        <div><b id="vTonnage">0</b><span>kg soulevés</span></div>
+        <div><b id="vSess">0</b><span>séances</span></div>
+      </div>
+      <canvas id="volCanvas"></canvas>
+      <div class="muted" style="text-align:center;margin-top:4px;font-size:11px">8 dernières semaines · séries de force</div>
+    </div>
+
+    <div class="prog" id="progWrap" style="display:none">
+      <select id="progSel"></select>
+      <canvas id="progCanvas"></canvas>
+      <div class="pstats">
+        <div><b id="pFirst">—</b><span>départ</span></div>
+        <div><b id="pLast">—</b><span>dernier</span></div>
+        <div><b id="pGain">—</b><span>évolution</span></div>
+        <div><b id="pPr">—</b><span>record 🏆</span></div>
+      </div>
+      <div class="exhist" id="exHist"></div>
+    </div>
+
+    <div class="backupwarn" id="backupWarn" style="display:none"></div>
+    <div id="histoList"></div>
+
+    <div class="row-btns">
+      <button class="btn ghost" id="expBtn">⬇ Exporter</button>
+      <button class="btn ghost" id="impBtn">⬆ Importer</button>
+    </div>
+    <label class="autosave"><input type="checkbox" id="autoSave"> Télécharger une sauvegarde datée après chaque séance</label>
+    <input type="file" id="impFile" accept=".json,application/json" style="display:none">
+
+    <div class="srvbox">
+      <div class="lab">☁️ Sauvegarde automatique sur serveur</div>
+      <p class="muted" id="srvState">Non configurée</p>
+      <button class="btn ghost block" id="srvConfig">🔑 Saisir le token de sauvegarde</button>
+      <p class="muted" style="font-size:11.5px;margin-top:8px">Une fois le token saisi, l'app envoie ta sauvegarde au serveur à la fin de chaque séance. À configurer depuis l'app installée sur l'écran d'accueil (son stockage est séparé de celui du navigateur).</p>
+    </div>
+  </div>
+
+</div>
+
+<nav>
+  <button data-view="plan" class="active">Semaine</button>
+  <button data-view="libre">Libre</button>
+  <button data-view="dos">Dos</button>
+  <button data-view="hiit">HIIT</button>
+  <button data-view="histo">Historique</button>
+</nav>
+
+<div class="overlay" id="hiitOverlay">
+  <div class="ov-label" id="hLabel">HIIT</div>
+  <div class="h-phase" id="hPhase">EFFORT</div>
+  <div class="h-exname" id="hExName">Squat</div>
+  <div class="ov-time" id="hTime">0:30</div>
+  <div class="h-tip" id="hTip"></div>
+  <div class="ov-bar"><i id="hBar"></i></div>
+  <div class="h-next" id="hNext"></div>
+  <div class="h-round" id="hRound"></div>
+  <div class="h-btns">
+    <button class="ov-close" id="hPause">⏸ Pause</button>
+    <button class="ov-close" id="hQuit">✕ Quitter</button>
+  </div>
+</div>
+
+<div class="overlay" id="chronoOverlay">
+  <div class="ov-label" id="ovLabel">Planche</div>
+  <div class="ov-time" id="ovTime">0:50</div>
+  <div class="ov-done">Terminé 💪</div>
+  <div class="ov-adjust">
+    <button id="ovMinus">−10s</button>
+    <button id="ovPlus">+10s</button>
+  </div>
+  <button class="ov-start" id="ovStart">Démarrer</button>
+  <button class="ov-restart" id="ovRestart">↻ Série suivante</button>
+  <div class="ov-bar"><i id="ovBar"></i></div>
+  <p class="ov-hint" id="ovHint">L'écran reste allumé pendant le chrono</p>
+  <button class="ov-close" id="ovClose">Fermer</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+var KEY="monProgMuscu_v3";
+var OLDKEY="monProgMuscu_v2";
+var state={freq:3,rest:90,dur:40,mode:"equilibre",autoRest:true,history:[],lastCharges:{},chronoDur:{},autoSave:false,lastSession:null,templates:[],hiitCustom:[],weights:[],lastExport:null};
+var canSave=true;
+try{
+  var raw=localStorage.getItem(KEY);
+  if(!raw){
+    var old=localStorage.getItem(OLDKEY);
+    if(old){raw=old;}
+  }
+  if(raw){
+    var p=JSON.parse(raw);
+    if(p&&typeof p==="object"){
+      state.freq=p.freq||3;
+      state.rest=p.rest||90;
+      state.dur=p.dur||40;
+      state.autoRest=p.autoRest!==false;
+      state.mode=p.mode||"equilibre";
+      state.history=Array.isArray(p.history)?p.history:[];
+      state.lastCharges=p.lastCharges||{};
+      state.chronoDur=p.chronoDur||{};
+      state.autoSave=!!p.autoSave;
+      state.lastSession=p.lastSession||null;
+      state.templates=Array.isArray(p.templates)?p.templates:[];
+      state.hiitCustom=Array.isArray(p.hiitCustom)?p.hiitCustom:[];
+      state.weights=Array.isArray(p.weights)?p.weights:[];
+      state.lastExport=p.lastExport||null;
+    }
+  }
+}catch(e){canSave=false;}
+function save(){if(!canSave)return;try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){canSave=false;}}
+
+/* ---------- Data ---------- */
+var S513="5 × 12";
+var PLANCHE={k:"planche",n:"Gainage — planche",s:"5 × 50 s",v:"Finisher · dos plat, fessiers serrés · règle le nb de séries si besoin",sets:5,fin:true,noCharge:true,chrono:50,g:"Avant-bras au sol sous les épaules, corps aligné tête-talons. Serre abdos + fessiers, ne bloque pas la respiration. Si les hanches tombent avant la fin, arrête : mieux vaut 40s propres que 50s cassées."};
+
+var DOS_LIB=[
+  {k:"curlup",n:"Curl-up McGill",s:"3 × 8 × 10s",v:"Le « crunch » spécial dos fragile · les lombaires ne bougent jamais",sets:3,noCharge:true,dos:true,g:"Allongé, une jambe pliée, une tendue, mains glissées sous le creux lombaire. Décolle seulement tête et épaules de quelques centimètres, tiens 8-10s en respirant, repose. Le bas du dos reste plaqué sur tes mains tout du long. Change de jambe à mi-série."},
+  {k:"birddog",n:"Bird-dog",s:"3 × 10 / côté",v:"À 4 pattes, bras + jambe opposés tendus, 2s de pause",sets:3,noCharge:true,dos:true,g:"À quatre pattes, dos neutre. Tends bras droit + jambe gauche à l horizontale, 2s de pause SANS bouger le bassin, reviens, alterne. Imagine un verre d eau posé sur tes lombaires."},
+  {k:"superman",n:"Superman",s:"3 × 12",v:"Allongé ventre, décolle bras et jambes en contrôle",sets:3,noCharge:true,dos:true,g:"Allongé sur le ventre, bras devant. Décolle simultanément bras et jambes de quelques centimètres, pause 2s, repose. Petit mouvement contrôlé, pas d à-coups."},
+  {k:"glat",n:"Gainage latéral",s:"2 × 30 s / côté",v:"Carré des lombes · corps aligné, hanche haute",sets:2,noCharge:true,dos:true,chrono:30,g:"Sur le côté, appui avant-bras, pieds empilés, hanches hautes et corps aligné tête-pieds. Cible le carré des lombes. Version facile : genou du bas au sol."},
+  {k:"hipthrustd",n:"Hip thrust",s:"3 × 12",v:"Dos sur banc plat, barre ou haltère sur les hanches",sets:3,dos:true,g:"Version prévention : dos sur le banc, charge légère ou poids du corps, monte les hanches en serrant les fessiers 2s en haut. Qualité de contraction avant la charge."},
+  {k:"chatvache",n:"Chat-vache (mobilité)",s:"2 × 10 lent",v:"Arrondis puis creuse le dos en respirant, sans forcer",sets:2,noCharge:true,dos:true,g:"À quatre pattes. Inspire en creusant le dos tête haute (vache), expire en arrondissant tête rentrée (chat). Lent, fluide, sans forcer en fin d amplitude. C est de la mobilité, pas du renfo."}
+];
+
+var LIB={
+ "Pectoraux":[
+  {k:"dc",n:"Développé couché",s:S513,v:"Barre olympique · Haltères : + d'amplitude",sets:5,g:"Allongé, pieds ancrés au sol, omoplates serrées, léger cambré naturel. Descends la barre en contrôle jusqu au milieu des pecs, remonte en soufflant. Erreur classique : rebondir sur la poitrine."},
+  {k:"dincl",n:"Développé incliné haltères",s:S513,v:"Banc calé incliné",sets:5,g:"Banc incliné ~30-45°. Haltères au niveau des épaules, pousse vers le haut en rapprochant légèrement les haltères au sommet. Descends jusqu à sentir l étirement des pecs. Ne claque pas les haltères en haut."},
+  {k:"ecarte",n:"Écarté couché",s:S513,v:"Haltères · isolation, coudes souples",sets:5,g:"Allongé, haltères au-dessus de la poitrine, coudes légèrement fléchis et FIXES. Ouvre les bras en arc de cercle jusqu à l étirement, referme comme pour enlacer un arbre. Léger, c est un exo d étirement-contraction."},
+  {k:"pompes",n:"Pompes lestées",s:"5 × max",v:"Disque sur le dos si besoin",sets:5,noCharge:true,g:"Mains largeur épaules +, corps gainé en planche. Descends poitrine près du sol, coudes à ~45° du buste. Erreur : hanches qui tombent ou fesses en l air."}],
+ "Dos":[
+  {k:"tractions",n:"Tractions pronation",s:"5 × max",v:"Paumes vers l'avant · dos · leste ou aide-toi selon ton niveau",sets:5,g:"Prise pronation (paumes vers l avant) un peu plus large que les épaules. Pars bras tendus, tire les coudes vers le bas jusqu au menton au-dessus de la barre, redescends en contrôle. C est la plus dure : si tu n en fais pas encore, utilise un élastique passé sous les pieds pour t alléger, ou fais des négatives (saute en haut, descends le plus lentement possible en 5s). Progresse vers la version lestée."},
+  {k:"chinups",n:"Tractions supination (chin-ups)",s:"5 × max",v:"Paumes vers toi · plus facile · dos + biceps",sets:5,g:"Prise supination (paumes vers TOI), mains largeur épaules. Tire jusqu à passer le menton au-dessus de la barre, redescends en contrôle complet. Les biceps aident beaucoup : c est ta meilleure option quand la pronation est trop dure. Garde les épaules basses et le buste gainé, sans donner d élan de jambes. Vu tes cervicales, ne force pas la tête vers la barre : c est la poitrine qui monte."},
+  {k:"rowbar",n:"Rowing barre",s:S513,v:"⚠ Préfère le rowing 1 bras appuyé au banc · position penchée chargée déconseillée pour ton dos",sets:5,g:"Buste penché ~45°, dos plat, genoux fléchis. Tire la barre vers le nombril en serrant les omoplates, redescends lentement. Erreur : arrondir le dos ou tricher avec les jambes."},
+  {k:"row1",n:"Rowing 1 bras",s:"5 × 12 / côté",v:"Haltère, appui sur banc · corrige les asymétries",sets:5,g:"Un genou et une main sur le banc, dos plat parallèle au sol. Tire l haltère vers la hanche, coude le long du corps, pause 1s en haut. Ne tourne pas le buste."},
+  {k:"sdt",n:"Soulevé de terre",s:S513,v:"⚠ En pause tant que ton kiné ne l a pas validé · si feu vert un jour : léger, dos neutre absolu",sets:5,g:"Pieds sous la barre, dos plat, poitrine sortie. Pousse le sol avec les jambes, la barre glisse le long des tibias, termine debout hanches verrouillées. JAMAIS le dos rond. En 5×12 : charge modérée, technique irréprochable jusqu à la dernière rep."}],
+ "Épaules":[
+  {k:"dm",n:"Développé haltères assis",s:S513,v:"Assis sur le banc, buste vertical et gainé · charge modérée",sets:5,g:"Assis sur le banc plat, pieds bien ancrés, buste vertical, abdos serrés. Pousse les haltères au-dessus de la tête SANS cambrer les lombaires, redescends aux épaules. Si le bas du dos se cambre, la charge est trop lourde."},
+  {k:"elevlat",n:"Élévations latérales",s:S513,v:"Haltères légers, mouvement propre",sets:5,g:"Debout, haltères le long du corps, coudes très légèrement fléchis. Monte les bras sur les côtés jusqu à l horizontale, comme si tu versais une carafe. Léger et propre, sans élan du buste."},
+  {k:"oiseau",n:"Oiseau (arrière d'épaule)",s:S513,v:"Assis, buste posé sur les cuisses (dos soutenu) · très léger",sets:5,g:"Assis en bout de banc, penche le buste jusqu à le poser sur les cuisses : le dos est ainsi soutenu. Haltères sous les mollets, ouvre les bras sur les côtés en serrant les omoplates. Très léger : ce muscle est petit."},
+  {k:"shrugs",n:"Shrugs",s:S513,v:"Léger · vu tes cervicales (C5-C6) : pas de charges lourdes, mouvement vertical strict",sets:5,g:"Debout, charges dans les mains, bras tendus. Hausse les épaules vers les oreilles, pause 1s, redescends. Pas de rotation des épaules, juste haut-bas."}],
+ "Biceps":[
+  {k:"curlez",n:"Curl pupitre barre EZ",s:S513,v:"Banc Larry Scott",sets:5,g:"Bras posés sur le pupitre, aisselles calées en haut du support. Fléchis jusqu en haut, redescends LENTEMENT sans tendre complètement les coudes en bas. La descente lente fait tout le boulot."},
+  {k:"curlalt",n:"Curl haltères alterné",s:S513,v:"Debout, sans balancier",sets:5,g:"Debout, un bras après l autre. Coude collé au flanc, monte l haltère en tournant la paume vers toi. Erreur : balancer le buste ou avancer le coude."},
+  {k:"marteau",n:"Curl marteau",s:S513,v:"Prise neutre · avant-bras + brachial",sets:5,g:"Comme le curl classique mais paumes face à face (prise marteau) tout du long. Coudes fixes contre le corps."}],
+ "Triceps":[
+  {k:"extez",n:"Extensions barre EZ",s:S513,v:"Couché uniquement · pas de version debout derrière la nuque",sets:5,g:"Allongé, barre EZ au-dessus du front, coudes fixes pointés au plafond. Seuls les avant-bras bougent : descends vers le front, remonte. Coudes qui s écartent = triche."},
+  {k:"ext1",n:"Extension 1 bras",s:"5 × 12 / côté",v:"Assis, buste gainé · haltère au-dessus de la tête",sets:5,g:"Assis ou debout, haltère tenu à une main derrière la tête, coude au ciel. Tends le bras vers le haut, redescends derrière la nuque en contrôle. Garde le coude près de la tête."},
+  {k:"dips",n:"Dips entre supports",s:"5 × max",v:"Ou banc, pieds surélevés",sets:5,noCharge:true,g:"Mains sur deux supports stables, corps entre les deux. Descends jusqu à ~90° de flexion des coudes, buste légèrement penché en avant, remonte. Ne descends pas plus bas si les épaules tirent."}],
+ "Jambes":[
+  {k:"gobelet",n:"Goblet squat",s:S513,v:"Haltère contre la poitrine · ta version squat par défaut, dos-friendly",sets:5,g:"Haltère tenu verticalement contre la poitrine, coudes sous le poids. Descends entre tes jambes, buste le plus droit possible, talons au sol. La charge devant t oblige à rester gainé : version la plus sûre pour ton dos."},
+  {k:"squat",n:"Squat barre",s:S513,v:"⚠ Charge modérée uniquement · le goblet squat est ta version par défaut",sets:5,g:"Barre sur les trapèzes (pas la nuque), pieds largeur épaules, pointes légèrement ouvertes. Descends comme pour t asseoir, genoux dans l axe des pieds, cuisses au moins parallèles. Pousse dans les talons, dos gainé."},
+  {k:"bulg",n:"Fentes bulgares",s:"5 × 12 / jambe",v:"Pied arrière sur banc, haltères en main",sets:5,g:"Pied arrière posé sur le banc, pied avant bien devant. Descends verticalement, genou avant au-dessus de la cheville. Le buste reste droit. Brûlure garantie, c est normal."},
+  {k:"fentesm",n:"Fentes marchées",s:"5 × 12 / jambe",v:"Haltères en main",sets:5,g:"Grand pas en avant, descends le genou arrière vers le sol, remonte en poussant sur le talon avant et enchaîne avec l autre jambe. Buste droit, regard loin devant."},
+  {k:"mollets",n:"Mollets debout",s:"5 × 15-20",v:"Haltères en main, sur une marche",sets:5,g:"Avant-pieds sur une marche, talons dans le vide. Monte le plus haut possible sur les pointes, pause 1s, descends sous le niveau de la marche pour étirer. Amplitude complète."}],
+ "Fessiers":[
+  {k:"hipthrust",n:"Hip thrust",s:S513,v:"Dos sur banc plat, barre sur les hanches",sets:5,g:"Haut du dos sur le banc plat, barre sur les hanches (mets une serviette), pieds à plat. Pousse les hanches vers le plafond jusqu à l alignement épaules-genoux, serre fort les fessiers 1s en haut. Menton rentré."},
+  {k:"pont1j",n:"Pont fessier 1 jambe",s:"3 × 10 / côté",v:"Fessiers puissants, zéro charge sur la colonne",sets:3,noCharge:true,g:"Allongé sur le dos, un pied au sol près des fesses, l autre jambe tendue. Monte les hanches en serrant la fesse d appui, aligne épaules-genou, 1s en haut, redescends. Zéro compression, gros bénéfice."},
+  {k:"sdtjt",n:"SDT jambes tendues",s:S513,v:"⚠ En pause · flexion lombaire chargée, à valider avec ton kiné avant de reprendre",sets:5,g:"Debout, jambes quasi tendues, barre ou haltères contre les cuisses. Pousse les fesses en ARRIÈRE, la charge descend le long des jambes, dos plat, jusqu à l étirement des ischios. Remonte avec les fessiers."}],
+ "Abdos":[
+  {k:"releves",n:"Relevés inclinés PA300",s:"5 × 12-15",v:"⚠ Préfère le curl-up McGill · la flexion lombaire répétée n est pas ton amie",sets:5,noCharge:true,g:"Sur le banc incliné PA300, pieds calés. Remonte le buste en enroulant les abdos, redescends en contrôle SANS te laisser tomber. Ne tire pas sur la nuque."},
+  {k:"planchex",n:"Planche",s:"3 × 50 s",v:"Version renforcée du finisher",sets:3,noCharge:true,chrono:50,g:"Comme le finisher mais en 3 séries : avant-bras au sol, corps aligné tête-talons, abdos et fessiers serrés, respiration continue. Si les hanches tombent, arrête la série."},
+  {k:"glatx",n:"Gainage latéral",s:"2 × 30 s / côté",v:"Obliques + carré des lombes",sets:2,noCharge:true,chrono:30,g:"Sur le côté, appui sur un avant-bras, pieds empilés. Hanches hautes, corps aligné. Si c est trop dur : genou du bas posé au sol."}],
+ "Dos santé":DOS_LIB
+};
+
+function ex(group,k,overrides){
+  var base=null;
+  LIB[group].forEach(function(e){if(e.k===k)base=e;});
+  var o=Object.assign({},base);
+  if(overrides)Object.assign(o,overrides);
+  return o;
+}
+
+var PLANS={
+ 1:{hint:"1 séance : un full-body complet, haut + bas, en 5 × 12. Parfait en mode circuit.",
+    sessions:[
+      {id:"F",letter:"F",title:"Full-body complet",sub:"Haut + bas · idéal en circuit",items:[
+        ex("Pectoraux","dc"),ex("Jambes","gobelet"),ex("Dos","row1"),ex("Épaules","dm"),
+        ex("Fessiers","hipthrust"),ex("Biceps","curlez"),ex("Triceps","extez"),
+        ex("Dos santé","birddog"),PLANCHE]}]},
+ 2:{hint:"2 séances full-body complémentaires : chacune travaille haut ET bas, avec des exos différents.",
+    sessions:[
+      {id:"FB1",letter:"1",title:"Full-body 1",sub:"Poussée + jambes avant · haut & bas",items:[
+        ex("Pectoraux","dc"),ex("Jambes","gobelet"),ex("Épaules","dm"),ex("Jambes","bulg"),
+        ex("Triceps","extez"),ex("Épaules","elevlat"),
+        ex("Dos santé","glat"),PLANCHE]},
+      {id:"FB2",letter:"2",title:"Full-body 2",sub:"Tirage + chaîne postérieure · haut & bas",items:[
+        ex("Dos","chinups"),ex("Dos","row1"),ex("Fessiers","pont1j"),ex("Fessiers","hipthrust"),
+        ex("Biceps","curlez"),ex("Jambes","mollets"),
+        ex("Dos santé","superman"),PLANCHE]}]},
+ 3:{hint:"3 séances A/B/C — chaque séance mêle haut et bas du corps, tout en 5 × 12.",
+    sessions:[
+      {id:"A",letter:"A",title:"Poussée + jambes",sub:"Pecs · épaules · triceps · quadris",items:[
+        ex("Pectoraux","dc"),ex("Jambes","gobelet"),ex("Épaules","dm"),
+        ex("Jambes","bulg"),ex("Triceps","extez"),ex("Épaules","elevlat"),
+        ex("Dos santé","birddog"),PLANCHE]},
+      {id:"Bs",letter:"B",title:"Tirage + postérieur",sub:"Dos · biceps · ischios · fessiers",items:[
+        ex("Dos","chinups"),ex("Dos","row1"),ex("Épaules","oiseau"),
+        ex("Fessiers","hipthrust"),ex("Biceps","curlez"),ex("Biceps","marteau"),
+        ex("Dos santé","glat"),PLANCHE]},
+      {id:"C",letter:"C",title:"Mixte / volume",sub:"Full-body · variantes haltères",items:[
+        ex("Pectoraux","dincl"),ex("Jambes","fentesm"),ex("Dos","row1"),
+        ex("Fessiers","pont1j"),ex("Triceps","ext1"),ex("Épaules","shrugs"),
+        ex("Dos santé","curlup"),ex("Dos santé","superman"),PLANCHE]}]},
+ 4:{hint:"4 séances : A/B/C + une séance dédiée dos & gainage, plus légère.",
+    sessions:[]},
+ 5:{hint:"5 séances : A/B/C + dos & gainage + une séance E bras & abdos légère. Grosse semaine — écoute ta récup.",
+    sessions:[]}
+};
+PLANS[4].sessions=PLANS[3].sessions.concat([
+  {id:"D",letter:"D",title:"Dos & gainage",sub:"Séance légère · prévention et posture",items:
+    DOS_LIB.map(function(e){return Object.assign({},e);}).concat([PLANCHE])}
+]);
+PLANS[5].sessions=PLANS[4].sessions.concat([
+  {id:"E",letter:"E",title:"Bras & abdos",sub:"Séance accessoire légère · finitions",items:[
+    ex("Biceps","curlalt"),ex("Triceps","dips"),ex("Biceps","marteau"),
+    ex("Triceps","ext1"),ex("Épaules","oiseau"),ex("Dos santé","curlup"),
+    ex("Abdos","glatx"),PLANCHE]}
+]);
+
+var DOS_SESSION={id:"DOSX",letter:"D+",title:"Dos express",sub:"~12 min · renforcement lombaire & posture",items:
+  DOS_LIB.map(function(e){return Object.assign({},e);}).concat([PLANCHE])};
+
+var ACT_PRESETS=["Course","Trail","Marche","Vélo","Padel","Natation","Randonnée","Étirements"];
+// Activités où la distance a du sens, et celles avec dénivelé
+var ACT_DIST=["Course","Trail","Marche","Vélo","Randonnée"];
+var ACT_DPLUS=["Trail","Randonnée"];
+
+/* ---------- Helpers ---------- */
+function $(s){return document.querySelector(s);}
+function el(tag,cls,html){var d=document.createElement(tag);if(cls)d.className=cls;if(html!=null)d.innerHTML=html;return d;}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function toast(msg){var t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._to);t._to=setTimeout(function(){t.classList.remove("show");},2200);}
+// Formate une durée en minutes décimales → "1h15", "45 min", "5 min 30 s"
+function fmtDur(mins){
+  if(mins==null)return "";
+  var totalSec=Math.round(mins*60);
+  var h=Math.floor(totalSec/3600);
+  var m=Math.floor((totalSec%3600)/60);
+  var s=totalSec%60;
+  if(h>0)return h+"h"+(m<10?"0":"")+m;
+  if(s>0&&m>0)return m+" min "+s+" s";
+  if(s>0&&m===0)return s+" s";
+  return m+" min";
+}
+function fmtDate(iso){
+  var d=new Date(iso);
+  var days=["dim","lun","mar","mer","jeu","ven","sam"];
+  var months=["janv","févr","mars","avr","mai","juin","juil","août","sept","oct","nov","déc"];
+  return {d:d.getDate(),m:months[d.getMonth()],wd:days[d.getDay()],y:d.getFullYear()};
+}
+function weekKey(iso){
+  var d=new Date(iso);
+  var t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  var day=t.getUTCDay()||7;
+  t.setUTCDate(t.getUTCDate()+4-day);
+  var y0=new Date(Date.UTC(t.getUTCFullYear(),0,1));
+  var w=Math.ceil(((t-y0)/86400000+1)/7);
+  return t.getUTCFullYear()+"-"+w;
+}
+function doneThisWeek(sessionId){
+  var wk=weekKey(new Date().toISOString());
+  return state.history.some(function(h){return h.sid===sessionId&&weekKey(h.date)===wk;});
+}
+// Récap réel de la semaine, indépendant de la fréquence choisie
+function renderWeekRecap(){
+  var box=$("#weekRecap");if(!box)return;
+  var wk=weekKey(new Date().toISOString());
+  var wh=state.history.filter(function(h){return weekKey(h.date)===wk;});
+  var muscu=0,hiit=0,act=0,totalMin=0;
+  wh.forEach(function(h){
+    if(h.type==="act"){act++;if(h.minutes)totalMin+=h.minutes;}
+    else if(h.sid==="HIIT"){hiit++;if(h.duration)totalMin+=h.duration/60;}
+    else{muscu++;if(h.duration)totalMin+=h.duration/60;}
+  });
+  var total=muscu+hiit+act;
+  if(total===0){
+    box.innerHTML="<div class='wr-empty'>Aucune séance encore cette semaine. C'est le moment de t'y mettre 💪</div>";
+    return;
+  }
+  var parts=[];
+  if(muscu)parts.push("<b>"+muscu+"</b> muscu");
+  if(hiit)parts.push("<b>"+hiit+"</b> HIIT");
+  if(act)parts.push("<b>"+act+"</b> activité"+(act>1?"s":""));
+  var timeStr=totalMin>=60?(Math.floor(totalMin/60)+"h"+(Math.round(totalMin%60)<10?"0":"")+Math.round(totalMin%60)):Math.round(totalMin)+" min";
+  box.innerHTML="<div class='wr-head'>✓ Cette semaine</div>"+
+    "<div class='wr-line'>"+parts.join(" · ")+"</div>"+
+    "<div class='wr-time'>"+total+" séance"+(total>1?"s":"")+" · "+timeStr+" d'effort au total</div>";
+}
+function muscuCount(){
+  return state.history.filter(function(h){return h.type!=="act";}).length;
+}
+
+/* ---------- Navigation ---------- */
+var views=["plan","session","libre","dos","hiit","histo"];
+function show(v){
+  views.forEach(function(x){$("#view-"+x).classList.toggle("active",x===v);});
+  document.querySelectorAll("nav button").forEach(function(b){
+    b.classList.toggle("active",b.getAttribute("data-view")===v||(v==="session"&&b.getAttribute("data-view")==="plan"));
+  });
+  window.scrollTo(0,0);
+}
+document.querySelectorAll("nav button").forEach(function(b){
+  b.addEventListener("click",function(){
+    var v=b.getAttribute("data-view");
+    show(v);
+    if(v==="histo")renderHisto();
+    if(v==="plan")renderPlan();
+    if(v==="dos")renderPainChart();
+    if(v==="hiit")renderHiitUI();
+    if(v==="libre")renderTemplates();
+  });
+});
+
+/* ---------- Vue Semaine ---------- */
+// Repos effectif selon le style choisi (utilisé pour l'estimation et en séance)
+function modeRest(){
+  if(state.mode==="force")return 120;
+  if(state.mode==="cardio")return 45;
+  return 90;
+}
+// Temps estimé d'un exercice (secondes) : séries × (effort + repos)
+function exSeconds(it){
+  if(it.chrono)return it.sets*(it.chrono+20); // gainage chronométré + transition
+  var effort=(it.noCharge?35:40); // temps sous tension approx par série
+  return it.sets*(effort+modeRest());
+}
+// Compose une séance qui tient dans le budget-temps, en gardant dos + planche
+function fitSession(s){
+  var express=(state.dur<=20);
+  var setup=express?120:180;
+  var budget=state.dur*60-setup;
+  var planche=s.items.filter(function(it){return it.fin;}).map(function(it){return Object.assign({},it);});
+  var dos=s.items.filter(function(it){return it.dos&&!it.fin;});
+  var force=s.items.filter(function(it){return !it.dos&&!it.fin;});
+  // Planche adaptative selon le temps
+  // Planche : 5 séries par défaut (réglable en séance via les boutons ±)
+  // Planche : 5 séries par défaut, 3 en express (réglable en séance via ±)
+  var plSets=express?3:5;
+  planche.forEach(function(p){p.sets=plSets;p.s=plSets+" × "+(p.chrono||50)+" s";});
+  // En express, on allège aussi les autres exos : l'objectif est de tenir en 20 min
+  if(express){
+    dos=dos.map(function(it){var c=Object.assign({},it);c.sets=3;c.s=buildScheme(3,parseReps(it.s),it.s);return c;});
+    force=force.map(function(it){var c=Object.assign({},it);c.sets=3;c.s=buildScheme(3,parseReps(it.s),it.s);return c;});
+  }
+  // Mode force = moins d'exos mais plus lourds (repos longs) ; cardio = plus d'exos, repos courts
+  var minForce=express?1:2;
+  var maxForce=express?1:(state.mode==="force"?3:(state.mode==="cardio"?6:5));
+  // Séance purement dos (D / Dos express) : on remplit avec les exos dos au budget
+  if(!force.length){
+    var mustP=planche.reduce(function(a,it){return a+exSeconds(it);},0);
+    var availD=budget-mustP;
+    var keptD=[];
+    for(var j=0;j<dos.length;j++){
+      var td=exSeconds(dos[j]);
+      if(keptD.length<2||availD-td>=0){keptD.push(dos[j]);availD-=td;}
+      else break;
+    }
+    var itemsD=keptD.concat(planche);
+    var estD=itemsD.reduce(function(a,it){return a+exSeconds(it);},0)+setup;
+    return {id:s.id,letter:s.letter,title:s.title,sub:s.sub,items:itemsD,estMin:Math.round(estD/60),express:express};
+  }
+  // temps incompressible : planche + 1er exo dos (en express, on garde le dos aussi)
+  var must=planche.concat(dos.slice(0,1));
+  var mustTime=must.reduce(function(a,it){return a+exSeconds(it);},0);
+  var avail=budget-mustTime;
+  var kept=[];
+  for(var i=0;i<force.length&&kept.length<maxForce;i++){
+    var t=exSeconds(force[i]);
+    if(kept.length<minForce||avail-t>=0){kept.push(force[i]);avail-=t;}
+    else break;
+  }
+  if(!kept.length&&force.length)kept.push(force[0]);
+  // Rognage final : si on déborde trop du budget (>2 min), on retire des exos (jamais sous 1)
+  var items=kept.concat(dos.slice(0,1)).concat(planche);
+  var est=items.reduce(function(a,it){return a+exSeconds(it);},0)+setup;
+  while(est>state.dur*60+120&&kept.length>1){
+    kept.pop();
+    items=kept.concat(dos.slice(0,1)).concat(planche);
+    est=items.reduce(function(a,it){return a+exSeconds(it);},0)+setup;
+  }
+  return {id:s.id,letter:s.letter,title:s.title,sub:s.sub,items:items,estMin:Math.round(est/60),express:express};
+}
+function renderPlan(){
+  renderWeekRecap();
+  document.querySelectorAll("#freqSel button").forEach(function(b){
+    b.classList.toggle("sel",parseInt(b.getAttribute("data-f"),10)===state.freq);
+  });
+  document.querySelectorAll("#durSel button").forEach(function(b){
+    b.classList.toggle("sel",parseInt(b.getAttribute("data-d"),10)===state.dur);
+  });
+  document.querySelectorAll("#modeSel button").forEach(function(b){
+    b.classList.toggle("sel",b.getAttribute("data-m")===state.mode);
+  });
+  var modeTxt={force:"Force : repos longs (2 min), moins d'exos mais plus lourds. Idéal si tu es en forme.",equilibre:"Équilibré : repos de 90s, dosage standard.",cardio:"Cardio / sueur : repos courts (45s), circuit dense — plus cardio, à éviter si grosse chaleur ET fatigue."};
+  $("#modeHint").textContent=modeTxt[state.mode]||"";
+  $("#durHint").textContent=(state.dur<=20?"⚡ Express : l'essentiel — 1 gros exo + dos + planche, pour ne rien lâcher les soirs très courts.":"Séances composées pour ~"+state.dur+" min. Dos et planche toujours gardés.");
+  $("#freqHint").textContent=PLANS[state.freq].hint;
+  var wrap=$("#planCards");wrap.innerHTML="";
+  // Suggestion : 1re séance non faite cette semaine
+  var sessions=PLANS[state.freq].sessions;
+  var nextIdx=-1;
+  for(var si=0;si<sessions.length;si++){ if(!doneThisWeek(sessions[si].id)){nextIdx=si;break;} }
+  var sugg=$("#suggBox");
+  if(sessions.length>1){
+    if(nextIdx>=0){
+      var doneCount=sessions.filter(function(x){return doneThisWeek(x.id);}).length;
+      sugg.style.display="block";
+      sugg.innerHTML="<b>À faire cette semaine :</b> séance "+esc(sessions[nextIdx].letter)+" · "+esc(sessions[nextIdx].title)+" <span style='color:var(--grey)'>("+doneCount+"/"+sessions.length+" faites)</span>";
+    }else{
+      sugg.style.display="block";
+      sugg.innerHTML="✓ <b>Semaine complète !</b> Les "+sessions.length+" séances sont faites. Repos, séance libre, ou 2e tour si tu es en forme.";
+    }
+  }else{sugg.style.display="none";}
+  var restTxt=modeRest();
+  sessions.forEach(function(s0,i){
+    var s=fitSession(s0);
+    var done=doneThisWeek(s.id);
+    var c=el("div","plan-card"+(i===nextIdx?" next":""));
+    c.appendChild(el("div","pc-letter"+(i%2?" alt":""),esc(s.letter)));
+    var mid=el("div","");
+    var title=esc(s.title)+(s.express?" <span class='xpress'>⚡ EXPRESS</span>":"");
+    mid.appendChild(el("div","pc-title",title));
+    var nForce=s.items.filter(function(it){return !it.dos&&!it.fin;}).length;
+    mid.appendChild(el("div","pc-sub",esc(s.sub)+" · "+nForce+" exo"+(nForce>1?"s":"")+" + dos + planche · ~"+s.estMin+" min · repos "+restTxt+"s"));
+    c.appendChild(mid);
+    c.appendChild(done?el("div","pc-done","✓ faite cette sem."):(i===nextIdx?el("div","pc-next","À faire ›"):el("div","pc-go","›")));
+    c.addEventListener("click",function(){openSession(s);});
+    wrap.appendChild(c);
+  });
+  $("#totalCount").textContent=muscuCount();
+  var rb=$("#redoBtn");
+  if(state.lastSession){
+    rb.style.display="block";
+    rb.textContent="↻ Refaire : "+state.lastSession.letter+" · "+state.lastSession.title;
+  }else{rb.style.display="none";}
+}
+document.querySelectorAll("#freqSel button").forEach(function(b){
+  b.addEventListener("click",function(){
+    state.freq=parseInt(b.getAttribute("data-f"),10);
+    save();renderPlan();
+    toast("Programme adapté : "+state.freq+" séance"+(state.freq>1?"s":"")+"/semaine");
+  });
+});
+document.querySelectorAll("#durSel button").forEach(function(b){
+  b.addEventListener("click",function(){
+    state.dur=parseInt(b.getAttribute("data-d"),10);
+    save();renderPlan();
+    toast(state.dur<=20?"Mode express ⚡ activé":"Séances calées sur ~"+state.dur+" min");
+  });
+});
+document.querySelectorAll("#modeSel button").forEach(function(b){
+  b.addEventListener("click",function(){
+    state.mode=b.getAttribute("data-m");
+    state.rest=modeRest();
+    save();renderPlan();restOptsSync&&restOptsSync();
+    var lbl={force:"Force · repos longs",equilibre:"Équilibré",cardio:"Cardio · repos courts"};
+    toast("Style : "+lbl[state.mode]);
+  });
+});
+$("#redoBtn").addEventListener("click",function(){
+  if(state.lastSession)openSession(state.lastSession);
+});
+
+/* ---------- Minuteur de repos ---------- */
+var timer={left:0,iv:null,endAt:0,beeped:{}};
+function timerRender(){
+  var m=Math.floor(timer.left/60),s=timer.left%60;
+  $("#timerDisplay").textContent=m+":"+(s<10?"0":"")+s;
+}
+function timerIdle(){
+  clearInterval(timer.iv);timer.iv=null;
+  timer.left=state.rest;
+  timerRender();
+  $("#timerDisplay").classList.remove("running");
+  var b=$("#timerBtn");b.textContent="▶ Lancer le repos";b.classList.remove("stop");
+  if(!chrono.iv)lockOff();
+}
+function timerTick(){
+  var remain=Math.round((timer.endAt-Date.now())/1000);
+  if(remain<=0){
+    timer.left=0;timerRender();
+    clearInterval(timer.iv);timer.iv=null;
+    $("#timerDisplay").classList.remove("running");
+    var b=$("#timerBtn");b.textContent="▶ Lancer le repos";b.classList.remove("stop");
+    if(!chrono.iv)lockOff();
+    timer.left=state.rest;
+    toast("Repos terminé — tour suivant !");
+    beepEnd();
+    if(navigator.vibrate)navigator.vibrate([200,100,200]);
+    setTimeout(function(){if(!timer.iv)timerRender();},1200);
+    return;
+  }
+  timer.left=remain;
+  timerRender();
+  if(remain<=3&&!timer.beeped[remain]){timer.beeped[remain]=true;beepShort();}
+}
+function timerStart(){
+  if(timer.iv){timerIdle();return;}
+  initAudio();
+  timer.endAt=Date.now()+state.rest*1000;
+  timer.beeped={};
+  timer.left=state.rest;
+  timerRender();
+  $("#timerDisplay").classList.add("running");
+  var b=$("#timerBtn");b.textContent="■ Stop";b.classList.add("stop");
+  lockOn();
+  timer.iv=setInterval(timerTick,250);
+}
+$("#timerBtn").addEventListener("click",timerStart);
+document.querySelectorAll("#restOpts button").forEach(function(b){
+  b.addEventListener("click",function(){
+    state.rest=parseInt(b.getAttribute("data-r"),10);
+    document.querySelectorAll("#restOpts button").forEach(function(x){x.classList.toggle("sel",x===b);});
+    save();
+    if(!timer.iv){timer.left=state.rest;timerRender();}
+  });
+});
+function restOptsSync(){
+  document.querySelectorAll("#restOpts button").forEach(function(b){
+    b.classList.toggle("sel",parseInt(b.getAttribute("data-r"),10)===state.rest);
+  });
+}
+
+/* ---------- Bips sonores ---------- */
+var audioCtx=null;
+function initAudio(){
+  if(audioCtx)return;
+  try{
+    var AC=window.AudioContext||window.webkitAudioContext;
+    if(AC)audioCtx=new AC();
+  }catch(e){audioCtx=null;}
+}
+function beep(freq,dur,vol){
+  if(!audioCtx)return;
+  try{
+    if(audioCtx.state==="suspended")audioCtx.resume();
+    var o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type="sine";o.frequency.value=freq||880;
+    g.gain.value=vol||0.25;
+    o.connect(g);g.connect(audioCtx.destination);
+    var t=audioCtx.currentTime;
+    o.start(t);
+    g.gain.setValueAtTime(vol||0.25,t);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+(dur||0.15));
+    o.stop(t+(dur||0.15));
+  }catch(e){}
+}
+function beepShort(){beep(880,0.12,0.22);}
+function beepEnd(){
+  // 3 bips montants bien audibles
+  beep(880,0.18,0.3);
+  setTimeout(function(){beep(1100,0.18,0.3);},200);
+  setTimeout(function(){beep(1400,0.35,0.35);},400);
+}
+
+/* ---------- Wake lock (écran allumé) ---------- */
+var wakeLock=null;
+var wakeWant=false;
+function lockOn(){
+  wakeWant=true;
+  if(!("wakeLock" in navigator))return;
+  if(wakeLock)return;
+  navigator.wakeLock.request("screen").then(function(wl){
+    wakeLock=wl;
+    wl.addEventListener("release",function(){wakeLock=null;});
+  }).catch(function(){});
+}
+function lockOff(){
+  wakeWant=false;
+  if(wakeLock){wakeLock.release().catch(function(){});wakeLock=null;}
+}
+document.addEventListener("visibilitychange",function(){
+  if(document.visibilityState==="visible"){
+    if(wakeWant&&!wakeLock)lockOn();
+    if(timer.iv)timerTick();
+    if(hiit.iv&&!hiit.paused)hiitTick();
+    if(chrono.iv){
+      var remain=Math.round((chrono.endAt-Date.now())/1000);
+      if(remain<=0){chrono.left=0;chronoRender();clearInterval(chrono.iv);chrono.iv=null;$("#chronoOverlay").classList.add("finished");beepEnd();if(navigator.vibrate)navigator.vibrate([300,120,300,120,500]);}
+      else{chrono.left=remain;chronoRender();}
+    }
+  }
+});
+// Filet de sécurité : re-demande le verrou régulièrement s'il a sauté
+setInterval(function(){
+  if(wakeWant&&!wakeLock&&document.visibilityState==="visible")lockOn();
+},5000);
+
+/* ---------- Chrono plein écran (planche & gainages) ---------- */
+var chrono={left:0,total:0,iv:null,key:null,endAt:0,beeped:{}};
+function chronoRender(){
+  var m=Math.floor(chrono.left/60),s=chrono.left%60;
+  $("#ovTime").textContent=m+":"+(s<10?"0":"")+s;
+  $("#ovTime").classList.toggle("warn",chrono.iv&&chrono.left<=5);
+  $("#ovBar").style.width=(chrono.total?Math.max(0,chrono.left/chrono.total*100):0)+"%";
+}
+function chronoStop(){
+  clearInterval(chrono.iv);chrono.iv=null;
+  $("#chronoOverlay").classList.remove("open","finished","ready");
+  if(document.fullscreenElement){document.exitFullscreen().catch(function(){});}
+  if(!timer.iv)lockOff();
+}
+function chronoOpen(label,seconds,key){
+  chrono.key=key||null;
+  if(chrono.key&&state.chronoDur&&state.chronoDur[chrono.key])seconds=state.chronoDur[chrono.key];
+  chrono.total=seconds;chrono.left=seconds;
+  $("#ovLabel").textContent=label;
+  $("#ovHint").textContent=("wakeLock" in navigator)?"Écran maintenu allumé · bip sonore à la fin":"Bip sonore à la fin · garde l'écran actif";
+  var ov=$("#chronoOverlay");
+  ov.classList.remove("finished");
+  ov.classList.add("open","ready");
+  chronoRender();
+  if(ov.requestFullscreen){ov.requestFullscreen().catch(function(){});}
+}
+function chronoGo(){
+  var ov=$("#chronoOverlay");
+  ov.classList.remove("ready");
+  initAudio();
+  if(chrono.key){
+    if(!state.chronoDur)state.chronoDur={};
+    state.chronoDur[chrono.key]=chrono.total;
+    save();
+  }
+  chrono.left=chrono.total;
+  chrono.endAt=Date.now()+chrono.total*1000;
+  chrono.beeped={};
+  chronoRender();
+  lockOn();
+  chrono.iv=setInterval(function(){
+    var remain=Math.round((chrono.endAt-Date.now())/1000);
+    if(remain<=0){
+      chrono.left=0;chronoRender();
+      clearInterval(chrono.iv);chrono.iv=null;
+      ov.classList.add("finished");
+      beepEnd();
+      if(navigator.vibrate)navigator.vibrate([300,120,300,120,500]);
+    }else{
+      chrono.left=remain;
+      chronoRender();
+      if(remain<=3&&!chrono.beeped[remain]){
+        chrono.beeped[remain]=true;
+        beepShort();
+        if(navigator.vibrate)navigator.vibrate(80);
+      }
+    }
+  },250);
+}
+function chronoAdj(d){
+  if(chrono.iv)return;
+  chrono.total=Math.max(10,Math.min(600,chrono.total+d));
+  chrono.left=chrono.total;
+  chronoRender();
+}
+$("#ovClose").addEventListener("click",chronoStop);
+$("#ovStart").addEventListener("click",chronoGo);
+$("#ovRestart").addEventListener("click",function(){
+  $("#chronoOverlay").classList.remove("finished");
+  chronoGo();
+});
+$("#ovMinus").addEventListener("click",function(){chronoAdj(-10);});
+$("#ovPlus").addEventListener("click",function(){chronoAdj(10);});
+
+/* ---------- HIIT 7 minutes (adapté pied droit + dos) ---------- */
+var HIIT_CIRCUITS=[
+ {name:"Full-body sans impact",ex:[
+  {n:"Squat poids de corps",t:"Talons bien ancrés, descends contrôlé, remonte tonique",g:"Pieds largeur épaules, poids sur les talons (le gros orteil ne pousse pas). Descends comme pour t asseoir, genoux dans l axe, cuisses parallèles si possible. Remonte en poussant dans les talons, buste fier."},
+  {n:"Pompes sur genoux",t:"Genoux au sol : ton gros orteil ne travaille pas",g:"Genoux au sol, mains sous les épaules, corps aligné genoux-tête. Descends la poitrine près du sol, remonte en soufflant. Version qui protège totalement ton gros orteil — passe sur les pieds seulement si le pied est d accord."},
+  {n:"Montées de genoux sans saut",t:"Marche dynamique genoux hauts, pied à plat, bras actifs",g:"Marche dynamique sur place : monte les genoux à hauteur de hanche, un pied toujours au sol, pose le pied À PLAT. Les bras pompent comme en course. Rapide mais zéro rebond."},
+  {n:"Pont fessier",t:"Serre fort les fessiers 1s en haut, sans hyperextension",g:"Allongé sur le dos, pieds à plat près des fesses. Monte les hanches en serrant fort les fessiers, aligne épaules-genoux, 1s en haut, redescends. Ne cambre pas au-delà de l alignement."},
+  {n:"Chaise au mur",t:"Dos au mur, cuisses parallèles, appui talons",g:"Dos plaqué au mur, descends jusqu à cuisses parallèles, genoux à 90°, poids dans les talons. Tiens la position en respirant. Ça brûle, c est le but."},
+  {n:"Shadow boxing",t:"Frappes rapides dans le vide, pieds à plat, gaine le tronc",g:"Debout, garde de boxe, pieds à plat largeur épaules. Enchaîne directs et crochets dans le vide, gaine le ventre, tourne légèrement le buste avec les coups. Cardio garanti sans bouger les pieds."},
+  {n:"Dead bug",t:"Dos plaqué au sol, bras+jambe opposés, lent et contrôlé",g:"Sur le dos, bras vers le plafond, genoux à 90°. Descends bras droit + jambe gauche vers le sol SANS décoller les lombaires, reviens, alterne. Le meilleur exo abdos pour ton dos."},
+  {n:"Talons-fesses sans saut",t:"Marche rapide talon vers la fesse, sans rebondir",g:"Marche rapide sur place en ramenant le talon vers la fesse, pose du pied à plat, sans rebondir. Bras actifs, buste droit."},
+  {n:"Planche",t:"Corps aligné, fessiers serrés, respire",g:"Avant-bras au sol sous les épaules, corps aligné tête-talons, fessiers et abdos serrés. Appui sur les avant-bras et le dessus des pieds si ça va, sinon sur les genoux. Respire."},
+  {n:"Fentes alternées",t:"Pied arrière sur le cou-de-pied côté droit, buste droit",g:"Grand pas en avant, descends le genou arrière vers le sol, remonte, alterne. Adaptation hallux : quand le pied droit est derrière, pose-le sur le cou-de-pied (dessus du pied à plat) ou garde la fente courte sans dérouler l orteil. Pied droit devant : aucune contrainte."},
+  {n:"Superman doux",t:"Petit décollé bras+jambes, 2s de pause, sans à-coups",g:"Allongé sur le ventre, décolle légèrement bras et jambes, 2s de pause, repose en contrôle. Petit mouvement, pas d à-coups — c est du renfo lombaire, pas de la gym artistique."},
+  {n:"Gainage latéral",t:"15s par côté, hanche haute, change à mi-temps",g:"Sur le côté, appui avant-bras, hanches hautes, corps aligné. 15 secondes par côté — change à mi-temps quand le bip des 3 dernières secondes approche. Genou au sol si besoin."}]},
+ {name:"Cardio & gainage",ex:[
+  {n:"Shadow boxing",t:"Rythme rapide, pieds à plat, rotation du buste légère",g:"Debout, garde de boxe, pieds à plat largeur épaules. Enchaîne directs et crochets dans le vide, gaine le ventre, tourne légèrement le buste avec les coups. Cardio garanti sans bouger les pieds."},
+  {n:"Montées de genoux sans saut",t:"Le plus vite possible SANS décoller, bras actifs",g:"Marche dynamique sur place : monte les genoux à hauteur de hanche, un pied toujours au sol, pose le pied À PLAT. Les bras pompent comme en course. Rapide mais zéro rebond."},
+  {n:"Squat pulse",t:"Petits rebonds en bas du squat, talons ancrés",g:"En position basse de squat (talons ancrés), fais de petits rebonds de 10-15 cm sans jamais remonter complètement. Brûlure express des cuisses."},
+  {n:"Planche épaule-touches",t:"En planche genoux si besoin, touche l'épaule opposée",g:"En planche (sur genoux si besoin), touche l épaule opposée avec une main, repose, alterne. Le défi : le bassin ne bouge PAS. Lent et stable vaut mieux que rapide et bancal."},
+  {n:"Jumping jacks",t:"Réception amortie · repli : step jacks si le pied proteste",g:"Sauts écart-serré classiques, bras au-dessus de la tête, réception AMORTIE genoux souples. Si ton pied droit proteste, bascule en step jacks : même mouvement de bras mais un pied s écarte à la fois, sans saut. Règle des 24h : raideur de l orteil le lendemain = version step la fois suivante."},
+  {n:"Pont fessier marché",t:"En pont, tends une jambe puis l'autre",g:"En position de pont fessier tenue, tends une jambe à l horizontale, repose, alterne. Les hanches restent hautes et stables tout du long."},
+  {n:"Pas chassés lents",t:"2 pas à droite, 2 à gauche, pieds à plat, en squat léger",g:"En squat léger, 2 pas chassés à droite puis 2 à gauche, pieds posés À PLAT, sans rebond. Reste bas tout du long : les cuisses travaillent en continu."},
+  {n:"Dead bug rapide",t:"Rythme soutenu mais dos toujours plaqué",g:"Même exercice que le dead bug, tempo plus soutenu — mais la règle d or reste absolue : les lombaires ne décollent jamais du sol. Si ça décolle, ralentis."},
+  {n:"Pompes sur genoux",t:"Tempo rapide, amplitude complète",g:"Genoux au sol, mains sous les épaules, corps aligné genoux-tête. Descends la poitrine près du sol, remonte en soufflant. Version qui protège totalement ton gros orteil — passe sur les pieds seulement si le pied est d accord."},
+  {n:"Chaise au mur + bras",t:"En chaise, monte et descends les bras tendus",g:"Position chaise au mur, et pendant ce temps monte et descends les bras tendus devant toi. Double peine : cuisses + épaules."},
+  {n:"Bird-dog rythmé",t:"Alterne vite mais bassin stable",g:"À quatre pattes, alterne bras droit + jambe gauche puis l inverse, à un rythme fluide. Le bassin reste une table stable — imagine ton verre d eau posé dessus."},
+  {n:"Planche",t:"Finis fort, corps aligné, respire",g:"Avant-bras au sol sous les épaules, corps aligné tête-talons, fessiers et abdos serrés. Appui sur les avant-bras et le dessus des pieds si ça va, sinon sur les genoux. Respire."}]}
+];
+var HIIT_WORK=30,HIIT_REST=10;
+var hiitSel={circ:0,tours:2};
+
+/* Bibliothèque HIIT par catégories — pour composer ses circuits */
+var HIIT_LIB={
+ "Pompes & haut":[
+  {n:"Pompes sur genoux",t:"Genoux au sol : gros orteil protégé",g:"Genoux au sol, mains sous les épaules, corps aligné genoux-tête. Descends la poitrine près du sol, remonte en soufflant. Ton orteil ne travaille pas du tout."},
+  {n:"Pompes classiques",t:"Sur les pieds · orteil en extension : à toi de juger",g:"Position planche sur les mains, corps gainé. Descends poitrine au sol, remonte. ⚠ Les orteils sont en extension : si ton hallux droit tire, décale l appui vers les 4 autres orteils ou repasse sur genoux."},
+  {n:"Pompes larges",t:"Mains écartées · cible les pecs",g:"Comme les pompes classiques mais mains bien plus larges que les épaules, coudes qui s ouvrent. Accent pectoraux. Même vigilance orteil : genoux en repli."},
+  {n:"Pompes diamant",t:"Mains serrées · triceps en feu",g:"Mains jointes sous la poitrine formant un diamant (pouces et index se touchent). Coudes le long du corps en descendant. Triceps ++. Faisable sur genoux sans rien perdre."},
+  {n:"Pompes pike",t:"Fesses hautes · épaules",g:"En V inversé fesses au plafond, mains au sol. Fléchis les coudes pour amener la tête vers le sol entre les mains, remonte. Cible les épaules. ⚠ Orteils en appui : recule sur les genoux si le pied proteste."},
+  {n:"Dips sur banc",t:"Talons au sol · triceps",g:"Mains au bord du banc derrière toi, jambes tendues devant, TALONS au sol (parfait pour ton pied). Descends en fléchissant les coudes, remonte. Ne descends pas si les épaules tirent."}],
+ "Jambes & fessiers":[
+  {n:"Squat poids de corps",t:"Talons ancrés",g:"Pieds largeur épaules, poids sur les talons. Descends comme pour t asseoir, cuisses parallèles, remonte en poussant dans les talons."},
+  {n:"Squat sumo",t:"Pieds larges, pointes ouvertes",g:"Pieds bien plus larges que les épaules, pointes à 45°. Descends entre tes jambes, talons ancrés. Intérieur des cuisses."},
+  {n:"Squat pulse",t:"Petits rebonds en position basse",g:"En bas du squat, petits rebonds de 10-15 cm sans remonter complètement, talons ancrés. Brûlure express."},
+  {n:"Fentes alternées",t:"Pied droit derrière : sur le cou-de-pied",g:"Grand pas en avant, genou arrière vers le sol, remonte, alterne. Hallux : pied droit derrière posé sur le cou-de-pied ou fente courte. Pied droit devant : libre."},
+  {n:"Fentes latérales",t:"Pas sur le côté, pied à plat",g:"Grand pas sur le côté, fesses en arrière, jambe opposée tendue, pied à plat. Alterne. Ne déroule pas l orteil."},
+  {n:"Chaise au mur",t:"Cuisses parallèles, appui talons",g:"Dos au mur, cuisses parallèles, genoux 90°, poids dans les talons. Tiens en respirant."},
+  {n:"Chaise au mur + bras",t:"Chaise + élévations bras",g:"En chaise au mur, monte et descends les bras tendus devant toi. Cuisses + épaules en même temps."},
+  {n:"Pont fessier",t:"Serre fort en haut",g:"Sur le dos, pieds à plat près des fesses. Monte les hanches, serre 1s, redescends. Sans hyperextension."},
+  {n:"Pont fessier marché",t:"En pont, tends une jambe puis l'autre",g:"Position de pont tenue, tends une jambe à l horizontale, repose, alterne. Hanches hautes et stables."},
+  {n:"Pont fessier 1 jambe",t:"Une jambe tendue, l'autre pousse",g:"Sur le dos, un pied au sol, l autre jambe tendue. Monte les hanches sur une jambe, 1s en haut. Costaud pour les fessiers, zéro colonne."}],
+ "Cardio sans/low impact":[
+  {n:"Montées de genoux sans saut",t:"Marche dynamique, pied à plat",g:"Genoux à hauteur de hanche, un pied toujours au sol, pose à plat, bras qui pompent. Rapide, zéro rebond."},
+  {n:"Talons-fesses sans saut",t:"Talon vers la fesse, sans rebond",g:"Marche rapide talon vers la fesse, pose du pied à plat, bras actifs, buste droit."},
+  {n:"Jumping jacks",t:"Réception amortie · repli step jacks",g:"Sauts écart-serré, bras au-dessus de la tête, réception amortie genoux souples. Repli : step jacks (un pied à la fois, sans saut) si l orteil proteste. Règle des 24h."},
+  {n:"Step jacks",t:"Jumping jack sans saut",g:"Même mouvement de bras que le jumping jack, mais un pied s écarte à la fois, sans jamais sauter. Cardio propre, zéro impact."},
+  {n:"Shadow boxing",t:"Frappes rapides, pieds à plat",g:"Garde de boxe, enchaîne directs et crochets dans le vide, gaine le tronc, buste qui tourne légèrement."},
+  {n:"Pas chassés lents",t:"En squat léger, pieds à plat",g:"2 pas chassés à droite, 2 à gauche, posés à plat, en restant bas. Cuisses en continu."}],
+ "Gainage & dos":[
+  {n:"Planche",t:"Corps aligné, respire",g:"Avant-bras au sol, corps aligné tête-talons, fessiers serrés. Sur les genoux si besoin."},
+  {n:"Planche épaule-touches",t:"Bassin immobile",g:"En planche mains (genoux si besoin), touche l épaule opposée, alterne. Le bassin ne bouge pas."},
+  {n:"Gainage latéral",t:"15s par côté",g:"Sur le côté, appui avant-bras, hanches hautes. Change de côté à mi-temps."},
+  {n:"Dead bug",t:"Lombaires plaquées, lent",g:"Sur le dos, bras+jambe opposés descendent SANS décoller les lombaires. Le meilleur abdo pour ton dos."},
+  {n:"Dead bug rapide",t:"Tempo soutenu, dos plaqué",g:"Même exercice, rythme plus rapide — mais si les lombaires décollent, ralentis."},
+  {n:"Bird-dog rythmé",t:"Bassin stable",g:"À quatre pattes, alterne bras+jambe opposés à rythme fluide, bassin immobile comme une table."},
+  {n:"Superman doux",t:"Petit décollé, 2s de pause",g:"Sur le ventre, petit décollé bras+jambes, pause 2s, repose en contrôle. Sans à-coups."}]
+};
+var hiit={seq:[],idx:0,phEnd:0,iv:null,paused:false,pauseLeft:0,startedAt:0,tours:1,circName:"",exCount:12,beeped:{}};
+
+// Résout le circuit sélectionné (défaut ou perso)
+function hiitResolve(){
+  if(typeof hiitSel.circ==="string"&&hiitSel.circ.charAt(0)==="u"){
+    var idx=parseInt(hiitSel.circ.slice(1),10);
+    var cust=(state.hiitCustom||[])[idx];
+    if(cust)return cust;
+    hiitSel.circ=0;
+  }
+  return HIIT_CIRCUITS[hiitSel.circ]||HIIT_CIRCUITS[0];
+}
+function renderHiitUI(){
+  document.querySelectorAll("#hiitCircSel button").forEach(function(b){
+    b.classList.toggle("sel",String(hiitSel.circ)===b.getAttribute("data-c"));
+  });
+  document.querySelectorAll("#hiitToursSel button").forEach(function(b){
+    b.classList.toggle("sel",parseInt(b.getAttribute("data-t"),10)===hiitSel.tours);
+  });
+  // Chips des circuits perso
+  var custWrap=$("#hiitCustomList");
+  custWrap.innerHTML="";
+  (state.hiitCustom||[]).forEach(function(c,i){
+    var chip=el("div","hc-chip"+(hiitSel.circ==="u"+i?" sel":""));
+    var nameSpan=el("span","hc-name",esc(c.name)+" <span class='hc-count'>("+c.ex.length+")</span>");
+    nameSpan.addEventListener("click",function(){hiitSel.circ="u"+i;renderHiitUI();});
+    chip.appendChild(nameSpan);
+    var del=el("button","hc-del","✕");
+    del.addEventListener("click",function(e){
+      e.stopPropagation();
+      if(!confirm("Supprimer le circuit « "+c.name+" » ?"))return;
+      state.hiitCustom.splice(i,1);
+      if(hiitSel.circ==="u"+i)hiitSel.circ=0;
+      save();renderHiitUI();
+    });
+    chip.appendChild(del);
+    custWrap.appendChild(chip);
+  });
+  // Preview du circuit résolu
+  var c=hiitResolve();
+  var prev=$("#hiitPreview");
+  prev.innerHTML="";
+  var box=el("div","hiit-prev");
+  box.appendChild(el("div","hp-title",esc(c.name)+" · "+c.ex.length+" exercices — tape pour voir comment faire"));
+  c.ex.forEach(function(e,i){
+    var row=el("div","hp-row");
+    var head=el("div","hp-head");
+    head.appendChild(el("span","hp-num",(i+1)));
+    head.appendChild(el("span","hp-name",esc(e.n)));
+    head.appendChild(el("span","hp-arrow","▸"));
+    row.appendChild(head);
+    var body=el("div","hp-body",esc(e.g||e.t));
+    row.appendChild(body);
+    head.addEventListener("click",function(){
+      row.classList.toggle("open");
+      head.children[2].textContent=row.classList.contains("open")?"▾":"▸";
+    });
+    box.appendChild(row);
+  });
+  prev.appendChild(box);
+}
+document.querySelectorAll("#hiitCircSel button").forEach(function(b){
+  b.addEventListener("click",function(){hiitSel.circ=parseInt(b.getAttribute("data-c"),10);renderHiitUI();});
+});
+document.querySelectorAll("#hiitToursSel button").forEach(function(b){
+  b.addEventListener("click",function(){hiitSel.tours=parseInt(b.getAttribute("data-t"),10);renderHiitUI();});
+});
+
+/* ---- Composeur de circuit perso ---- */
+var hiitBasket=[];
+function renderHiitLib(){
+  var wrap=$("#hiitLibList");wrap.innerHTML="";
+  Object.keys(HIIT_LIB).forEach(function(cat){
+    var box=el("div","hiit-prev");
+    box.appendChild(el("div","hp-title",esc(cat)));
+    HIIT_LIB[cat].forEach(function(e){
+      var inB=hiitBasket.some(function(x){return x.n===e.n;});
+      var row=el("div","hp-row"+(inB?" inbasket":""));
+      var head=el("div","hp-head");
+      head.appendChild(el("span","hp-add",inB?"✓":"+"));
+      head.appendChild(el("span","hp-name",esc(e.n)));
+      head.appendChild(el("span","hp-arrow","▸"));
+      row.appendChild(head);
+      var body=el("div","hp-body",esc(e.g||e.t));
+      row.appendChild(body);
+      head.children[0].addEventListener("click",function(ev){
+        ev.stopPropagation();
+        var i=hiitBasket.findIndex(function(x){return x.n===e.n;});
+        if(i>=0)hiitBasket.splice(i,1);
+        else hiitBasket.push(Object.assign({},e));
+        renderHiitLib();
+      });
+      head.addEventListener("click",function(){
+        row.classList.toggle("open");
+        head.children[2].textContent=row.classList.contains("open")?"▾":"▸";
+      });
+      box.appendChild(row);
+    });
+    wrap.appendChild(box);
+  });
+  $("#hiitBuildCount").textContent=hiitBasket.length;
+}
+$("#hiitBuildBtn").addEventListener("click",function(){
+  var b=$("#hiitBuilder");
+  var open=b.style.display!=="none";
+  b.style.display=open?"none":"block";
+  if(!open){hiitBasket=[];$("#hiitTplName").value="";renderHiitLib();}
+});
+$("#hiitBuildCancel").addEventListener("click",function(){$("#hiitBuilder").style.display="none";});
+$("#hiitBuildSave").addEventListener("click",function(){
+  if(hiitBasket.length<4){toast("Choisis au moins 4 exercices");return;}
+  var name=$("#hiitTplName").value.trim()||("Circuit perso "+((state.hiitCustom||[]).length+1));
+  if(!state.hiitCustom)state.hiitCustom=[];
+  state.hiitCustom.push({name:name,ex:hiitBasket.map(function(e){return Object.assign({},e);})});
+  hiitSel.circ="u"+(state.hiitCustom.length-1);
+  save();
+  $("#hiitBuilder").style.display="none";
+  toast("Circuit enregistré : "+name);
+  renderHiitUI();
+});
+
+function hiitBuildSeq(exList,tours){
+  var seq=[];
+  var ex=exList;
+  for(var t=0;t<tours;t++){
+    for(var i=0;i<ex.length;i++){
+      seq.push({type:"work",dur:HIIT_WORK,ex:ex[i],tour:t+1,pos:i+1});
+      var isLast=(t===tours-1&&i===ex.length-1);
+      if(!isLast)seq.push({type:"rest",dur:HIIT_REST,tour:t+1});
+    }
+  }
+  return seq;
+}
+function hiitPhase(){return hiit.seq[hiit.idx];}
+function hiitRenderPhase(){
+  var p=hiitPhase();
+  if(!p)return;
+  var ov=$("#hiitOverlay");
+  ov.classList.toggle("rest",p.type==="rest");
+  if(p.type==="work"){
+    $("#hPhase").textContent="EFFORT";
+    $("#hExName").textContent=p.ex.n;
+    $("#hTip").textContent=p.ex.t;
+  }else{
+    $("#hPhase").textContent="RÉCUP";
+    $("#hExName").textContent="Souffle…";
+    $("#hTip").textContent="";
+  }
+  var nxt=null;
+  for(var j=hiit.idx+1;j<hiit.seq.length;j++){if(hiit.seq[j].type==="work"){nxt=hiit.seq[j];break;}}
+  $("#hNext").innerHTML=nxt?("Suivant : <b>"+esc(nxt.ex.n)+"</b>"):"Dernier exercice !";
+  $("#hRound").textContent="Tour "+p.tour+"/"+hiit.tours+" · Exo "+(p.pos||"")+"/"+hiit.exCount;
+}
+function hiitRenderTime(left,dur){
+  var m=Math.floor(left/60),s=left%60;
+  $("#hTime").textContent=m+":"+(s<10?"0":"")+s;
+  $("#hBar").style.width=Math.max(0,left/dur*100)+"%";
+}
+function hiitAdvance(){
+  hiit.idx++;
+  hiit.beeped={};
+  if(hiit.idx>=hiit.seq.length){hiitFinish();return;}
+  var p=hiitPhase();
+  // Cumul depuis la fin de la phase précédente : le rythme reste exact
+  // et un gel d'écran long est rattrapé phase par phase dans hiitTick
+  hiit.phEnd=hiit.phEnd+p.dur*1000;
+  hiitRenderPhase();
+  var leftNow=Math.max(0,Math.round((hiit.phEnd-Date.now())/1000));
+  hiitRenderTime(leftNow,p.dur);
+  // bips seulement si la phase est réellement en cours (pas en plein rattrapage)
+  if(leftNow>0){
+    if(p.type==="work"){beep(1400,0.25,0.32);if(navigator.vibrate)navigator.vibrate([200,80,200]);}
+    else{beep(600,0.2,0.25);}
+  }
+}
+function hiitTick(){
+  if(hiit.paused)return;
+  var p=hiitPhase();
+  if(!p)return;
+  var left=Math.round((hiit.phEnd-Date.now())/1000);
+  // rattrapage après gel : avancer autant de phases que nécessaire
+  while(left<=0){
+    hiitAdvance();
+    p=hiitPhase();
+    if(!p)return;
+    left=Math.round((hiit.phEnd-Date.now())/1000);
+  }
+  hiitRenderTime(left,p.dur);
+  if(left<=3&&!hiit.beeped[left]){hiit.beeped[left]=true;beepShort();}
+}
+function hiitStart(){
+  initAudio();
+  var circ=hiitResolve();
+  hiit.circName=circ.name;
+  hiit.exList=circ.ex;
+  hiit.exCount=circ.ex.length;
+  hiit.tours=hiitSel.tours;
+  hiit.seq=hiitBuildSeq(circ.ex,hiit.tours);
+  hiit.idx=0;hiit.paused=false;hiit.beeped={};
+  hiit.startedAt=Date.now();
+  var p=hiitPhase();
+  hiit.phEnd=Date.now()+p.dur*1000;
+  var ov=$("#hiitOverlay");
+  ov.classList.add("open");
+  ov.classList.remove("paused");
+  hiitRenderPhase();
+  hiitRenderTime(p.dur,p.dur);
+  if(ov.requestFullscreen){ov.requestFullscreen().catch(function(){});}
+  lockOn();
+  beep(1400,0.25,0.32);
+  clearInterval(hiit.iv);
+  hiit.iv=setInterval(hiitTick,250);
+}
+function hiitStop(record){
+  clearInterval(hiit.iv);hiit.iv=null;
+  $("#hiitOverlay").classList.remove("open","paused","rest");
+  if(document.fullscreenElement){document.exitFullscreen().catch(function(){});}
+  if(!timer.iv&&!chrono.iv)lockOff();
+}
+function hiitFinish(){
+  var duration=Math.floor((Date.now()-hiit.startedAt)/1000);
+  var entry={
+    type:"sess",
+    date:new Date().toISOString(),
+    sid:"HIIT",
+    label:"HIIT · "+hiit.circName+" ×"+hiit.tours,
+    letter:"⚡",
+    duration:duration,
+    painBefore:null,painAfter:null,rpe:null,mood:null,note:"",
+    partial:false,ratio:100,
+    items:(hiit.exList||[]).map(function(e){return {n:e.n,s:HIIT_WORK+" s",done:hiit.tours,total:hiit.tours,charge:""};})
+  };
+  state.history.unshift(entry);
+  save();
+  hiitStop();
+  beepEnd();
+  if(navigator.vibrate)navigator.vibrate([300,120,300,120,600]);
+  toast("HIIT terminé et enregistré ⚡ "+Math.round(duration/60)+" min");
+  if(state.autoSave)doExport(true);
+  sauvegardeServeur(state);
+  renderPlan();
+}
+$("#startHiit").addEventListener("click",hiitStart);
+$("#hPause").addEventListener("click",function(){
+  if(!hiit.iv)return;
+  var ov=$("#hiitOverlay");
+  if(!hiit.paused){
+    hiit.paused=true;
+    hiit.pauseLeft=Math.max(0,hiit.phEnd-Date.now());
+    ov.classList.add("paused");
+    $("#hPhase").textContent="PAUSE";
+    $("#hPause").textContent="▶ Reprendre";
+  }else{
+    hiit.paused=false;
+    hiit.phEnd=Date.now()+hiit.pauseLeft;
+    ov.classList.remove("paused");
+    hiitRenderPhase();
+    $("#hPause").textContent="⏸ Pause";
+  }
+});
+$("#hQuit").addEventListener("click",function(){
+  if(confirm("Quitter le HIIT en cours ? (non enregistré)")){hiitStop();}
+});
+
+/* ---------- Vue Séance ---------- */
+var current=null;
+var RPE_LABELS=["Facile","OK","Solide","Dur","Très dur"];
+var MOOD_EMO=["😣","😕","😐","🙂","😄"];
+function renderRpe(){
+  var wrap=$("#rpeChips");wrap.innerHTML="";
+  RPE_LABELS.forEach(function(lab,i){
+    var c=el("button","chip"+(current&&current.rpe===i+1?" sel":""),esc(lab));
+    c.addEventListener("click",function(){
+      if(!current)return;
+      current.rpe=(current.rpe===i+1)?null:i+1;
+      renderRpe();
+    });
+    wrap.appendChild(c);
+  });
+}
+function renderMood(){
+  var wrap=$("#moodRow");wrap.innerHTML="";
+  MOOD_EMO.forEach(function(emo,i){
+    var c=el("button",(current&&current.mood===i+1?"sel":""),emo);
+    c.setAttribute("aria-label","Humeur "+(i+1));
+    c.addEventListener("click",function(){
+      if(!current)return;
+      current.mood=(current.mood===i+1)?null:i+1;
+      renderMood();
+    });
+    wrap.appendChild(c);
+  });
+}
+function renderPain(which){
+  var wrap=$(which==="before"?"#painBefore":"#painAfter");
+  var key=which==="before"?"painBefore":"painAfter";
+  wrap.innerHTML="";
+  for(var i=0;i<=5;i++){
+    (function(i){
+      var b=el("button",(current&&current[key]===i?"sel":""),String(i));
+      b.setAttribute("data-p",i);
+      b.setAttribute("aria-label","Douleur "+i+" sur 5");
+      b.addEventListener("click",function(){
+        if(!current)return;
+        current[key]=(current[key]===i)?0:i;
+        renderPain(which);
+      });
+      wrap.appendChild(b);
+    })(i);
+  }
+}
+/* Minuteur global de séance */
+var sessClock={start:0,iv:null};
+function sessClockRender(){
+  var s=Math.floor((Date.now()-sessClock.start)/1000);
+  var m=Math.floor(s/60),ss=s%60;
+  $("#sessClock").textContent=m+":"+(ss<10?"0":"")+ss;
+}
+function sessClockStart(){
+  sessClock.start=Date.now();
+  $("#sessClock").classList.add("run");
+  sessClockRender();
+  clearInterval(sessClock.iv);
+  sessClock.iv=setInterval(sessClockRender,1000);
+}
+function sessClockStop(){
+  clearInterval(sessClock.iv);sessClock.iv=null;
+  $("#sessClock").classList.remove("run");
+}
+/* Progression de séance + estimation de fin en direct */
+function updateSessProgress(){
+  if(!current)return;
+  var doneSets=0,totalSets=0,remainSecs=0;
+  current.work.forEach(function(w){
+    var it=w.item;
+    var d=w.sets.filter(Boolean).length;
+    doneSets+=d;totalSets+=w.sets.length;
+    var rem=w.sets.length-d;
+    // temps restant estimé pour les séries non faites
+    if(it.chrono)remainSecs+=rem*(it.chrono+20);
+    else remainSecs+=rem*((it.noCharge?35:40)+state.rest);
+  });
+  var pct=totalSets?Math.round(doneSets/totalSets*100):0;
+  $("#sprogBar").style.width=pct+"%";
+  $("#sprogSets").textContent=doneSets+" / "+totalSets+" séries · "+pct+"%";
+  var endEl=$("#sprogEnd");
+  if(doneSets===0){
+    // avant de commencer : estimation basée sur le total
+    var d=new Date(Date.now()+remainSecs*1000);
+    endEl.textContent="fin prévue ~"+d.getHours()+"h"+String(d.getMinutes()).padStart(2,"0");
+  }else if(doneSets>=totalSets){
+    endEl.textContent="terminé 💪";
+  }else{
+    var end=new Date(Date.now()+remainSecs*1000);
+    endEl.textContent="fin ~"+end.getHours()+"h"+String(end.getMinutes()).padStart(2,"0");
+  }
+}
+function openSession(s){
+  state.rest=modeRest();
+  current={session:s,rpe:null,mood:null,note:"",painBefore:0,painAfter:0,work:s.items.map(function(it){
+    return {item:it,sets:new Array(it.sets).fill(false),charge:state.lastCharges[it.k]||""};
+  })};
+  $("#sLetter").textContent=s.letter;
+  $("#sTitle").textContent=s.title;
+  $("#sSub").textContent=s.sub;
+  $("#sessNote").value="";
+  restOptsSync();
+  renderRpe();
+  renderMood();
+  renderPain("before");
+  renderPain("after");
+  sessClockStart();
+  timerIdle();
+  updateSessProgress();
+  renderSessionCards();
+  show("session");
+}
+function renderSessionCards(){
+  var wrap=$("#sExercises");wrap.innerHTML="";
+  current.work.forEach(function(w){
+    var it=w.item;
+    var card=el("div","ex"+(it.fin?" finisher":"")+(it.dos?" dos":""));
+    var top=el("div","ex-top");
+    top.appendChild(el("div","ex-name",esc(it.n)));
+    top.appendChild(el("div","ex-scheme",esc(w.scheme||it.s)));
+    card.appendChild(top);
+    if(it.v)card.appendChild(el("div","ex-var",it.v));
+    if(it.g){
+      var gt=el("button","gtoggle","▸ Comment faire");
+      var gd=el("div","ex-guide",esc(it.g));
+      gt.addEventListener("click",function(){
+        card.classList.toggle("showg");
+        gt.textContent=card.classList.contains("showg")?"▾ Comment faire":"▸ Comment faire";
+      });
+      card.appendChild(gt);
+      card.appendChild(gd);
+    }
+    var track=el("div","ex-track");
+    var sets=el("div","sets");
+    w.sets.forEach(function(v,i){
+      var b=el("div","setbox"+(v?" done":""));
+      b.setAttribute("role","checkbox");b.setAttribute("tabindex","0");
+      b.setAttribute("aria-checked",v?"true":"false");b.setAttribute("aria-label","Série "+(i+1));
+      function tg(){
+        w.sets[i]=!w.sets[i];
+        b.classList.toggle("done",w.sets[i]);
+        b.setAttribute("aria-checked",w.sets[i]?"true":"false");
+        if(w.sets[i]&&!it.chrono&&state.autoRest!==false){
+          if(!timer.iv)timerStart();
+        }
+        updateSessProgress();
+      }
+      b.addEventListener("click",tg);
+      b.addEventListener("keydown",function(e){if(e.key===" "||e.key==="Enter"){e.preventDefault();tg();}});
+      sets.appendChild(b);
+    });
+    track.appendChild(sets);
+    // Contrôle ± nombre de séries
+    var setsCtrl=el("div","sets-ctrl");
+    var minus=el("button","sc-btn","−");
+    var plus=el("button","sc-btn","+");
+    minus.setAttribute("aria-label","Retirer une série");
+    plus.setAttribute("aria-label","Ajouter une série");
+    minus.addEventListener("click",function(){
+      if(w.sets.length>1){w.sets.pop();updateSchemeSets(w);renderSessionCards();updateSessProgress();}
+    });
+    plus.addEventListener("click",function(){
+      if(w.sets.length<12){w.sets.push(false);updateSchemeSets(w);renderSessionCards();updateSessProgress();}
+    });
+    setsCtrl.appendChild(minus);setsCtrl.appendChild(plus);
+    track.appendChild(setsCtrl);
+    if(!it.noCharge){
+      var ch=el("div","charge");
+      ch.appendChild(el("label",null,"kg"));
+      var inp=document.createElement("input");
+      inp.type="text";inp.inputMode="decimal";inp.value=w.charge;
+      inp.addEventListener("input",function(){w.charge=inp.value;});
+      ch.appendChild(inp);
+      if(state.lastCharges[it.k]){
+        ch.appendChild(el("span","lastw","dernier : <b>"+esc(state.lastCharges[it.k])+" kg</b>"));
+      }
+      track.appendChild(ch);
+      var hint=progressionHint(it.n);
+      if(hint){
+        (function(h2,input,work){
+          var up=el("button","uphint","↗ Prêt pour "+h2.next+" kg");
+          up.setAttribute("title","2 séances bouclées à "+h2.current+" kg");
+          up.addEventListener("click",function(){
+            input.value=String(h2.next);
+            work.charge=String(h2.next);
+            up.classList.add("applied");
+            up.textContent="✓ "+h2.next+" kg";
+            toast("Charge montée à "+h2.next+" kg — garde la technique !");
+          });
+          track.appendChild(up);
+        })(hint,inp,w);
+      }
+    }
+    if(it.chrono){
+      var cb=el("button","chrono-btn","⏱ "+it.chrono+" s plein écran");
+      cb.addEventListener("click",function(){chronoOpen(it.n,it.chrono,it.k);});
+      track.appendChild(cb);
+    }
+    card.appendChild(track);
+    wrap.appendChild(card);
+  });
+}
+// Met à jour le schéma affiché quand on change le nb de séries en séance
+function updateSchemeSets(w){
+  var base=w.scheme||w.item.s;
+  var m=String(base).match(/×\s*(.*)$/);
+  var rest=m?m[1]:"12";
+  w.scheme=w.sets.length+" × "+rest;
+}
+function _oldNoop(){}
+$("#backBtn").addEventListener("click",function(){
+  if(confirm("Annuler cette séance sans l'enregistrer ?")){current=null;sessClockStop();timerIdle();show("plan");renderPlan();}
+});
+$("#finishBtn").addEventListener("click",function(){
+  if(!current)return;
+  var anyDone=current.work.some(function(w){return w.sets.some(Boolean);});
+  if(!anyDone&&!confirm("Aucune série cochée — enregistrer quand même ?"))return;
+  $("#sessNote")&&(current.note=$("#sessNote").value.trim());
+  // Détection de records (PR) sur les charges de cette séance
+  var prevPR=bestCharges();
+  var newPRs=[];
+  current.work.forEach(function(w){
+    if(w.item.noCharge||!w.charge)return;
+    var v=parseFloat(String(w.charge).replace(",","."));
+    if(isNaN(v))return;
+    var doneAny=w.sets.some(Boolean);
+    if(doneAny&&(!prevPR[w.item.n]||v>prevPR[w.item.n])){newPRs.push(w.item.n+" "+v+" kg");}
+  });
+  var entry={
+    type:"sess",
+    rpe:current.rpe||null,
+    mood:current.mood||null,
+    note:current.note||"",
+    painBefore:(current.painBefore!=null?current.painBefore:0),
+    painAfter:(current.painAfter!=null?current.painAfter:0),
+    duration:Math.floor((Date.now()-sessClock.start)/1000),
+    date:new Date().toISOString(),
+    sid:current.session.id,
+    label:current.session.title,
+    letter:current.session.letter,
+    items:current.work.map(function(w){
+      return {n:w.item.n,s:w.scheme||w.item.s,done:w.sets.filter(Boolean).length,total:w.sets.length,charge:w.charge||""};
+    })
+  };
+  var dS=0,tS=0;
+  current.work.forEach(function(w){
+    if(w.item.fin)return;
+    dS+=w.sets.filter(Boolean).length;tS+=w.sets.length;
+  });
+  entry.partial=(tS>0&&dS<tS);
+  entry.ratio=tS>0?Math.round(dS/tS*100):0;
+  current.work.forEach(function(w){
+    if(w.charge&&!w.item.noCharge)state.lastCharges[w.item.k]=w.charge;
+  });
+  // Mémorise la dernière séance pour la refaire d'un tap
+  state.lastSession={title:current.session.title,letter:current.session.letter,sub:current.session.sub,id:current.session.id,items:current.session.items};
+  state.history.unshift(entry);
+  save();
+  var wasNote=current.note;
+  current=null;
+  sessClockStop();
+  timerIdle();
+  if(newPRs.length){toast("🏆 Record : "+newPRs[0]);}
+  else{toast("Séance enregistrée 💪");}
+  if(state.autoSave)doExport(true);
+  sauvegardeServeur(state);
+  renderPlan();
+  show("plan");
+});
+
+/* ---------- Vue Libre ---------- */
+var basket={};
+function renderGroups(){
+  var wrap=$("#groupBtns");wrap.innerHTML="";
+  Object.keys(LIB).forEach(function(g){
+    var b=el("button","gbtn",esc(g));
+    b.addEventListener("click",function(){b.classList.toggle("sel");renderLib();});
+    b.setAttribute("data-g",g);
+    wrap.appendChild(b);
+  });
+}
+// Extrait le nb de reps d'un schéma ("5 × 12 / côté" -> 12, "5 × max" -> null)
+function parseReps(s){
+  var m=String(s).match(/×\s*(\d+)/);
+  return m?parseInt(m[1],10):null;
+}
+// Reconstruit le libellé du schéma en gardant le suffixe ("/ côté", "s", etc.)
+function buildScheme(sets,reps,orig){
+  var suffix="";
+  var m=String(orig).match(/×\s*(?:\d+(?:-\d+)?|max)\s*(.*)$/);
+  if(m&&m[1])suffix=" "+m[1].trim();
+  return sets+" × "+(reps===null?"max":reps)+suffix;
+}
+function renderLib(){
+  var list=$("#libList");list.innerHTML="";
+  var sel=[];
+  document.querySelectorAll(".gbtn.sel").forEach(function(b){sel.push(b.getAttribute("data-g"));});
+  sel.forEach(function(g){
+    list.appendChild(el("h2",null,esc(g)));
+    LIB[g].forEach(function(it){
+      var added=!!basket[it.k];
+      var card=el("div","lib-card"+(added?" added":""));
+      var row=el("div","lib-ex"+(added?" added":""));
+      var left=el("div");
+      left.appendChild(el("div","n",esc(it.n)));
+      left.appendChild(el("div","s",esc(added?basket[it.k].s:it.s)));
+      row.appendChild(left);
+      row.appendChild(el("div","add",added?"✓":"+"));
+      row.addEventListener("click",function(){
+        if(basket[it.k])delete basket[it.k];
+        else{
+          var copy=Object.assign({},it);
+          copy._reps=parseReps(it.s);
+          basket[it.k]=copy;
+        }
+        renderLib();
+      });
+      card.appendChild(row);
+      // Réglages séries / reps quand l'exercice est sélectionné
+      if(added){
+        var b=basket[it.k];
+        var tune=el("div","lib-tune");
+        function stepper(label,getVal,setVal){
+          var box=el("div","tune-box");
+          box.appendChild(el("span","tune-lab",label));
+          var minus=el("button","tune-btn","−");
+          var val=el("span","tune-val",getVal());
+          var plus=el("button","tune-btn","+");
+          minus.addEventListener("click",function(e){e.stopPropagation();setVal(-1);renderLib();});
+          plus.addEventListener("click",function(e){e.stopPropagation();setVal(1);renderLib();});
+          box.appendChild(minus);box.appendChild(val);box.appendChild(plus);
+          return box;
+        }
+        tune.appendChild(stepper("Séries",
+          function(){return b.sets;},
+          function(d){b.sets=Math.max(1,Math.min(10,b.sets+d));b.s=buildScheme(b.sets,b._reps,it.s);}
+        ));
+        tune.appendChild(stepper("Reps",
+          function(){return b._reps===null?"max":b._reps;},
+          function(d){
+            if(b._reps===null){b._reps=(d>0?5:null);}
+            else{
+              var nv=b._reps+d;
+              if(nv<1){b._reps=null;}
+              else b._reps=Math.min(50,nv);
+            }
+            b.s=buildScheme(b.sets,b._reps,it.s);
+          }
+        ));
+        card.appendChild(tune);
+      }
+      list.appendChild(card);
+    });
+  });
+  var n=Object.keys(basket).length;
+  $("#basketWrap").style.display=n?"block":"none";
+  $("#basketCount").textContent=n;
+}
+$("#startLibre").addEventListener("click",function(){
+  var items=Object.keys(basket).map(function(k){
+    var o=Object.assign({},basket[k]);delete o._reps;return o;
+  });
+  if(!items.length)return;
+  items.push(PLANCHE);
+  openSession({id:"LIBRE",letter:"L",title:"Séance libre",sub:(items.length-1)+" exercices choisis",items:items});
+  basket={};
+  document.querySelectorAll(".gbtn.sel").forEach(function(b){b.classList.remove("sel");});
+  renderLib();
+});
+$("#saveTpl").addEventListener("click",function(){
+  var keys=Object.keys(basket);
+  if(!keys.length){toast("Choisis d'abord des exercices");return;}
+  var name=$("#tplName").value.trim()||("Modèle "+((state.templates||[]).length+1));
+  if(!state.templates)state.templates=[];
+  state.templates.push({name:name,items:keys.map(function(k){
+    var o=Object.assign({},basket[k]);delete o._reps;return o;
+  })});
+  save();
+  $("#tplName").value="";
+  toast("Modèle enregistré : "+name);
+  renderTemplates();
+});
+function renderTemplates(){
+  var wrap=$("#tplList");
+  var tpls=state.templates||[];
+  $("#tplWrap").style.display=tpls.length?"block":"none";
+  if(!wrap)return;
+  wrap.innerHTML="";
+  tpls.forEach(function(t,idx){
+    var row=el("div","tpl-item");
+    var mid=el("div",null);mid.style.flex="1";
+    mid.appendChild(el("div","tn",esc(t.name)));
+    mid.appendChild(el("div","ts",t.items.length+" exercices"));
+    row.appendChild(mid);
+    var go=el("button","tgo","Lancer");
+    go.addEventListener("click",function(){
+      var items=t.items.map(function(it){return Object.assign({},it);});
+      items.push(PLANCHE);
+      openSession({id:"TPL",letter:"M",title:t.name,sub:(items.length-1)+" exercices (modèle)",items:items});
+    });
+    row.appendChild(go);
+    var del=el("button","tdel","✕");
+    del.addEventListener("click",function(){
+      if(!confirm("Supprimer le modèle « "+t.name+" » ?"))return;
+      state.templates.splice(idx,1);save();renderTemplates();
+    });
+    row.appendChild(del);
+    wrap.appendChild(row);
+  });
+}
+
+/* ---------- Vue Dos ---------- */
+$("#startDos").addEventListener("click",function(){openSession(DOS_SESSION);});
+
+/* ---------- Courbe douleur dos ---------- */
+function renderPainChart(){
+  var pts=[];
+  state.history.slice().reverse().forEach(function(h){
+    if(h.type==="act")return;
+    if(h.painBefore==null&&h.painAfter==null)return;
+    pts.push({date:h.date,b:h.painBefore,a:h.painAfter});
+  });
+  var wrap=$("#painWrap");
+  if(!pts.length){wrap.style.display="none";return;}
+  wrap.style.display="block";
+  var bs=pts.filter(function(p){return p.b!=null;}).map(function(p){return p.b;});
+  var as=pts.filter(function(p){return p.a!=null;}).map(function(p){return p.a;});
+  function avg(arr){return arr.length?Math.round(arr.reduce(function(x,y){return x+y;},0)/arr.length*10)/10:null;}
+  $("#painAvgB").textContent=avg(bs)!=null?avg(bs):"—";
+  $("#painAvgA").textContent=avg(as)!=null?avg(as):"—";
+  // tendance : compare la douleur "avant" de la 1re moitié vs 2e moitié
+  var trend="—";
+  if(bs.length>=4){
+    var half=Math.floor(bs.length/2);
+    var early=avg(bs.slice(0,half)),late=avg(bs.slice(half));
+    var d=late-early;
+    trend=(d<=-0.5?"↓ mieux":(d>=0.5?"↑ +douleur":"→ stable"));
+  }
+  $("#painTrend").textContent=trend;
+  $("#painTrend").style.color=trend.indexOf("mieux")>=0?"var(--ok)":(trend.indexOf("+douleur")>=0?"var(--red)":"inherit");
+  drawPain(pts);
+}
+function drawPain(pts){
+  var cv=$("#painCanvas");
+  var dpr=window.devicePixelRatio||1;
+  var W=cv.clientWidth||300,H=160;
+  cv.width=W*dpr;cv.height=H*dpr;
+  var ctx=cv.getContext("2d");ctx.scale(dpr,dpr);ctx.clearRect(0,0,W,H);
+  var pad={l:24,r:12,t:12,b:18};
+  function X(i){return pts.length>1?pad.l+(W-pad.l-pad.r)*i/(pts.length-1):W/2;}
+  function Y(v){return pad.t+(H-pad.t-pad.b)*(v/5);}
+  ctx.strokeStyle="#e2ded7";ctx.lineWidth=1;ctx.fillStyle="#8a857d";
+  ctx.font="9px 'IBM Plex Sans',sans-serif";ctx.textAlign="right";ctx.textBaseline="middle";
+  for(var g=0;g<=5;g++){var gy=Y(g);ctx.beginPath();ctx.moveTo(pad.l,gy);ctx.lineTo(W-pad.r,gy);ctx.stroke();ctx.fillText(g,pad.l-4,gy);}
+  function line(key,color){
+    var seg=pts.map(function(p,i){return {i:i,v:p[key]};}).filter(function(o){return o.v!=null;});
+    if(!seg.length)return;
+    ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.lineJoin="round";ctx.beginPath();
+    seg.forEach(function(o,j){var x=X(o.i),y=Y(o.v);j?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+    ctx.stroke();
+    seg.forEach(function(o){ctx.beginPath();ctx.arc(X(o.i),Y(o.v),3,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();});
+  }
+  line("b","#8a857d");
+  line("a","#E30613");
+  // légende
+  ctx.textAlign="left";ctx.fillStyle="#8a857d";ctx.fillText("● avant",pad.l+2,pad.t-2>6?pad.t-2:8);
+  ctx.fillStyle="#E30613";ctx.fillText("● après",pad.l+52,pad.t-2>6?pad.t-2:8);
+}
+
+/* ---------- Formulaire activité ---------- */
+var actSel="";
+function syncActFields(){
+  // Nom libre tapé ? on montre tout par prudence. Sinon selon le preset.
+  var custom=$("#actName")&&$("#actName").value.trim();
+  var showDist=custom?true:(ACT_DIST.indexOf(actSel)>=0);
+  var showDplus=custom?true:(ACT_DPLUS.indexOf(actSel)>=0);
+  if($("#actDistRow"))$("#actDistRow").style.display=showDist?"flex":"none";
+  if($("#actDplusCol"))$("#actDplusCol").style.display=showDplus?"block":"none";
+}
+function renderChips(){
+  var wrap=$("#actChips");wrap.innerHTML="";
+  ACT_PRESETS.forEach(function(a){
+    var c=el("button","chip"+(actSel===a?" sel":""),esc(a));
+    c.addEventListener("click",function(){
+      actSel=(actSel===a)?"":a;
+      renderChips();syncActFields();
+    });
+    wrap.appendChild(c);
+  });
+}
+$("#addActBtn").addEventListener("click",function(){
+  var f=$("#actForm");
+  f.classList.toggle("open");
+  if(f.classList.contains("open")){
+    $("#actDate").value=new Date().toISOString().slice(0,10);
+    actSel="";renderChips();
+    $("#actName").value="";$("#actMin").value="";$("#actNote").value="";
+    if($("#actH"))$("#actH").value="";
+    if($("#actS"))$("#actS").value="";
+    if($("#actDist"))$("#actDist").value="";
+    if($("#actDplus"))$("#actDplus").value="";
+    syncActFields();
+  }
+});
+if($("#actName"))$("#actName").addEventListener("input",syncActFields);
+$("#actCancel").addEventListener("click",function(){$("#actForm").classList.remove("open");});
+$("#actSave").addEventListener("click",function(){
+  var name=actSel||$("#actName").value.trim();
+  if(!name){toast("Choisis ou nomme l'activité");return;}
+  var dateStr=$("#actDate").value||new Date().toISOString().slice(0,10);
+  var d=new Date(dateStr+"T12:00:00");
+  var h=parseInt($("#actH")?$("#actH").value:"",10);
+  var m=parseInt($("#actMin").value,10);
+  var sec=parseInt($("#actS")?$("#actS").value:"",10);
+  h=isNaN(h)?0:h;m=isNaN(m)?0:m;sec=isNaN(sec)?0:sec;
+  var mins=h*60+m+sec/60;
+  if(mins<=0)mins=NaN;
+  var distRaw=($("#actDist")?$("#actDist").value:"").trim().replace(",",".");
+  var dist=parseFloat(distRaw);
+  var dplusRaw=($("#actDplus")?$("#actDplus").value:"").trim().replace(",",".");
+  var dplus=parseInt(dplusRaw,10);
+  var entry={
+    type:"act",
+    date:d.toISOString(),
+    label:name,
+    minutes:isNaN(mins)?null:Math.round(mins*100)/100,
+    distance:(isNaN(dist)||dist<=0)?null:Math.round(dist*100)/100,
+    dplus:(isNaN(dplus)||dplus<=0)?null:dplus,
+    note:$("#actNote").value.trim()
+  };
+  state.history.unshift(entry);
+  state.history.sort(function(a,b){return a.date<b.date?1:-1;});
+  save();
+  $("#actForm").classList.remove("open");
+  toast("Activité ajoutée : "+name);
+  renderHisto();
+});
+
+/* ---------- Progression (courbe) ---------- */
+function chargeSeries(){
+  var map={};
+  state.history.slice().reverse().forEach(function(h){
+    if(h.type==="act"||!h.items)return;
+    h.items.forEach(function(i){
+      var v=parseFloat(String(i.charge).replace(",","."));
+      if(isNaN(v)||v<=0)return;
+      if(!map[i.n])map[i.n]=[];
+      map[i.n].push({date:h.date,v:v});
+    });
+  });
+  return map;
+}
+function renderProg(){
+  var map=chargeSeries();
+  var names=Object.keys(map).filter(function(n){return map[n].length>=1;}).sort();
+  var wrap=$("#progWrap");
+  if(!names.length){wrap.style.display="none";return;}
+  wrap.style.display="block";
+  var sel=$("#progSel");
+  var prev=sel.value;
+  sel.innerHTML="";
+  names.forEach(function(n){
+    var o=document.createElement("option");
+    o.value=n;o.textContent=n+" ("+map[n].length+")";
+    sel.appendChild(o);
+  });
+  if(prev&&names.indexOf(prev)>=0)sel.value=prev;
+  function refresh(){drawChart(map[sel.value]||[]);drawExHist(map[sel.value]||[]);}
+  refresh();
+  sel.onchange=refresh;
+}
+function drawExHist(pts){
+  var wrap=$("#exHist");wrap.innerHTML="";
+  if(!pts.length){$("#pPr").textContent="—";return;}
+  var pr=Math.max.apply(null,pts.map(function(p){return p.v;}));
+  $("#pPr").textContent=pr+" kg";
+  pts.slice().reverse().forEach(function(p){
+    var f=fmtDate(p.date);
+    var line=el("div","eh-line");
+    line.appendChild(el("span","eh-date",f.d+" "+f.m+" "+f.y));
+    var isPr=p.v===pr;
+    line.appendChild(el("span","eh-charge"+(isPr?" pr":""),(isPr?"🏆 ":"")+p.v+" kg"));
+    wrap.appendChild(line);
+  });
+}
+function drawChart(pts){
+  var cv=$("#progCanvas");
+  var dpr=window.devicePixelRatio||1;
+  var W=cv.clientWidth||300,H=180;
+  cv.width=W*dpr;cv.height=H*dpr;
+  var ctx=cv.getContext("2d");
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,W,H);
+  var f=pts.length?pts[0].v:0, l=pts.length?pts[pts.length-1].v:0;
+  $("#pFirst").textContent=pts.length?f+" kg":"—";
+  $("#pLast").textContent=pts.length?l+" kg":"—";
+  var g=l-f;
+  $("#pGain").textContent=pts.length>1?((g>=0?"+":"")+Math.round(g*10)/10+" kg"):"—";
+  $("#pGain").style.color=g>0?"var(--ok)":(g<0?"var(--red)":"inherit");
+  if(!pts.length)return;
+  var pad={l:34,r:12,t:12,b:20};
+  var vs=pts.map(function(p){return p.v;});
+  var vmin=Math.min.apply(null,vs),vmax=Math.max.apply(null,vs);
+  if(vmin===vmax){vmin-=5;vmax+=5;}
+  var span=vmax-vmin;
+  vmin-=span*0.1;vmax+=span*0.1;
+  function X(i){return pts.length>1?pad.l+(W-pad.l-pad.r)*i/(pts.length-1):W/2;}
+  function Y(v){return pad.t+(H-pad.t-pad.b)*(1-(v-vmin)/(vmax-vmin));}
+  ctx.strokeStyle="#e2ded7";ctx.lineWidth=1;ctx.fillStyle="#8a857d";
+  ctx.font="10px 'IBM Plex Sans',sans-serif";ctx.textAlign="right";ctx.textBaseline="middle";
+  for(var gI=0;gI<4;gI++){
+    var gv=vmin+(vmax-vmin)*gI/3;
+    var gy=Y(gv);
+    ctx.beginPath();ctx.moveTo(pad.l,gy);ctx.lineTo(W-pad.r,gy);ctx.stroke();
+    ctx.fillText(Math.round(gv),pad.l-5,gy);
+  }
+  ctx.strokeStyle="#E30613";ctx.lineWidth=2.5;ctx.lineJoin="round";
+  ctx.beginPath();
+  pts.forEach(function(p,i){var x=X(i),y=Y(p.v);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+  ctx.stroke();
+  pts.forEach(function(p,i){
+    ctx.beginPath();ctx.arc(X(i),Y(p.v),3.5,0,Math.PI*2);
+    ctx.fillStyle="#161616";ctx.fill();
+  });
+}
+
+/* ---------- Records (PR) ---------- */
+/* Progression des charges : prêt à monter ? */
+function parseKg(v){
+  var n=parseFloat(String(v).replace(",","."));
+  return isNaN(n)?null:n;
+}
+// Renvoie {ready, next, count} si les 2 dernières séances ont été bouclées
+// à la même charge sur cet exercice → suggestion d'augmentation
+function progressionHint(name){
+  var done=[];
+  for(var i=0;i<state.history.length&&done.length<2;i++){
+    var h=state.history[i];
+    if(h.type==="act"||!h.items)continue;
+    for(var j=0;j<h.items.length;j++){
+      var it=h.items[j];
+      if(it.n!==name)continue;
+      var kg=parseKg(it.charge);
+      if(kg===null||kg<=0)return null;          // pas de charge suivie
+      if(it.done<it.total)return null;          // série non bouclée → on ne monte pas
+      done.push(kg);
+      break;
+    }
+  }
+  if(done.length<2)return null;
+  if(done[0]!==done[1])return null;             // charge déjà changée récemment
+  var cur=done[0];
+  var step=cur>=20?2.5:1;                       // barre lourde vs haltères/isolation
+  return {ready:true,next:Math.round((cur+step)*10)/10,current:cur};
+}
+function bestCharges(){
+  var best={};
+  state.history.forEach(function(h){
+    if(h.type==="act"||!h.items)return;
+    h.items.forEach(function(i){
+      if(!i.charge||!i.done)return;
+      var v=parseFloat(String(i.charge).replace(",","."));
+      if(isNaN(v))return;
+      if(!best[i.n]||v>best[i.n])best[i.n]=v;
+    });
+  });
+  return best;
+}
+
+/* ---------- Export / Import ---------- */
+function doExport(silent){
+  try{
+    var data=JSON.stringify(state,null,1);
+    var blob=new Blob([data],{type:"application/json"});
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    var d=new Date();
+    a.download="muscu-sauvegarde-"+d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0")+".json";
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
+    state.lastExport=new Date().toISOString();
+    save();
+    renderBackupWarn();
+    if(!silent)toast("Sauvegarde exportée");
+  }catch(e){if(!silent)toast("Export impossible ici");}
+}
+/* Alerte sauvegarde : prévient quand l'historique n'est plus protégé */
+/* ---------- Sauvegarde automatique sur le serveur ----------
+   Le token n'est jamais dans le code (l'app est publique) : il est saisi
+   une fois dans les réglages et gardé dans le localStorage du téléphone. */
+var MB_URL="https://suite.ageoterra.fr/muscu-backup/api/save";
+
+function configurerSauvegarde(){
+  var actuel="";
+  try{actuel=localStorage.getItem("mb_token")||"";}catch(e){}
+  var t=prompt("Token de sauvegarde serveur (laisser vide pour désactiver) :",actuel);
+  if(t===null)return;
+  try{
+    if(t.trim()){localStorage.setItem("mb_token",t.trim());toast("Sauvegarde serveur activée");}
+    else{localStorage.removeItem("mb_token");toast("Sauvegarde serveur désactivée");}
+  }catch(e){toast("Stockage indisponible ici");}
+  renderSrvState();
+}
+function mbToken(){
+  try{return localStorage.getItem("mb_token");}catch(e){return null;}
+}
+function mbDerniere(){
+  try{return localStorage.getItem("mb_derniere_sauvegarde");}catch(e){return null;}
+}
+function sauvegardeServeur(donnees){
+  try{
+    var token=mbToken();
+    if(!token||!navigator.onLine)return;
+    var corps=JSON.stringify({token:token,data:donnees});
+    // text/plain = requête "simple" : pas de pré-vérification CORS
+    fetch(MB_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain"},
+      body:corps,
+      keepalive:corps.length<60000
+    }).then(function(r){return r.ok?r.json():null;})
+      .then(function(j){
+        if(j&&j.ok){
+          try{localStorage.setItem("mb_derniere_sauvegarde",new Date().toISOString());}catch(e){}
+          toast("✓ Sauvegardé sur le serveur");
+          renderSrvState();
+          renderBackupWarn();
+        }
+      }).catch(function(){});
+  }catch(e){}
+}
+function renderSrvState(){
+  var p=$("#srvState");if(!p)return;
+  var btn=$("#srvConfig");
+  if(!mbToken()){
+    p.innerHTML="Non configurée — tes sauvegardes restent sur ce téléphone.";
+    if(btn)btn.textContent="🔑 Saisir le token de sauvegarde";
+    return;
+  }
+  var d=mbDerniere();
+  if(!d){
+    p.innerHTML="<b>Activée</b> — aucune sauvegarde encore envoyée.";
+  }else{
+    var dt=new Date(d);
+    var j=Math.floor((Date.now()-dt.getTime())/86400000);
+    var quand=j===0?"aujourd'hui":(j===1?"hier":"il y a "+j+" jours");
+    p.innerHTML="<b>Activée</b> — dernière sauvegarde "+quand+" ("+dt.getDate()+"/"+(dt.getMonth()+1)+" à "+dt.getHours()+"h"+String(dt.getMinutes()).padStart(2,"0")+").";
+  }
+  if(btn)btn.textContent="🔑 Modifier le token";
+}
+function renderBackupWarn(){
+  var box=$("#backupWarn");if(!box)return;
+  var n=state.history.length;
+  if(n<3){box.style.display="none";return;}
+  // On retient la plus récente des deux protections : export manuel ou envoi serveur
+  var days=null;
+  var refs=[];
+  if(state.lastExport)refs.push(new Date(state.lastExport).getTime());
+  var srv=mbDerniere();
+  if(srv)refs.push(new Date(srv).getTime());
+  if(refs.length){
+    days=Math.floor((Date.now()-Math.max.apply(null,refs))/86400000);
+  }
+  // jamais exporté, ou plus de 14 jours
+  if(days===null){
+    box.style.display="block";
+    box.className="backupwarn urgent";
+    box.innerHTML="<b>⚠ Aucune sauvegarde</b><br>Tes "+n+" séances ne sont que dans ce téléphone. Un nettoyage du navigateur et tout est perdu — exporte le fichier et range-le sur ton cloud.";
+  }else if(days>=14){
+    box.style.display="block";
+    box.className="backupwarn"+(days>=30?" urgent":"");
+    box.innerHTML="<b>⚠ Dernière sauvegarde il y a "+days+" jours</b><br>Pense à exporter ton historique pour ne pas le perdre.";
+  }else{
+    box.style.display="none";
+  }
+}
+$("#expBtn").addEventListener("click",function(){doExport(false);});
+$("#impBtn").addEventListener("click",function(){$("#impFile").click();});
+$("#impFile").addEventListener("change",function(){
+  var f=this.files[0];
+  if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      var p=JSON.parse(r.result);
+      if(!p||typeof p!=="object"||!Array.isArray(p.history))throw new Error("format");
+      if(!confirm("Importer cette sauvegarde ("+p.history.length+" entrées) ? Elle remplacera les données actuelles."))return;
+      state.freq=p.freq||3;
+      state.rest=p.rest||90;
+      state.dur=p.dur||40;
+      state.autoRest=p.autoRest!==false;
+      state.mode=p.mode||"equilibre";
+      state.history=p.history;
+      state.lastCharges=p.lastCharges||{};
+      state.chronoDur=p.chronoDur||{};
+      state.autoSave=!!p.autoSave;
+      state.lastSession=p.lastSession||null;
+      state.templates=Array.isArray(p.templates)?p.templates:[];
+      state.hiitCustom=Array.isArray(p.hiitCustom)?p.hiitCustom:[];
+      state.weights=Array.isArray(p.weights)?p.weights:[];
+      state.lastExport=p.lastExport||null;
+      save();
+      renderPlan();renderHisto();
+      toast("Sauvegarde importée ✓");
+    }catch(e){toast("Fichier invalide");}
+  };
+  r.readAsText(f);
+  this.value="";
+});
+
+/* ---------- Poids de corps ---------- */
+function renderWeight(){
+  var ws=(state.weights||[]).slice().sort(function(a,b){return a.date<b.date?-1:1;});
+  var hasData=ws.length>0;
+  $("#weightStats").style.display=hasData?"flex":"none";
+  $("#weightCanvas").style.display=ws.length>=2?"block":"none";
+  $("#weightEmpty").style.display=hasData?"none":"block";
+  if(!hasData)return;
+  var first=ws[0].v,last=ws[ws.length-1].v;
+  $("#wLast").textContent=last+" kg";
+  $("#wStart").textContent=first+" kg";
+  var d=Math.round((last-first)*10)/10;
+  $("#wDelta").textContent=(d>0?"+":"")+d+" kg";
+  $("#wDelta").style.color=d===0?"inherit":(Math.abs(d)<=2?"var(--ok)":"var(--ink)");
+  if(ws.length>=2)drawWeight(ws);
+}
+function drawWeight(ws){
+  var cv=$("#weightCanvas");
+  var dpr=window.devicePixelRatio||1;
+  var W=cv.clientWidth||300,H=150;
+  cv.width=W*dpr;cv.height=H*dpr;
+  var ctx=cv.getContext("2d");ctx.scale(dpr,dpr);ctx.clearRect(0,0,W,H);
+  var pad={l:34,r:12,t:12,b:20};
+  var vs=ws.map(function(p){return p.v;});
+  var vmin=Math.min.apply(null,vs),vmax=Math.max.apply(null,vs);
+  if(vmin===vmax){vmin-=2;vmax+=2;}
+  var span=vmax-vmin;vmin-=span*0.15;vmax+=span*0.15;
+  function X(i){return ws.length>1?pad.l+(W-pad.l-pad.r)*i/(ws.length-1):W/2;}
+  function Y(v){return pad.t+(H-pad.t-pad.b)*(1-(v-vmin)/(vmax-vmin));}
+  ctx.strokeStyle="#e2ded7";ctx.lineWidth=1;ctx.fillStyle="#8a857d";
+  ctx.font="10px 'IBM Plex Sans',sans-serif";ctx.textAlign="right";ctx.textBaseline="middle";
+  for(var g=0;g<4;g++){var gv=vmin+(vmax-vmin)*g/3;var gy=Y(gv);ctx.beginPath();ctx.moveTo(pad.l,gy);ctx.lineTo(W-pad.r,gy);ctx.stroke();ctx.fillText(Math.round(gv*10)/10,pad.l-5,gy);}
+  ctx.strokeStyle="#E30613";ctx.lineWidth=2.5;ctx.lineJoin="round";
+  ctx.beginPath();ws.forEach(function(p,i){var x=X(i),y=Y(p.v);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
+  ws.forEach(function(p,i){ctx.beginPath();ctx.arc(X(i),Y(p.v),3.5,0,Math.PI*2);ctx.fillStyle="#161616";ctx.fill();});
+}
+if($("#weightSave")){
+  $("#weightSave").addEventListener("click",function(){
+    var raw=$("#weightInput").value.trim().replace(",",".");
+    var v=parseFloat(raw);
+    if(isNaN(v)||v<30||v>250){toast("Entre un poids valide (kg)");return;}
+    v=Math.round(v*10)/10;
+    if(!state.weights)state.weights=[];
+    var today=new Date().toISOString().slice(0,10);
+    var existing=state.weights.find(function(w){return w.date.slice(0,10)===today;});
+    if(existing)existing.v=v;
+    else state.weights.push({date:new Date().toISOString(),v:v});
+    save();
+    $("#weightInput").value="";
+    toast("Poids noté : "+v+" kg");
+    renderWeight();
+  });
+}
+
+/* ---------- Volume hebdomadaire ---------- */
+function repsFromScheme(s){
+  var m=String(s).match(/×\s*(\d+)/);
+  return m?parseInt(m[1],10):12;
+}
+function weekVolume(){
+  var byWeek={};
+  state.history.forEach(function(h){
+    if(h.type==="act"||!h.items)return;
+    var wk=weekKey(h.date);
+    if(!byWeek[wk])byWeek[wk]={series:0,tonnage:0,sess:0,label:h.date};
+    byWeek[wk].sess++;
+    h.items.forEach(function(i){
+      byWeek[wk].series+=i.done||0;
+      var v=parseFloat(String(i.charge).replace(",","."));
+      if(!isNaN(v)&&v>0&&i.done)byWeek[wk].tonnage+=v*repsFromScheme(i.s)*i.done;
+    });
+  });
+  return byWeek;
+}
+function renderVolume(){
+  var bw=weekVolume();
+  var keys=Object.keys(bw);
+  var card=$("#volCard");
+  if(!keys.length){card.style.display="none";return;}
+  card.style.display="block";
+  var wk=weekKey(new Date().toISOString());
+  var cur=bw[wk]||{series:0,tonnage:0,sess:0};
+  $("#vSeries").textContent=cur.series;
+  $("#vTonnage").textContent=cur.tonnage>=1000?(Math.round(cur.tonnage/100)/10)+"t":Math.round(cur.tonnage);
+  $("#vSess").textContent=cur.sess;
+  // 8 dernières semaines (barres)
+  var now=new Date();
+  var weeks=[];
+  for(var i=7;i>=0;i--){
+    var d=new Date(now);d.setDate(d.getDate()-i*7);
+    var k=weekKey(d.toISOString());
+    weeks.push({k:k,series:bw[k]?bw[k].series:0});
+  }
+  drawBars(weeks);
+}
+function drawBars(weeks){
+  var cv=$("#volCanvas");
+  var dpr=window.devicePixelRatio||1;
+  var W=cv.clientWidth||300,H=90;
+  cv.width=W*dpr;cv.height=H*dpr;
+  var ctx=cv.getContext("2d");ctx.scale(dpr,dpr);ctx.clearRect(0,0,W,H);
+  var max=Math.max.apply(null,weeks.map(function(w){return w.series;}).concat([1]));
+  var n=weeks.length,gap=8,bw=(W-gap*(n-1))/n;
+  weeks.forEach(function(w,i){
+    var h=w.series/max*(H-18);
+    var x=i*(bw+gap),y=H-18-h;
+    ctx.fillStyle=(i===n-1)?"#E30613":"#c9c5bd";
+    ctx.fillRect(x,y,bw,h);
+    if(w.series){
+      ctx.fillStyle="#3a3a3a";ctx.font="9px 'IBM Plex Sans',sans-serif";ctx.textAlign="center";
+      ctx.fillText(w.series,x+bw/2,y-3);
+    }
+  });
+}
+
+/* ---------- Vue Historique ---------- */
+function renderHisto(){
+  renderSrvState();
+  renderBackupWarn();
+  renderWeight();
+  renderVolume();
+  renderProg();
+  var list=$("#histoList");list.innerHTML="";
+  var wk=weekKey(new Date().toISOString());
+  var wkSess=state.history.filter(function(h){return h.type!=="act"&&weekKey(h.date)===wk;}).length;
+  var wkAct=state.history.filter(function(h){return h.type==="act"&&weekKey(h.date)===wk;}).length;
+  $("#histoStats").textContent=state.history.length
+    ? muscuCount()+" séance(s) muscu · "+state.history.filter(function(h){return h.type==="act";}).length+" activité(s) · cette semaine : "+wkSess+" muscu + "+wkAct+" autre(s)"
+    : "";
+  if(!state.history.length){
+    list.appendChild(el("div","empty","Rien pour l'instant.<br>Termine une séance ou ajoute une activité, tout apparaîtra ici."));
+    return;
+  }
+  state.history.forEach(function(h,idx){
+    var isAct=h.type==="act";
+    var card=el("div","h-card"+(isAct?" act":""));
+    var head=el("div","h-head");
+    var f=fmtDate(h.date);
+    head.appendChild(el("div","h-date",f.d+"<span>"+f.m+"</span>"));
+    var mid=el("div");
+    if(isAct){
+      mid.appendChild(el("div","h-title",esc(h.label)));
+      var bits=[f.wd+" "+f.y];
+      if(h.minutes)bits.push(fmtDur(h.minutes));
+      if(h.distance)bits.push(h.distance+" km");
+      if(h.dplus)bits.push("D+ "+h.dplus+" m");
+      // Allure min/km si distance + durée présentes
+      if(h.distance&&h.minutes){
+        var pace=h.minutes/h.distance;
+        var pm=Math.floor(pace),ps=Math.round((pace-pm)*60);
+        if(ps===60){pm++;ps=0;}
+        bits.push(pm+":"+(ps<10?"0":"")+ps+"/km");
+        // Allure-effort : D+ converti en distance (100 m D+ = 1 km plat)
+        if(h.dplus){
+          var effKm=h.distance+h.dplus/100;
+          var ep=h.minutes/effKm;
+          var em=Math.floor(ep),es=Math.round((ep-em)*60);
+          if(es===60){em++;es=0;}
+          bits.push(em+":"+(es<10?"0":"")+es+"/km effort");
+        }
+      }
+      mid.appendChild(el("div","h-sub",esc(bits.join(" · "))));
+    }else{
+      mid.appendChild(el("div","h-title",esc(h.letter||"·")+" · "+esc(h.label)+(h.partial?" <span class='h-badge'>partielle "+h.ratio+"%</span>":"")+(h.mood?" <span class='h-mood'>"+MOOD_EMO[h.mood-1]+"</span>":"")));
+      var doneEx=(h.items||[]).filter(function(i){return i.done>0;}).length;
+      var durTxt=h.duration?" · "+Math.round(h.duration/60)+" min":"";
+      mid.appendChild(el("div","h-sub",f.wd+" "+f.y+" · "+doneEx+"/"+(h.items||[]).length+" exos"+durTxt+(h.rpe?" · "+RPE_LABELS[h.rpe-1]:"")));
+    }
+    head.appendChild(mid);
+    var del=el("button","h-del","✕");
+    del.setAttribute("aria-label","Supprimer cette entrée");
+    del.addEventListener("click",function(e){
+      e.stopPropagation();
+      if(!confirm("Supprimer cette entrée de l'historique ?"))return;
+      state.history.splice(idx,1);save();renderHisto();renderPlan();
+    });
+    head.appendChild(del);
+    card.appendChild(head);
+    if(isAct){
+      if(h.note){
+        head.addEventListener("click",function(){card.classList.toggle("open");});
+        var body=el("div","h-body");
+        body.appendChild(el("div",null,esc(h.note)));
+        card.appendChild(body);
+      }
+    }else{
+      head.addEventListener("click",function(){card.classList.toggle("open");});
+      var body2=el("div","h-body");
+      if(h.painBefore!=null||h.painAfter!=null){
+        var pn=el("div","h-pain","🩹 Dos : "+(h.painBefore!=null?h.painBefore:"–")+" → "+(h.painAfter!=null?h.painAfter:"–")+" /5");
+        pn.style.cssText="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f1eee9";
+        body2.appendChild(pn);
+      }
+      if(h.note){
+        var nn=el("div",null,"📝 "+esc(h.note));
+        nn.style.cssText="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f1eee9;color:var(--ink-2);font-style:italic";
+        body2.appendChild(nn);
+      }
+      (h.items||[]).forEach(function(i){
+        var line=el("div","h-line");
+        line.appendChild(el("span",null,esc(i.n)+" <span style='color:var(--grey)'>("+i.done+"/"+i.total+")</span>"));
+        line.appendChild(el("span","c",i.charge?esc(i.charge)+" kg":"—"));
+        body2.appendChild(line);
+      });
+      card.appendChild(body2);
+    }
+    list.appendChild(card);
+  });
+}
+
+/* ---------- Init ---------- */
+renderGroups();
+renderLib();
+renderChips();
+renderPlan();
+renderTemplates();
+renderHiitUI();
+timerIdle();
+if($("#srvConfig")){$("#srvConfig").addEventListener("click",configurerSauvegarde);renderSrvState();}
+$("#autoSave").checked=!!state.autoSave;
+$("#autoSave").addEventListener("change",function(){
+  state.autoSave=this.checked;save();
+  toast(this.checked?"Sauvegarde auto activée":"Sauvegarde auto désactivée");
+});
+if($("#autoRest")){
+  $("#autoRest").checked=state.autoRest!==false;
+  $("#autoRest").addEventListener("change",function(){
+    state.autoRest=this.checked;save();
+    toast(this.checked?"Repos auto activé":"Repos auto désactivé");
+  });
+}
+if(!canSave){toast("⚠ Sauvegarde locale indisponible dans ce contexte");}
+})();
+</script>
+<script>
+/* Enregistrement du service worker (mode PWA installable + hors-ligne) */
+if("serviceWorker" in navigator){
+  window.addEventListener("load",function(){
+    navigator.serviceWorker.register("sw.js").then(function(reg){
+      // Si une nouvelle version est dispo, on l'active au prochain lancement
+      reg.addEventListener("updatefound",function(){
+        var nw=reg.installing;
+        if(!nw)return;
+        nw.addEventListener("statechange",function(){
+          if(nw.state==="installed"&&navigator.serviceWorker.controller){
+            nw.postMessage("SKIP_WAITING");
+          }
+        });
+      });
+    }).catch(function(){/* pas bloquant : l'app marche sans SW */});
+  });
+}
+</script>
+</body>
+</html>
