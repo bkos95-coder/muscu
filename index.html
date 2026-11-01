@@ -685,8 +685,15 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.1.0";
+var APP_VERSION="1.2.0";
 var CHANGELOG=[
+ {v:"1.2.0",d:"2026-11-02",n:[
+   "HIIT : on peut s'arrêter en cours de route et enregistrer ce qui a été fait",
+   "Le bouton Quitter propose d'enregistrer plutôt que de tout perdre"
+ ]},
+ {v:"1.1.1",d:"2026-11-02",n:[
+   "Sauvegarde serveur aussi après l'ajout d'une activité (course, trail…) et après un relevé de poids"
+ ]},
  {v:"1.1.0",d:"2026-11-01",n:[
    "Option « garder l'écran allumé pendant toute la séance » (bandeau circuit)",
    "Numéro de version visible et journal des nouveautés",
@@ -1577,25 +1584,54 @@ function hiitStop(record){
   if(document.fullscreenElement){document.exitFullscreen().catch(function(){});}
   if(!timer.iv&&!chrono.iv)lockOff();
 }
-function hiitFinish(){
+// Compte combien de fois chaque exercice a réellement été effectué
+// (utile quand on quitte un HIIT en cours de route)
+function hiitFait(){
+  var compte={},total=0;
+  for(var i=0;i<hiit.idx&&i<hiit.seq.length;i++){
+    var p=hiit.seq[i];
+    if(p.type==="work"){compte[p.ex.n]=(compte[p.ex.n]||0)+1;total++;}
+  }
+  return {compte:compte,total:total};
+}
+function hiitFinish(partiel){
   var duration=Math.floor((Date.now()-hiit.startedAt)/1000);
+  var exList=hiit.exList||[];
+  var items,ratio,label;
+  if(partiel){
+    var f=hiitFait();
+    var prevu=exList.length*hiit.tours;
+    ratio=prevu?Math.round(f.total/prevu*100):0;
+    label="HIIT · "+hiit.circName+" (partiel "+ratio+"%)";
+    items=exList.map(function(e){
+      return {n:e.n,s:HIIT_WORK+" s",done:f.compte[e.n]||0,total:hiit.tours,charge:""};
+    }).filter(function(it){return it.done>0;});
+  }else{
+    ratio=100;
+    label="HIIT · "+hiit.circName+" ×"+hiit.tours;
+    items=exList.map(function(e){return {n:e.n,s:HIIT_WORK+" s",done:hiit.tours,total:hiit.tours,charge:""};});
+  }
   var entry={
     type:"sess",
     date:new Date().toISOString(),
     sid:"HIIT",
-    label:"HIIT · "+hiit.circName+" ×"+hiit.tours,
+    label:label,
     letter:"⚡",
     duration:duration,
     painBefore:null,painAfter:null,rpe:null,mood:null,note:"",
-    partial:false,ratio:100,
-    items:(hiit.exList||[]).map(function(e){return {n:e.n,s:HIIT_WORK+" s",done:hiit.tours,total:hiit.tours,charge:""};})
+    partial:!!partiel,ratio:ratio,
+    items:items
   };
   state.history.unshift(entry);
   save();
   hiitStop();
-  beepEnd();
-  if(navigator.vibrate)navigator.vibrate([300,120,300,120,600]);
-  toast("HIIT terminé et enregistré ⚡ "+Math.round(duration/60)+" min");
+  if(!partiel){
+    beepEnd();
+    if(navigator.vibrate)navigator.vibrate([300,120,300,120,600]);
+    toast("HIIT terminé et enregistré ⚡ "+Math.round(duration/60)+" min");
+  }else{
+    toast("HIIT enregistré ⚡ "+ratio+"% · "+Math.round(duration/60)+" min");
+  }
   if(state.autoSave)doExport(true);
   sauvegardeServeur(state);
   renderPlan();
@@ -1619,7 +1655,26 @@ $("#hPause").addEventListener("click",function(){
   }
 });
 $("#hQuit").addEventListener("click",function(){
-  if(confirm("Quitter le HIIT en cours ? (non enregistré)")){hiitStop();}
+  var f=hiitFait();
+  if(f.total===0){
+    // rien de fait : on sort sans rien enregistrer
+    if(confirm("Quitter le HIIT ? Rien n'a encore été fait, rien ne sera enregistré."))hiitStop();
+    return;
+  }
+  var mins=Math.round((Date.now()-hiit.startedAt)/60000);
+  var prevu=(hiit.exList||[]).length*hiit.tours;
+  var pct=prevu?Math.round(f.total/prevu*100):0;
+  // Pause automatique pendant que la question est posée
+  var etaitEnPause=hiit.paused;
+  hiit.paused=true;
+  var reste=Math.max(0,hiit.phEnd-Date.now());
+  if(confirm("Arrêter ici et enregistrer ?\n\n"+f.total+" exercice"+(f.total>1?"s":"")+" faits sur "+prevu+" ("+pct+"%) · environ "+mins+" min.\n\nOK = enregistrer ce qui est fait\nAnnuler = reprendre le circuit")){
+    hiitFinish(true);
+  }else{
+    // on reprend là où on s'était arrêté
+    hiit.paused=etaitEnPause;
+    if(!etaitEnPause)hiit.phEnd=Date.now()+reste;
+  }
 });
 
 /* ---------- Vue Séance ---------- */
@@ -2159,6 +2214,7 @@ $("#actSave").addEventListener("click",function(){
   save();
   $("#actForm").classList.remove("open");
   toast("Activité ajoutée : "+name);
+  sauvegardeServeur(state);
   renderHisto();
 });
 
@@ -2521,6 +2577,7 @@ if($("#weightSave")){
     save();
     $("#weightInput").value="";
     toast("Poids noté : "+v+" kg");
+    sauvegardeServeur(state);
     renderWeight();
   });
 }
