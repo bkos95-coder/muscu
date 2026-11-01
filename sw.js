@@ -1,13 +1,18 @@
 /* Service Worker — Mon Programme Muscu
-   Stratégie :
-   - HTML (index) : network-first, on retombe sur le cache si hors-ligne.
-     => tu récupères automatiquement les nouvelles versions quand tu as du réseau.
-   - Le reste (icônes, manifeste) : cache-first.
-   IMPORTANT : les données d'entraînement sont dans localStorage,
-   le SW ne les touche jamais. Vider le cache ne perd aucune donnée.
-*/
+   VERSION : à incrémenter à chaque nouvelle livraison.
+   Elle doit correspondre à APP_VERSION dans index.html.
 
-const CACHE = "muscu-v1";
+   Stratégie :
+   - HTML (index) : network-first → la nouvelle version arrive dès qu'il y a
+     du réseau, avec repli sur le cache si hors-ligne.
+   - Le reste (icônes, manifeste) : cache-first.
+
+   IMPORTANT : les données d'entraînement sont dans localStorage,
+   le SW n'y touche jamais. Vider le cache ne perd aucune donnée. */
+
+const VERSION = "1.1.0";
+const CACHE = "muscu-" + VERSION;
+
 const ASSETS = [
   "./",
   "./index.html",
@@ -48,7 +53,6 @@ self.addEventListener("fetch", function (e) {
                  (req.headers.get("accept") || "").indexOf("text/html") >= 0;
 
   if (isHTML) {
-    // network-first : toujours la dernière version si le réseau répond
     e.respondWith(
       fetch(req).then(function (res) {
         const copy = res.clone();
@@ -63,7 +67,6 @@ self.addEventListener("fetch", function (e) {
     return;
   }
 
-  // cache-first pour les assets
   e.respondWith(
     caches.match(req).then(function (cached) {
       return cached || fetch(req).then(function (res) {
@@ -77,7 +80,7 @@ self.addEventListener("fetch", function (e) {
   );
 });
 
-// Permet de forcer la mise à jour depuis la page
 self.addEventListener("message", function (e) {
   if (e.data === "SKIP_WAITING") self.skipWaiting();
+  if (e.data === "GET_VERSION" && e.source) e.source.postMessage({ swVersion: VERSION });
 });

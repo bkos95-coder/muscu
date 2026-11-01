@@ -68,6 +68,20 @@
   .wr-line b{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:18px;color:var(--red)}
   .wr-time{font-size:12.5px;color:var(--grey)}
   .wr-empty{background:#faf9f6;border:1px dashed var(--line);border-radius:10px;padding:12px 14px;font-size:13.5px;color:var(--grey);text-align:center}
+  .verfoot{margin:16px 0 4px;text-align:center}
+  .verbtn{background:none;border:none;color:var(--grey);font-size:12px;cursor:pointer;padding:6px;font-family:"IBM Plex Sans",sans-serif}
+  .verbtn b{color:var(--ink-2);font-family:"Barlow Condensed",sans-serif;font-size:13px;letter-spacing:.03em}
+  .verlog{display:none;text-align:left;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-top:8px;box-shadow:var(--shadow)}
+  .verlog.open{display:block}
+  .vl-item{margin-bottom:12px}
+  .vl-item:last-child{margin-bottom:0}
+  .vl-head{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:15px;letter-spacing:.03em}
+  .vl-head span{color:var(--grey);font-weight:500;font-size:12px;font-family:"IBM Plex Sans",sans-serif;margin-left:6px}
+  .vl-item ul{margin:5px 0 0;padding-left:18px;font-size:13px;color:var(--ink-2);line-height:1.5}
+  .vl-item li{margin:3px 0}
+  .newver{background:#eaf7ee;border:1px solid #8fd3a4;border-left:4px solid #1d7a3e;border-radius:10px;padding:11px 14px;margin-bottom:12px;font-size:13px;color:var(--ink-2);display:none}
+  .newver.show{display:block}
+  .newver b{color:#1d7a3e}
   .srvbox{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-top:12px;box-shadow:var(--shadow)}
   .srvbox .lab{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin-bottom:6px}
   .srvbox p{margin:0 0 10px;font-size:13px;line-height:1.45}
@@ -336,6 +350,7 @@
   <!-- ============ VUE SEMAINE ============ -->
   <div class="view active" id="view-plan">
     <h2>Séances cette semaine</h2>
+    <div class="newver" id="newVer"></div>
     <div class="weekrecap" id="weekRecap"></div>
     <div class="freq" id="freqSel">
       <button data-f="1"><span>1 / sem</span>Full-body</button>
@@ -409,6 +424,7 @@
         <button class="btn-timer" id="timerBtn">▶ Lancer le repos</button>
       </div>
       <label class="autorest"><input type="checkbox" id="autoRest" checked> Lancer le repos automatiquement quand je coche une série</label>
+      <label class="autorest"><input type="checkbox" id="keepAwake"> Garder l'écran allumé pendant toute la séance</label>
     </div>
 
     <div id="sExercises"></div>
@@ -614,6 +630,11 @@
       <button class="btn ghost block" id="srvConfig">🔑 Saisir le token de sauvegarde</button>
       <p class="muted" style="font-size:11.5px;margin-top:8px">Une fois le token saisi, l'app envoie ta sauvegarde au serveur à la fin de chaque séance. À configurer depuis l'app installée sur l'écran d'accueil (son stockage est séparé de celui du navigateur).</p>
     </div>
+
+    <div class="verfoot">
+      <button class="verbtn" id="verBtn">Version <b id="verNum">—</b> · voir les nouveautés</button>
+      <div class="verlog" id="verLog"></div>
+    </div>
   </div>
 
 </div>
@@ -663,7 +684,23 @@
 "use strict";
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
-var state={freq:3,rest:90,dur:40,mode:"equilibre",autoRest:true,history:[],lastCharges:{},chronoDur:{},autoSave:false,lastSession:null,templates:[],hiitCustom:[],weights:[],lastExport:null};
+/* ---------- Version de l'application ---------- */
+var APP_VERSION="1.1.0";
+var CHANGELOG=[
+ {v:"1.1.0",d:"2026-11-01",n:[
+   "Option « garder l'écran allumé pendant toute la séance » (bandeau circuit)",
+   "Numéro de version visible et journal des nouveautés",
+   "Mise à jour automatique de l'app au lancement"
+ ]},
+ {v:"1.0.0",d:"2026-11-01",n:[
+   "Première version installable (PWA) avec icône sur l'écran d'accueil",
+   "Sauvegarde automatique sur serveur à la fin de chaque séance",
+   "Suggestion de progression des charges (+2,5 kg après 2 séances bouclées)",
+   "Alerte si l'historique n'est plus sauvegardé",
+   "Récap réel de la semaine, indépendant du programme choisi"
+ ]}
+];
+var state={freq:3,rest:90,dur:40,mode:"equilibre",autoRest:true,keepAwake:false,history:[],lastCharges:{},chronoDur:{},autoSave:false,lastSession:null,templates:[],hiitCustom:[],weights:[],lastExport:null};
 var canSave=true;
 try{
   var raw=localStorage.getItem(KEY);
@@ -678,6 +715,7 @@ try{
       state.rest=p.rest||90;
       state.dur=p.dur||40;
       state.autoRest=p.autoRest!==false;
+      state.keepAwake=!!p.keepAwake;
       state.mode=p.mode||"equilibre";
       state.history=Array.isArray(p.history)?p.history:[];
       state.lastCharges=p.lastCharges||{};
@@ -1151,7 +1189,13 @@ function lockOn(){
     wl.addEventListener("release",function(){wakeLock=null;});
   }).catch(function(){});
 }
+// Vrai quand une séance est ouverte et que l'option "écran allumé" est active :
+// dans ce cas on ne relâche pas le maintien d'écran entre les minuteurs.
+function sessionVeutEcran(){
+  return !!(current && state.keepAwake);
+}
 function lockOff(){
+  if(sessionVeutEcran())return;   // la séance garde la main
   wakeWant=false;
   if(wakeLock){wakeLock.release().catch(function(){});wakeLock=null;}
 }
@@ -1687,6 +1731,7 @@ function openSession(s){
   renderPain("after");
   sessClockStart();
   timerIdle();
+  if(state.keepAwake)lockOn();
   updateSessProgress();
   renderSessionCards();
   show("session");
@@ -2266,6 +2311,42 @@ function doExport(silent){
   }catch(e){if(!silent)toast("Export impossible ici");}
 }
 /* Alerte sauvegarde : prévient quand l'historique n'est plus protégé */
+/* ---------- Version : affichage, nouveautés, détection de mise à jour ---------- */
+function renderVersion(){
+  var n=$("#verNum");if(n)n.textContent=APP_VERSION;
+  var log=$("#verLog");if(!log)return;
+  log.innerHTML=CHANGELOG.map(function(c){
+    var d=c.d?("<span>"+esc(c.d.split("-").reverse().join("/"))+"</span>"):"";
+    return "<div class='vl-item'><div class='vl-head'>Version "+esc(c.v)+d+"</div><ul>"+
+      c.n.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+"</ul></div>";
+  }).join("");
+}
+// Compare deux versions "1.2.3" : -1, 0 ou 1
+function cmpVer(a,b){
+  var pa=String(a).split("."),pb=String(b).split(".");
+  for(var i=0;i<3;i++){
+    var x=parseInt(pa[i]||0,10),y=parseInt(pb[i]||0,10);
+    if(x>y)return 1;
+    if(x<y)return -1;
+  }
+  return 0;
+}
+// Au lancement : si la version a changé depuis la dernière ouverture, on l'annonce
+function checkVersion(){
+  var vue=null;
+  try{vue=localStorage.getItem("mb_version_vue");}catch(e){}
+  if(vue&&cmpVer(APP_VERSION,vue)>0){
+    var entry=CHANGELOG.find?CHANGELOG.find(function(c){return c.v===APP_VERSION;}):null;
+    var box=$("#newVer");
+    if(box){
+      var liste=entry?("<ul style='margin:6px 0 0;padding-left:18px'>"+entry.n.slice(0,3).map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+"</ul>"):"";
+      box.innerHTML="<b>✨ Mise à jour installée — version "+esc(APP_VERSION)+"</b>"+liste;
+      box.classList.add("show");
+    }
+  }
+  try{localStorage.setItem("mb_version_vue",APP_VERSION);}catch(e){}
+}
+
 /* ---------- Sauvegarde automatique sur le serveur ----------
    Le token n'est jamais dans le code (l'app est publique) : il est saisi
    une fois dans les réglages et gardé dans le localStorage du téléphone. */
@@ -2370,6 +2451,7 @@ $("#impFile").addEventListener("change",function(){
       state.rest=p.rest||90;
       state.dur=p.dur||40;
       state.autoRest=p.autoRest!==false;
+      state.keepAwake=!!p.keepAwake;
       state.mode=p.mode||"equilibre";
       state.history=p.history;
       state.lastCharges=p.lastCharges||{};
@@ -2608,11 +2690,28 @@ renderTemplates();
 renderHiitUI();
 timerIdle();
 if($("#srvConfig")){$("#srvConfig").addEventListener("click",configurerSauvegarde);renderSrvState();}
+if($("#verBtn")){
+  $("#verBtn").addEventListener("click",function(){
+    var l=$("#verLog");
+    l.classList.toggle("open");
+    this.innerHTML="Version <b id=\"verNum\">"+esc(APP_VERSION)+"</b> · "+(l.classList.contains("open")?"masquer":"voir les nouveautés");
+  });
+}
+renderVersion();
+checkVersion();
 $("#autoSave").checked=!!state.autoSave;
 $("#autoSave").addEventListener("change",function(){
   state.autoSave=this.checked;save();
   toast(this.checked?"Sauvegarde auto activée":"Sauvegarde auto désactivée");
 });
+if($("#keepAwake")){
+  $("#keepAwake").checked=!!state.keepAwake;
+  $("#keepAwake").addEventListener("change",function(){
+    state.keepAwake=this.checked;save();
+    if(this.checked){ if(current)lockOn(); toast("Écran maintenu allumé en séance"); }
+    else{ if(!timer.iv&&!chrono.iv&&!hiit.iv)lockOff(); toast("Écran libre (veille normale)"); }
+  });
+}
 if($("#autoRest")){
   $("#autoRest").checked=state.autoRest!==false;
   $("#autoRest").addEventListener("change",function(){
@@ -2628,7 +2727,12 @@ if(!canSave){toast("⚠ Sauvegarde locale indisponible dans ce contexte");}
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
     navigator.serviceWorker.register("sw.js").then(function(reg){
-      // Si une nouvelle version est dispo, on l'active au prochain lancement
+      // Cherche une mise à jour au lancement, puis à chaque retour dans l'app
+      reg.update().catch(function(){});
+      document.addEventListener("visibilitychange",function(){
+        if(document.visibilityState==="visible")reg.update().catch(function(){});
+      });
+      // Nouvelle version détectée : on l'active tout de suite
       reg.addEventListener("updatefound",function(){
         var nw=reg.installing;
         if(!nw)return;
@@ -2639,6 +2743,15 @@ if("serviceWorker" in navigator){
         });
       });
     }).catch(function(){/* pas bloquant : l'app marche sans SW */});
+
+    // Quand le nouveau service worker prend la main, on recharge une seule fois
+    // pour afficher la nouvelle version sans que l'utilisateur ait à le faire.
+    var recharge=false;
+    navigator.serviceWorker.addEventListener("controllerchange",function(){
+      if(recharge)return;
+      recharge=true;
+      location.reload();
+    });
   });
 }
 </script>
