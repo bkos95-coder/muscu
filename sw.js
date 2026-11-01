@@ -10,7 +10,7 @@
    IMPORTANT : les données d'entraînement sont dans localStorage,
    le SW n'y touche jamais. Vider le cache ne perd aucune donnée. */
 
-const VERSION = "1.2.0";
+const VERSION = "1.4.0";
 const CACHE = "muscu-" + VERSION;
 
 const ASSETS = [
