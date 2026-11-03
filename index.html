@@ -93,6 +93,10 @@
   .newver{background:#eaf7ee;border:1px solid #8fd3a4;border-left:4px solid #1d7a3e;border-radius:10px;padding:11px 14px;margin-bottom:12px;font-size:13px;color:var(--ink-2);display:none}
   .newver.show{display:block}
   .newver b{color:#1d7a3e}
+  .volrow{display:flex;align-items:center;gap:10px;margin:4px 0 2px}
+  .volico{font-size:20px;width:26px;text-align:center;flex:0 0 auto}
+  .volval{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:18px;min-width:52px;text-align:right;flex:0 0 auto}
+  #volRange{flex:1;accent-color:var(--red);height:28px}
   .srvbox{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-top:12px;box-shadow:var(--shadow)}
   .srvbox .lab{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin-bottom:6px}
   .srvbox p{margin:0 0 10px;font-size:13px;line-height:1.45}
@@ -657,7 +661,13 @@
 
     <div class="srvbox">
       <div class="lab">🔊 Sons</div>
-      <p class="muted" id="sonState">Joue la séquence complète pour régler le volume avant ta séance. Rien n'est enregistré.</p>
+      <div class="volrow">
+        <span class="volico" id="volIco">🔉</span>
+        <input type="range" id="volRange" min="0" max="150" step="5" value="100" aria-label="Volume des sons">
+        <b class="volval" id="volVal">100 %</b>
+      </div>
+      <p class="muted" id="volHint" style="font-size:11.5px;margin:2px 0 10px">100 % = niveau standard · au-delà, son renforcé</p>
+      <p class="muted" id="sonState">Joue la séquence complète pour vérifier le réglage. Rien n'est enregistré.</p>
       <button class="btn ghost block" id="sonTest">▶ Tester les sons</button>
     </div>
 
@@ -715,8 +725,13 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.9.1";
+var APP_VERSION="1.10.0";
 var CHANGELOG=[
+ {v:"1.10.0",d:"2026-11-03",n:[
+   "Réglage du volume des sons dans l'app (de muet à 150 %)",
+   "Au-delà de 100 %, son renforcé avec un limiteur pour éviter la saturation",
+   "Un bip d'aperçu se joue quand tu relâches le curseur"
+ ]},
  {v:"1.9.1",d:"2026-11-03",n:[
    "Bouton « Tester les sons » dans l'Historique : décompte, sifflet et double sifflet, sans rien enregistrer"
  ]},
@@ -777,7 +792,7 @@ var CHANGELOG=[
    "Récap réel de la semaine, indépendant du programme choisi"
  ]}
 ];
-var state={freq:3,rest:90,dur:40,mode:"equilibre",autoRest:true,keepAwake:false,history:[],lastCharges:{},chronoDur:{},autoSave:false,lastSession:null,templates:[],hiitCustom:[],weights:[],lastExport:null};
+var state={freq:3,rest:90,dur:40,mode:"equilibre",autoRest:true,keepAwake:false,volume:100,history:[],lastCharges:{},chronoDur:{},autoSave:false,lastSession:null,templates:[],hiitCustom:[],weights:[],lastExport:null};
 var canSave=true;
 try{
   var raw=localStorage.getItem(KEY);
@@ -793,6 +808,7 @@ try{
       state.dur=p.dur||40;
       state.autoRest=p.autoRest!==false;
       state.keepAwake=!!p.keepAwake;
+      state.volume=typeof p.volume==="number"?Math.max(0,Math.min(150,p.volume)):100;
       state.mode=p.mode||"equilibre";
       state.history=Array.isArray(p.history)?p.history:[];
       state.lastCharges=p.lastCharges||{};
@@ -1222,7 +1238,33 @@ function restOptsSync(){
 }
 
 /* ---------- Bips sonores ---------- */
-var audioCtx=null;
+var audioCtx=null,audioMaster=null;
+/* Sortie audio commune : volume réglable dans l'app, puis un limiteur.
+   Au-delà de 100 % le son est renforcé ; le limiteur évite qu'il sature. */
+function audioOut(){
+  if(!audioCtx)return null;
+  if(audioMaster)return audioMaster;
+  try{
+    audioMaster=audioCtx.createGain();
+    audioMaster.gain.value=volumeFactor();
+    if(audioCtx.createDynamicsCompressor){
+      var lim=audioCtx.createDynamicsCompressor();
+      lim.threshold.value=-4;lim.knee.value=3;lim.ratio.value=14;
+      lim.attack.value=0.002;lim.release.value=0.12;
+      audioMaster.connect(lim);lim.connect(audioCtx.destination);
+    }else{
+      audioMaster.connect(audioCtx.destination);
+    }
+  }catch(e){audioMaster=null;return audioCtx.destination;}
+  return audioMaster;
+}
+function volumeFactor(){
+  var v=typeof state.volume==="number"?state.volume:100;
+  return Math.max(0,Math.min(150,v))/100;
+}
+function appliquerVolume(){
+  if(audioMaster)try{audioMaster.gain.value=volumeFactor();}catch(e){}
+}
 function initAudio(){
   if(audioCtx)return;
   try{
@@ -1237,7 +1279,7 @@ function beep(freq,dur,vol,type){
     var o=audioCtx.createOscillator(),g=audioCtx.createGain();
     o.type=type||"sine";o.frequency.value=freq||880;
     g.gain.value=vol||0.25;
-    o.connect(g);g.connect(audioCtx.destination);
+    o.connect(g);g.connect(audioOut());
     var t=audioCtx.currentTime;
     o.start(t);
     g.gain.setValueAtTime(vol||0.25,t);
@@ -1260,7 +1302,7 @@ function whistle(dur,delay){
     if(audioCtx.state==="suspended")audioCtx.resume();
     var t=audioCtx.currentTime+start;
     var g=audioCtx.createGain();
-    g.connect(audioCtx.destination);
+    g.connect(audioOut());
     g.gain.setValueAtTime(0.0001,t);
     g.gain.exponentialRampToValueAtTime(0.85,t+0.02);   // attaque sèche
     g.gain.setValueAtTime(0.85,t+d-0.08);
@@ -2750,6 +2792,7 @@ $("#impFile").addEventListener("change",function(){
       state.dur=p.dur||40;
       state.autoRest=p.autoRest!==false;
       state.keepAwake=!!p.keepAwake;
+      state.volume=typeof p.volume==="number"?Math.max(0,Math.min(150,p.volume)):100;
       state.mode=p.mode||"equilibre";
       state.history=p.history;
       state.lastCharges=p.lastCharges||{};
@@ -3107,6 +3150,27 @@ renderHiitUI();
 timerIdle();
 if($("#srvConfig")){$("#srvConfig").addEventListener("click",configurerSauvegarde);renderSrvState();}
 if($("#sonTest"))$("#sonTest").addEventListener("click",testSons);
+function renderSonVolume(){
+  var v=typeof state.volume==="number"?state.volume:100;
+  if($("#volRange"))$("#volRange").value=v;
+  if($("#volVal"))$("#volVal").textContent=v===0?"Muet":v+" %";
+  if($("#volIco"))$("#volIco").textContent=v===0?"🔇":(v<60?"🔈":(v<=100?"🔉":"🔊"));
+  if($("#volHint"))$("#volHint").textContent=v===0?"Sons coupés — pense à les réactiver avant ta séance":(v>100?"Son renforcé au-delà du niveau standard":"100 % = niveau standard · au-delà, son renforcé");
+}
+if($("#volRange")){
+  renderSonVolume();
+  // déplacement du curseur : mise à jour en direct
+  $("#volRange").addEventListener("input",function(){
+    state.volume=parseInt(this.value,10)||0;
+    appliquerVolume();renderSonVolume();
+  });
+  // relâchement : on sauvegarde et on fait entendre le niveau choisi
+  $("#volRange").addEventListener("change",function(){
+    state.volume=parseInt(this.value,10)||0;
+    appliquerVolume();renderSonVolume();save();
+    if(state.volume>0){initAudio();appliquerVolume();beepShort();}
+  });
+}
 if($("#verBtn")){
   $("#verBtn").addEventListener("click",function(){
     var l=$("#verLog");
