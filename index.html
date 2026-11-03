@@ -68,6 +68,17 @@
   .wr-line b{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:18px;color:var(--red)}
   .wr-time{font-size:12.5px;color:var(--grey)}
   .wr-empty{background:#faf9f6;border:1px dashed var(--line);border-radius:10px;padding:12px 14px;font-size:13.5px;color:var(--grey);text-align:center}
+  .statbox{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-bottom:12px;box-shadow:var(--shadow)}
+  .sb-title{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin-bottom:10px}
+  .sb-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px 10px}
+  .sb-cell b{display:block;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:21px;line-height:1.05;color:var(--ink)}
+  .sb-cell span{display:block;font-size:11.5px;color:var(--grey);margin-top:1px}
+  .sb-cell.hl b{color:var(--red)}
+  .sb-foot{margin-top:10px;padding-top:9px;border-top:1px solid #f1eee9;font-size:12px;color:var(--grey)}
+  .hfilter{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;-webkit-overflow-scrolling:touch}
+  .hf-chip{flex:0 0 auto;background:#fff;border:1.5px solid var(--line);border-radius:99px;padding:7px 13px;font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer;white-space:nowrap;font-family:"IBM Plex Sans",sans-serif}
+  .hf-chip.sel{background:var(--ink);border-color:var(--ink);color:#fff}
+  .hf-chip b{font-family:"Barlow Condensed",sans-serif;font-weight:800;margin-left:5px;opacity:.65}
   .verfoot{margin:16px 0 4px;text-align:center}
   .verbtn{background:none;border:none;color:var(--grey);font-size:12px;cursor:pointer;padding:6px;font-family:"IBM Plex Sans",sans-serif}
   .verbtn b{color:var(--ink-2);font-family:"Barlow Condensed",sans-serif;font-size:13px;letter-spacing:.03em}
@@ -167,6 +178,9 @@
   .groups{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
   .gbtn{padding:14px 6px;border:1.5px solid var(--line);background:#fff;border-radius:11px;cursor:pointer;text-align:center;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.03em;color:var(--ink-2)}
   .gbtn.sel{background:var(--red);border-color:var(--red);color:#fff}
+  .gbtn.hiit{border-style:dashed;color:#b8860b}
+  .gbtn.hiit.sel{background:var(--ink);border-color:var(--ink);border-style:solid;color:#f5b301}
+  .hiittag{color:#e0a800;font-size:.85em}
   .lib-ex{background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;margin:8px 0;display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer}
   .lib-ex.added{border-color:var(--ink);background:#faf9f6}
   .lib-ex .n{font-weight:600;font-size:14px}
@@ -314,6 +328,11 @@
   .hp-arrow{color:var(--grey);font-size:13px}
   .hp-body{display:none;padding:0 10px 12px 42px;font-size:13px;color:var(--ink-2);line-height:1.5}
   .hp-row.open .hp-body{display:block}
+  .warnbadge{display:inline-block;background:#f5b301;color:#3a2c00;font-weight:800;font-size:11px;border-radius:5px;padding:0 5px;vertical-align:middle;line-height:1.5}
+  .warnbadge.big{background:none;color:#f5b301;font-size:inherit;padding:0}
+  .warnbox{margin-top:8px;background:#fffbe6;border:1px solid #f0dfa0;border-left:3px solid #e0a800;border-radius:8px;padding:8px 10px;font-size:12.5px;color:var(--ink-2);line-height:1.45}
+  .warnbox b{color:var(--ink)}
+  .tipwarn{margin-top:7px;color:#f5b301;font-size:12.5px;line-height:1.4;max-width:34ch}
   .hp-add{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:17px;color:#fff;background:var(--grey);width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;cursor:pointer}
   .hp-row.inbasket .hp-add{background:var(--red)}
   .hp-row.inbasket .hp-name{color:var(--red-dark);font-weight:700}
@@ -456,6 +475,7 @@
       <div class="lab" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin:0 0 8px">Mes modèles</div>
       <div id="tplList"></div>
     </div>
+    <p class="muted" style="font-size:12.5px;margin:0 0 10px">Les groupes <b style="color:#b8860b">⚡ HIIT</b> ajoutent des blocs chronométrés (3 × 30 s par défaut, réglables) : mélange-les librement avec tes exercices de muscu.</p>
     <div class="groups" id="groupBtns"></div>
     <div id="libList"></div>
     <div class="basket" id="basketWrap" style="display:none">
@@ -499,6 +519,7 @@
     <h2>HIIT 7 minutes</h2>
     <p class="muted">Circuit poids de corps auto-enchaîné : 12 exercices × 30s d'effort + 10s de transition ≈ 7 min par tour. <b>Adapté à ton pied droit et ton dos</b> : appuis talons, pompes sur genoux, et pour les fentes et jumping jacks chaque fiche indique l'adaptation hallux (cou-de-pied, step jacks). Pas de squats sautés : trop de compression pour tes disques.</p>
 
+    <p class="muted" style="font-size:12.5px;margin:10px 0 0"><span class="warnbadge">⚠</span> Les exercices marqués d'un ⚠ sont plus exigeants pour le dos ou le pied. Ils restent disponibles : la fiche explique le risque, à toi de juger selon la forme du jour.</p>
     <div class="lab" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin:14px 0 6px">Circuit</div>
     <div class="freq" id="hiitCircSel">
       <button data-c="0"><span>complet</span>Full-body</button>
@@ -616,6 +637,8 @@
     </div>
 
     <div class="backupwarn" id="backupWarn" style="display:none"></div>
+    <div class="hfilter" id="histoFilter"></div>
+    <div class="statbox" id="histoStatsBox" style="display:none"></div>
     <div id="histoList"></div>
 
     <div class="row-btns">
@@ -686,8 +709,38 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.4.0";
+var APP_VERSION="1.9.0";
 var CHANGELOG=[
+ {v:"1.9.0",d:"2026-11-03",n:[
+   "Séance mixte : mélange exercices de muscu et blocs HIIT dans la séance libre",
+   "Les blocs HIIT se règlent en séries et en durée (pas de 5 s), avec le chrono plein écran",
+   "Le ⚠ des exercices à risque apparaît aussi dans la séance"
+ ]},
+ {v:"1.8.0",d:"2026-11-03",n:[
+   "Bibliothèque HIIT étendue : burpees, mountain climbers, squats sautés, skaters, crunchs, relevés de jambes, fentes sautées…",
+   "Panneau ⚠ sur les exercices exigeants pour le dos ou le pied, avec l'explication du risque dans la fiche et pendant le circuit",
+   "Correction : l'écran ne s'éteint plus en cours de séance (le maintien est redemandé si Android le relâche)"
+ ]},
+ {v:"1.7.2",d:"2026-11-03",n:[
+   "Confirmation demandée avant de décocher une série déjà faite (évite les appuis involontaires)"
+ ]},
+ {v:"1.7.1",d:"2026-11-03",n:[
+   "Plus de planche en double : si tu as déjà choisi un gainage, le finisher n'est pas rajouté"
+ ]},
+ {v:"1.7.0",d:"2026-11-03",n:[
+   "Décompte sonore dès 5 secondes, avec des bips nettement plus forts",
+   "Coup de sifflet à 0 (fin de repos, fin de gainage)",
+   "Double coup de sifflet en fin de séance et en fin de circuit HIIT"
+ ]},
+ {v:"1.6.0",d:"2026-11-02",n:[
+   "Statistiques dans l'historique, calculées sur le filtre actif",
+   "Course et trail : distance totale, dénivelé cumulé, allure moyenne et meilleure allure",
+   "Muscu : séries réalisées et tonnage soulevé"
+ ]},
+ {v:"1.5.0",d:"2026-11-02",n:[
+   "Historique : filtres rapides (Muscu, HIIT, Course, Trail…) avec le nombre d'entrées",
+   "Les filtres apparaissent à partir de 5 entrées et s'adaptent à tes activités"
+ ]},
  {v:"1.4.0",d:"2026-11-02",n:[
    "Nouveau palier de temps : 25 min (séries de 4 pour tenir le format)"
  ]},
@@ -1130,7 +1183,7 @@ function timerTick(){
   }
   timer.left=remain;
   timerRender();
-  if(remain<=3&&!timer.beeped[remain]){timer.beeped[remain]=true;beepShort();}
+  if(remain<=5&&!timer.beeped[remain]){timer.beeped[remain]=true;beepShort();}
 }
 function timerStart(){
   if(timer.iv){timerIdle();return;}
@@ -1168,12 +1221,12 @@ function initAudio(){
     if(AC)audioCtx=new AC();
   }catch(e){audioCtx=null;}
 }
-function beep(freq,dur,vol){
+function beep(freq,dur,vol,type){
   if(!audioCtx)return;
   try{
     if(audioCtx.state==="suspended")audioCtx.resume();
     var o=audioCtx.createOscillator(),g=audioCtx.createGain();
-    o.type="sine";o.frequency.value=freq||880;
+    o.type=type||"sine";o.frequency.value=freq||880;
     g.gain.value=vol||0.25;
     o.connect(g);g.connect(audioCtx.destination);
     var t=audioCtx.currentTime;
@@ -1183,25 +1236,72 @@ function beep(freq,dur,vol){
     o.stop(t+(dur||0.15));
   }catch(e){}
 }
-function beepShort(){beep(880,0.12,0.22);}
-function beepEnd(){
-  // 3 bips montants bien audibles
-  beep(880,0.18,0.3);
-  setTimeout(function(){beep(1100,0.18,0.3);},200);
-  setTimeout(function(){beep(1400,0.35,0.35);},400);
+// Bip de décompte (5, 4, 3, 2, 1) : franc et bien audible en séance
+function beepShort(){
+  beep(1150,0.16,0.7,"square");
+  beep(2300,0.16,0.25);   // harmonique aiguë pour percer le bruit ambiant
+}
+/* Coup de sifflet synthétisé : deux fréquences proches qui battent,
+   avec un vibrato rapide — c'est ce battement qui fait le "trille"
+   caractéristique d'un sifflet d'arbitre. */
+function whistle(dur,delay){
+  if(!audioCtx)return;
+  var d=dur||0.45, start=delay||0;
+  try{
+    if(audioCtx.state==="suspended")audioCtx.resume();
+    var t=audioCtx.currentTime+start;
+    var g=audioCtx.createGain();
+    g.connect(audioCtx.destination);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(0.85,t+0.02);   // attaque sèche
+    g.gain.setValueAtTime(0.85,t+d-0.08);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+    // vibrato commun aux deux oscillateurs
+    var lfo=audioCtx.createOscillator(),lfoG=audioCtx.createGain();
+    lfo.frequency.value=38;lfoG.gain.value=90;
+    lfo.connect(lfoG);
+    [2150,2720].forEach(function(f){
+      var o=audioCtx.createOscillator();
+      o.type="sine";o.frequency.value=f;
+      lfoG.connect(o.frequency);
+      o.connect(g);
+      o.start(t);o.stop(t+d);
+    });
+    lfo.start(t);lfo.stop(t+d);
+  }catch(e){}
+}
+// Fin d'un temps de repos ou d'un gainage : un coup de sifflet
+function beepEnd(){whistle(0.45,0);}
+// Fin de la séance complète ou du circuit : double coup de sifflet
+function whistleDouble(){
+  whistle(0.30,0);
+  whistle(0.55,0.42);
 }
 
 /* ---------- Wake lock (écran allumé) ---------- */
 var wakeLock=null;
-var wakeWant=false;
+var wakeWant=false,wakeBusy=false,wakeIv=null;
 function lockOn(){
   wakeWant=true;
+  if(!wakeIv)wakeIv=setInterval(wakeWatch,10000);
   if(!("wakeLock" in navigator))return;
-  if(wakeLock)return;
+  if(wakeLock||wakeBusy)return;
+  wakeBusy=true;
   navigator.wakeLock.request("screen").then(function(wl){
+    wakeBusy=false;
     wakeLock=wl;
-    wl.addEventListener("release",function(){wakeLock=null;});
-  }).catch(function(){});
+    // Android relâche parfois le verrou tout seul (économie d'énergie,
+    // notification, perte de focus). On le redemande aussitôt si on en a
+    // toujours besoin : sans ça l'écran finissait par s'éteindre en séance.
+    wl.addEventListener("release",function(){
+      wakeLock=null;
+      if(wakeWant&&document.visibilityState==="visible")lockOn();
+    });
+  }).catch(function(){wakeBusy=false;});
+}
+// Filet de sécurité : on vérifie régulièrement que le verrou tient toujours
+function wakeWatch(){
+  if(wakeWant&&!wakeLock&&!wakeBusy&&document.visibilityState==="visible")lockOn();
 }
 // Vrai quand une séance est ouverte et que l'option "écran allumé" est active :
 // dans ce cas on ne relâche pas le maintien d'écran entre les minuteurs.
@@ -1211,6 +1311,7 @@ function sessionVeutEcran(){
 function lockOff(){
   if(sessionVeutEcran())return;   // la séance garde la main
   wakeWant=false;
+  if(wakeIv){clearInterval(wakeIv);wakeIv=null;}
   if(wakeLock){wakeLock.release().catch(function(){});wakeLock=null;}
 }
 document.addEventListener("visibilitychange",function(){
@@ -1281,7 +1382,7 @@ function chronoGo(){
     }else{
       chrono.left=remain;
       chronoRender();
-      if(remain<=3&&!chrono.beeped[remain]){
+      if(remain<=5&&!chrono.beeped[remain]){
         chrono.beeped[remain]=true;
         beepShort();
         if(navigator.vibrate)navigator.vibrate(80);
@@ -1363,14 +1464,30 @@ var HIIT_LIB={
   {n:"Chaise au mur + bras",t:"Chaise + élévations bras",g:"En chaise au mur, monte et descends les bras tendus devant toi. Cuisses + épaules en même temps."},
   {n:"Pont fessier",t:"Serre fort en haut",g:"Sur le dos, pieds à plat près des fesses. Monte les hanches, serre 1s, redescends. Sans hyperextension."},
   {n:"Pont fessier marché",t:"En pont, tends une jambe puis l'autre",g:"Position de pont tenue, tends une jambe à l horizontale, repose, alterne. Hanches hautes et stables."},
-  {n:"Pont fessier 1 jambe",t:"Une jambe tendue, l'autre pousse",g:"Sur le dos, un pied au sol, l autre jambe tendue. Monte les hanches sur une jambe, 1s en haut. Costaud pour les fessiers, zéro colonne."}],
+  {n:"Pont fessier 1 jambe",t:"Une jambe tendue, l'autre pousse",g:"Sur le dos, un pied au sol, l autre jambe tendue. Monte les hanches sur une jambe, 1 s en haut. Costaud pour les fessiers, zéro colonne."},
+  {n:"Fentes marchées",t:"Avancer en fentes",g:"Enchaîne des fentes en avançant, genou arrière vers le sol. Pied droit derrière sur le cou-de-pied si l orteil tire."},
+  {n:"Fentes bulgares",t:"Pied arrière surélevé",w:"Appui prolongé sur le dessus du pied arrière ou sur les orteils.",g:"Pied arrière posé sur un banc, descends sur la jambe avant, remonte. Très efficace mais exigeant pour l équilibre."},
+  {n:"Good morning poids de corps",t:"Charnière de hanche",w:"Flexion de hanche dos tendu : à proscrire si le dos est sensible ce jour-là.",g:"Debout, mains derrière la tête, bascule le buste vers l avant en gardant le dos parfaitement plat, genoux légèrement fléchis, puis redresse par les fessiers."},
+  {n:"Mollets debout",t:"Montées sur la pointe des pieds",w:"Met l avant-pied en extension complète.",g:"Debout, monte lentement sur la pointe des pieds, 1 s en haut, redescends en contrôle. Appuie-toi à un mur pour l équilibre."},],
  "Cardio sans/low impact":[
   {n:"Montées de genoux sans saut",t:"Marche dynamique, pied à plat",g:"Genoux à hauteur de hanche, un pied toujours au sol, pose à plat, bras qui pompent. Rapide, zéro rebond."},
   {n:"Talons-fesses sans saut",t:"Talon vers la fesse, sans rebond",g:"Marche rapide talon vers la fesse, pose du pied à plat, bras actifs, buste droit."},
   {n:"Jumping jacks",t:"Réception amortie · repli step jacks",g:"Sauts écart-serré, bras au-dessus de la tête, réception amortie genoux souples. Repli : step jacks (un pied à la fois, sans saut) si l orteil proteste. Règle des 24h."},
+  {n:"Course sur place",t:"Genoux hauts, rythme soutenu",w:"Impact répété sur l avant-pied (hallux) et petites compressions pour les lombaires.",g:"Cours sur place en montant les genoux, réception sur l avant-pied, amortie. Bras actifs."},
+  {n:"Montées de genoux sautées",t:"Version explosive",w:"Impact à chaque foulée : hallux opéré et disques lombaires encaissent.",g:"Comme les montées de genoux mais en alternant par petits bonds. Réception souple, buste droit, gainage serré."},
+  {n:"Talons-fesses courus",t:"Rapide, avec rebond",w:"Impact répété sur l avant-pied.",g:"Talon vers la fesse en courant sur place. Réception amortie, buste droit."},
+  {n:"Skaters (pas du patineur)",t:"Bonds latéraux",w:"Réception sur une jambe : impact + torsion, sollicite genou, cheville et lombaires.",g:"Bond latéral d un pied sur l autre, jambe libre qui passe derrière, bras qui accompagnent. Réception amortie, poitrine haute."},
+  {n:"Corde à sauter (sans corde)",t:"Petits bonds sur l'avant-pied",w:"Impact continu sur l avant-pied : le plus exigeant pour un hallux opéré.",g:"Petits bonds réguliers, chevilles souples, bras qui miment la corde. Reste bas : 2-3 cm suffisent."},
+  {n:"Sprint sur place",t:"Intensité maximale 30 s",w:"Impact élevé et rythme cardiaque très haut.",g:"Course sur place au maximum de la fréquence, genoux hauts, bras qui pompent. C est l exercice le plus cardio du lot."},
+  {n:"Burpees",t:"Le classique complet",w:"Flexion lombaire répétée sous fatigue + impact à la réception : l exercice le plus à risque pour un dos fragile.",g:"Debout, mains au sol, saut arrière en planche, pompe, saut avant, saut vertical. Garde le dos plat en descendant et ne t écroule pas au sol."},
+  {n:"Burpees sans saut ni pompe",t:"Version allégée",w:"Reste une flexion lombaire répétée, mais sans impact.",g:"Mains au sol, recule les pieds en marchant (sans sauter), reviens, redresse-toi sans saut final. Le cardio sans les chocs."},
+  {n:"Mountain climbers",t:"Genoux vers la poitrine, en planche",w:"Appui prolongé sur les orteils (hallux) ; bassin qui bouge = lombaires sollicitées.",g:"En planche mains, ramène alternativement un genou vers la poitrine, vite. Le bassin reste bas et stable, pas de fesses en l air."},
+  {n:"Fentes sautées",t:"Changement de jambe en l'air",w:"Impact fort + poussée de l avant-pied : cumule les deux contraintes.",g:"En fente, saute et change de jambe en l air, réception amortie en fente. Buste droit, genou arrière qui descend sans toucher."},
+  {n:"Squats sautés",t:"Explosivité jambes",w:"Compression axiale répétée à la réception : le geste le moins indiqué pour une discopathie.",g:"Squat classique puis saut vertical, réception genoux souples et fesses en arrière pour amortir. Amorti maximal, dos gainé."},
+  {n:"Box step-up",t:"Montées sur marche",w:"Poussée de l avant-pied sur la jambe qui monte.",g:"Monte un pied sur une marche ou un banc bas, déroule, redescends en contrôle, alterne. Pousse dans le talon pour épargner l orteil."},
+  {n:"Pas chassés lents",t:"En squat léger, pieds à plat",g:"2 pas chassés à droite, 2 à gauche, posés à plat, en restant bas. Cuisses en continu."},
   {n:"Step jacks",t:"Jumping jack sans saut",g:"Même mouvement de bras que le jumping jack, mais un pied s écarte à la fois, sans jamais sauter. Cardio propre, zéro impact."},
-  {n:"Shadow boxing",t:"Frappes rapides, pieds à plat",g:"Garde de boxe, enchaîne directs et crochets dans le vide, gaine le tronc, buste qui tourne légèrement."},
-  {n:"Pas chassés lents",t:"En squat léger, pieds à plat",g:"2 pas chassés à droite, 2 à gauche, posés à plat, en restant bas. Cuisses en continu."}],
+  {n:"Shadow boxing",t:"Frappes rapides, pieds à plat",g:"Garde de boxe, enchaîne directs et crochets dans le vide, gaine le tronc, buste qui tourne légèrement."}],
  "Gainage & dos":[
   {n:"Planche",t:"Corps aligné, respire",g:"Avant-bras au sol, corps aligné tête-talons, fessiers serrés. Sur les genoux si besoin."},
   {n:"Planche épaule-touches",t:"Bassin immobile",g:"En planche mains (genoux si besoin), touche l épaule opposée, alterne. Le bassin ne bouge pas."},
@@ -1378,7 +1495,16 @@ var HIIT_LIB={
   {n:"Dead bug",t:"Lombaires plaquées, lent",g:"Sur le dos, bras+jambe opposés descendent SANS décoller les lombaires. Le meilleur abdo pour ton dos."},
   {n:"Dead bug rapide",t:"Tempo soutenu, dos plaqué",g:"Même exercice, rythme plus rapide — mais si les lombaires décollent, ralentis."},
   {n:"Bird-dog rythmé",t:"Bassin stable",g:"À quatre pattes, alterne bras+jambe opposés à rythme fluide, bassin immobile comme une table."},
-  {n:"Superman doux",t:"Petit décollé, 2s de pause",g:"Sur le ventre, petit décollé bras+jambes, pause 2s, repose en contrôle. Sans à-coups."}]
+  {n:"Superman doux",t:"Petit décollé, 2s de pause",g:"Sur le ventre, petit décollé bras+jambes, pause 2s, repose en contrôle. Sans à-coups."},
+  {n:"Hollow hold",t:"Bas du dos plaqué",g:"Sur le dos, bras et jambes tendus légèrement décollés, lombaires écrasées au sol. Si le bas du dos décolle, replie les genoux."},
+  {n:"Flutter kicks",t:"Battements de jambes",w:"Jambes tendues basses = forte traction sur les lombaires.",g:"Sur le dos, mains sous les fesses, petits battements de jambes tendues. Plus les jambes sont basses, plus c est dur pour le dos : monte-les si ça tire."},
+  {n:"Relevés de jambes",t:"Jambes tendues, montée contrôlée",w:"Bascule du bassin et traction lombaire à chaque descente.",g:"Sur le dos, jambes tendues, monte-les à la verticale puis redescends lentement sans toucher le sol. Garde les lombaires plaquées — c est ça qui protège."},
+  {n:"Crunchs",t:"Flexion courte du buste",w:"Flexion lombaire répétée : à éviter en cas de discopathie, surtout sur 30 s à rythme rapide.",g:"Sur le dos, genoux pliés, décolle les omoplates de quelques centimètres, souffle en montant. Ne tire pas sur la nuque."},
+  {n:"Sit-ups",t:"Buste complet",w:"La flexion complète du rachis sous charge est la plus contraignante pour les disques.",g:"Sur le dos, remonte le buste jusqu à l assise, redescends en contrôle. Mouvement complet et exigeant pour la colonne."},
+  {n:"Russian twists",t:"Rotation buste assis",w:"Rotation lombaire répétée en position fléchie : combinaison à risque pour les disques.",g:"Assis, buste incliné en arrière, pieds décollés ou non, tourne le buste d un côté puis de l autre. Tourne depuis les côtes, pas depuis le bas du dos."},
+  {n:"V-ups",t:"Bras et jambes se rejoignent",w:"Flexion lombaire complète et dynamique.",g:"Allongé, monte simultanément buste et jambes tendues pour former un V, redescends en contrôle."},
+  {n:"Planche dynamique (up-down)",t:"Avant-bras → mains → avant-bras",g:"En planche, passe des avant-bras aux mains puis reviens, en alternant le bras qui démarre. Le bassin ne tourne pas."},
+  {n:"Planche commando",t:"Gainage + haut du corps",g:"Même principe que l up-down, en enchaînant plus vite. Serre les fessiers pour bloquer le bassin."}]
 };
 var hiit={seq:[],idx:0,phEnd:0,iv:null,paused:false,pauseLeft:0,startedAt:0,tours:1,circName:"",exCount:12,beeped:{}};
 
@@ -1428,10 +1554,10 @@ function renderHiitUI(){
     var row=el("div","hp-row");
     var head=el("div","hp-head");
     head.appendChild(el("span","hp-num",(i+1)));
-    head.appendChild(el("span","hp-name",esc(e.n)));
+    head.appendChild(el("span","hp-name",esc(e.n)+(e.w?" <span class='warnbadge'>⚠</span>":"")));
     head.appendChild(el("span","hp-arrow","▸"));
     row.appendChild(head);
-    var body=el("div","hp-body",esc(e.g||e.t));
+    var body=el("div","hp-body",esc(e.g||e.t)+(e.w?"<div class='warnbox'>⚠ <b>À savoir :</b> "+esc(e.w)+"</div>":""));
     row.appendChild(body);
     head.addEventListener("click",function(){
       row.classList.toggle("open");
@@ -1460,10 +1586,10 @@ function renderHiitLib(){
       var row=el("div","hp-row"+(inB?" inbasket":""));
       var head=el("div","hp-head");
       head.appendChild(el("span","hp-add",inB?"✓":"+"));
-      head.appendChild(el("span","hp-name",esc(e.n)));
+      head.appendChild(el("span","hp-name",esc(e.n)+(e.w?" <span class='warnbadge'>⚠</span>":"")));
       head.appendChild(el("span","hp-arrow","▸"));
       row.appendChild(head);
-      var body=el("div","hp-body",esc(e.g||e.t));
+      var body=el("div","hp-body",esc(e.g||e.t)+(e.w?"<div class='warnbox'>⚠ <b>À savoir :</b> "+esc(e.w)+"</div>":""));
       row.appendChild(body);
       head.children[0].addEventListener("click",function(ev){
         ev.stopPropagation();
@@ -1521,8 +1647,8 @@ function hiitRenderPhase(){
   ov.classList.toggle("rest",p.type==="rest");
   if(p.type==="work"){
     $("#hPhase").textContent="EFFORT";
-    $("#hExName").textContent=p.ex.n;
-    $("#hTip").textContent=p.ex.t;
+    $("#hExName").innerHTML=(p.ex.w?"<span class='warnbadge big'>⚠</span> ":"")+esc(p.ex.n);
+    $("#hTip").innerHTML=esc(p.ex.t)+(p.ex.w?"<div class='tipwarn'>⚠ "+esc(p.ex.w)+"</div>":"");
   }else{
     $("#hPhase").textContent="RÉCUP";
     $("#hExName").textContent="Souffle…";
@@ -1568,7 +1694,7 @@ function hiitTick(){
     left=Math.round((hiit.phEnd-Date.now())/1000);
   }
   hiitRenderTime(left,p.dur);
-  if(left<=3&&!hiit.beeped[left]){hiit.beeped[left]=true;beepShort();}
+  if(left<=5&&!hiit.beeped[left]){hiit.beeped[left]=true;beepShort();}
 }
 function hiitStart(){
   initAudio();
@@ -1641,7 +1767,7 @@ function hiitFinish(partiel){
   save();
   hiitStop();
   if(!partiel){
-    beepEnd();
+    whistleDouble();
     if(navigator.vibrate)navigator.vibrate([300,120,300,120,600]);
     toast("HIIT terminé et enregistré ⚡ "+Math.round(duration/60)+" min");
   }else{
@@ -1812,13 +1938,13 @@ function renderSessionCards(){
     var it=w.item;
     var card=el("div","ex"+(it.fin?" finisher":"")+(it.dos?" dos":""));
     var top=el("div","ex-top");
-    top.appendChild(el("div","ex-name",esc(it.n)));
+    top.appendChild(el("div","ex-name",(it.hiit?"<span class='hiittag'>⚡</span> ":"")+esc(it.n)+(it.w?" <span class='warnbadge'>⚠</span>":"")));
     top.appendChild(el("div","ex-scheme",esc(w.scheme||it.s)));
     card.appendChild(top);
     if(it.v)card.appendChild(el("div","ex-var",it.v));
     if(it.g){
       var gt=el("button","gtoggle","▸ Comment faire");
-      var gd=el("div","ex-guide",esc(it.g));
+      var gd=el("div","ex-guide",esc(it.g)+(it.w?"<div class='warnbox'>⚠ <b>À savoir :</b> "+esc(it.w)+"</div>":""));
       gt.addEventListener("click",function(){
         card.classList.toggle("showg");
         gt.textContent=card.classList.contains("showg")?"▾ Comment faire":"▸ Comment faire";
@@ -1833,6 +1959,11 @@ function renderSessionCards(){
       b.setAttribute("role","checkbox");b.setAttribute("tabindex","0");
       b.setAttribute("aria-checked",v?"true":"false");b.setAttribute("aria-label","Série "+(i+1));
       function tg(){
+        // Décochage : on demande confirmation, un appui involontaire
+        // en pleine séance ferait perdre une série déjà faite.
+        if(w.sets[i]){
+          if(!confirm("Décocher la série "+(i+1)+" de « "+it.n+" » ?\n\nElle est actuellement comptée comme faite."))return;
+        }
         w.sets[i]=!w.sets[i];
         b.classList.toggle("done",w.sets[i]);
         b.setAttribute("aria-checked",w.sets[i]?"true":"false");
@@ -1956,6 +2087,8 @@ $("#finishBtn").addEventListener("click",function(){
   current=null;
   sessClockStop();
   timerIdle();
+  whistleDouble();
+  if(navigator.vibrate)navigator.vibrate([300,120,300,120,600]);
   if(newPRs.length){toast("🏆 Record : "+newPRs[0]);}
   else{toast("Séance enregistrée 💪");}
   if(state.autoSave)doExport(true);
@@ -1966,10 +2099,35 @@ $("#finishBtn").addEventListener("click",function(){
 
 /* ---------- Vue Libre ---------- */
 var basket={};
+/* ---------- Séance libre mixte : muscu + HIIT ----------
+   Les exercices HIIT sont convertis en blocs chronométrés compatibles avec
+   les cartes de séance (séries × durée, chrono plein écran, pas de charge). */
+var LIB_HIIT_CACHE=null;
+function slugHiit(n){
+  return "hiit_"+String(n).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,"");
+}
+function libHiit(){
+  if(LIB_HIIT_CACHE)return LIB_HIIT_CACHE;
+  var out={};
+  Object.keys(HIIT_LIB).forEach(function(cat){
+    out["⚡ "+cat]=HIIT_LIB[cat].map(function(e){
+      return {k:slugHiit(e.n),n:e.n,s:"3 × 30 s",v:e.t,sets:3,noCharge:true,chrono:30,g:e.g,w:e.w,hiit:true};
+    });
+  });
+  LIB_HIIT_CACHE=out;
+  return out;
+}
+function allLib(){
+  var o={};
+  Object.keys(LIB).forEach(function(k){o[k]=LIB[k];});
+  var h=libHiit();
+  Object.keys(h).forEach(function(k){o[k]=h[k];});
+  return o;
+}
 function renderGroups(){
   var wrap=$("#groupBtns");wrap.innerHTML="";
-  Object.keys(LIB).forEach(function(g){
-    var b=el("button","gbtn",esc(g));
+  Object.keys(allLib()).forEach(function(g){
+    var b=el("button","gbtn"+(g.indexOf("⚡")===0?" hiit":""),esc(g));
     b.addEventListener("click",function(){b.classList.toggle("sel");renderLib();});
     b.setAttribute("data-g",g);
     wrap.appendChild(b);
@@ -1993,12 +2151,12 @@ function renderLib(){
   document.querySelectorAll(".gbtn.sel").forEach(function(b){sel.push(b.getAttribute("data-g"));});
   sel.forEach(function(g){
     list.appendChild(el("h2",null,esc(g)));
-    LIB[g].forEach(function(it){
+    (allLib()[g]||[]).forEach(function(it){
       var added=!!basket[it.k];
       var card=el("div","lib-card"+(added?" added":""));
       var row=el("div","lib-ex"+(added?" added":""));
       var left=el("div");
-      left.appendChild(el("div","n",esc(it.n)));
+      left.appendChild(el("div","n",esc(it.n)+(it.w?" <span class='warnbadge'>⚠</span>":"")));
       left.appendChild(el("div","s",esc(added?basket[it.k].s:it.s)));
       row.appendChild(left);
       row.appendChild(el("div","add",added?"✓":"+"));
@@ -2029,20 +2187,32 @@ function renderLib(){
         }
         tune.appendChild(stepper("Séries",
           function(){return b.sets;},
-          function(d){b.sets=Math.max(1,Math.min(10,b.sets+d));b.s=buildScheme(b.sets,b._reps,it.s);}
+          function(d){b.sets=Math.max(1,Math.min(10,b.sets+d));b.s=it.chrono?(b.sets+" × "+b.chrono+" s"):buildScheme(b.sets,b._reps,it.s);}
         ));
-        tune.appendChild(stepper("Reps",
-          function(){return b._reps===null?"max":b._reps;},
-          function(d){
-            if(b._reps===null){b._reps=(d>0?5:null);}
-            else{
-              var nv=b._reps+d;
-              if(nv<1){b._reps=null;}
-              else b._reps=Math.min(50,nv);
+        if(it.chrono){
+          // Bloc chronométré (HIIT, gainage) : on règle la durée, par pas de 5 s
+          tune.appendChild(stepper("Durée",
+            function(){return b.chrono+" s";},
+            function(d){
+              b.chrono=Math.max(10,Math.min(120,b.chrono+d*5));
+              b._reps=b.chrono;
+              b.s=b.sets+" × "+b.chrono+" s";
             }
-            b.s=buildScheme(b.sets,b._reps,it.s);
-          }
-        ));
+          ));
+        }else{
+          tune.appendChild(stepper("Reps",
+            function(){return b._reps===null?"max":b._reps;},
+            function(d){
+              if(b._reps===null){b._reps=(d>0?5:null);}
+              else{
+                var nv=b._reps+d;
+                if(nv<1){b._reps=null;}
+                else b._reps=Math.min(50,nv);
+              }
+              b.s=buildScheme(b.sets,b._reps,it.s);
+            }
+          ));
+        }
         card.appendChild(tune);
       }
       list.appendChild(card);
@@ -2052,13 +2222,31 @@ function renderLib(){
   $("#basketWrap").style.display=n?"block":"none";
   $("#basketCount").textContent=n;
 }
+// Ajoute la planche de fin, sauf si la séance contient déjà un gainage
+// chronométré choisi par l'utilisateur (évite les doublons de planche)
+function ajouterFinisher(items){
+  var dejaGainage=items.some(function(it){
+    return /planche|gainage/i.test(it.n||"");
+  });
+  if(!dejaGainage)items.push(PLANCHE);
+  return items;
+}
 $("#startLibre").addEventListener("click",function(){
   var items=Object.keys(basket).map(function(k){
     var o=Object.assign({},basket[k]);delete o._reps;return o;
   });
   if(!items.length)return;
-  items.push(PLANCHE);
-  openSession({id:"LIBRE",letter:"L",title:"Séance libre",sub:(items.length-1)+" exercices choisis",items:items});
+  // La durée réglée dans le composeur fait foi pour le chrono plein écran
+  if(!state.chronoDur)state.chronoDur={};
+  items.forEach(function(it){if(it.hiit&&it.chrono)state.chronoDur[it.k]=it.chrono;});
+  ajouterFinisher(items);
+  // Le finisher ajouté automatiquement ne compte ni comme muscu ni dans le total choisi
+  var choisis=items.filter(function(it){return !it.fin;});
+  var nH=choisis.filter(function(it){return it.hiit;}).length;
+  var nM=choisis.length-nH;
+  var titre=(nH&&nM)?"Séance mixte":(nH?"Séance HIIT libre":"Séance libre");
+  var sub=choisis.length+" exercice"+(choisis.length>1?"s":"")+" choisi"+(choisis.length>1?"s":"")+(nH&&nM?" · dont "+nH+" HIIT":"");
+  openSession({id:"LIBRE",letter:nH?"⚡":"L",title:titre,sub:sub,items:items});
   basket={};
   document.querySelectorAll(".gbtn.sel").forEach(function(b){b.classList.remove("sel");});
   renderLib();
@@ -2091,8 +2279,8 @@ function renderTemplates(){
     var go=el("button","tgo","Lancer");
     go.addEventListener("click",function(){
       var items=t.items.map(function(it){return Object.assign({},it);});
-      items.push(PLANCHE);
-      openSession({id:"TPL",letter:"M",title:t.name,sub:(items.length-1)+" exercices (modèle)",items:items});
+      ajouterFinisher(items);
+      openSession({id:"TPL",letter:"M",title:t.name,sub:items.length+" exercices (modèle)",items:items});
     });
     row.appendChild(go);
     var del=el("button","tdel","✕");
@@ -2659,6 +2847,111 @@ function drawBars(weeks){
 }
 
 /* ---------- Vue Historique ---------- */
+var histoFiltre="tout";
+// Construit les filtres à partir de ce qui existe réellement dans l'historique
+// Statistiques calculées sur les entrées actuellement affichées (filtre compris)
+function renderHistoStats(vus){
+  var box=$("#histoStatsBox");if(!box)return;
+  if(!vus||vus.length<3){box.style.display="none";return;}
+  box.style.display="block";
+
+  var nb=vus.length, minutes=0, km=0, dplus=0, tonnage=0, series=0, allures=[];
+  var premiere=null, derniere=null;
+  vus.forEach(function(h){
+    var t=new Date(h.date).getTime();
+    if(premiere===null||t<premiere)premiere=t;
+    if(derniere===null||t>derniere)derniere=t;
+    if(h.type==="act"){
+      if(h.minutes)minutes+=h.minutes;
+      if(h.distance){
+        km+=h.distance;
+        if(h.minutes)allures.push(h.minutes/h.distance);
+      }
+      if(h.dplus)dplus+=h.dplus;
+    }else{
+      if(h.duration)minutes+=h.duration/60;
+      (h.items||[]).forEach(function(i){
+        if(!i.done)return;
+        series+=i.done;
+        var v=parseKg(i.charge);
+        if(v&&v>0)tonnage+=v*repsFromScheme(i.s)*i.done;
+      });
+    }
+  });
+
+  // régularité : nombre de semaines distinctes couvertes
+  var semaines={};
+  vus.forEach(function(h){semaines[weekKey(h.date)]=1;});
+  var nbSem=Object.keys(semaines).length;
+  var jours=premiere&&derniere?Math.max(1,Math.round((derniere-premiere)/86400000)+1):1;
+  var parSem=Math.round(nb/Math.max(1,jours/7)*10)/10;
+
+  var cells=[];
+  cells.push({v:nb,l:nb>1?"entrées":"entrée",hl:true});
+  if(minutes>0)cells.push({v:fmtDur(minutes),l:"temps total"});
+  if(km>0){
+    cells.push({v:(Math.round(km*10)/10)+" km",l:"distance totale",hl:true});
+    if(dplus>0)cells.push({v:dplus+" m",l:"dénivelé cumulé"});
+    if(allures.length){
+      var moy=allures.reduce(function(a,b){return a+b;},0)/allures.length;
+      var best=Math.min.apply(null,allures);
+      cells.push({v:paceTxt(moy),l:"allure moyenne"});
+      cells.push({v:paceTxt(best),l:"meilleure allure"});
+    }
+  }
+  if(series>0)cells.push({v:series,l:"séries réalisées"});
+  if(tonnage>0)cells.push({v:(Math.round(tonnage/100)/10)+" t",l:"tonnage soulevé"});
+  cells.push({v:parSem,l:"par semaine en moyenne"});
+
+  var html="<div class='sb-title'>Statistiques"+(histoFiltre!=="tout"?" · "+esc(filtreLabel()):"")+"</div>";
+  html+="<div class='sb-grid'>"+cells.map(function(c){
+    return "<div class='sb-cell"+(c.hl?" hl":"")+"'><b>"+esc(String(c.v))+"</b><span>"+esc(c.l)+"</span></div>";
+  }).join("")+"</div>";
+  if(premiere){
+    var p=new Date(premiere),dn=new Date(derniere);
+    var fmt=function(x){return x.getDate()+"/"+(x.getMonth()+1)+"/"+String(x.getFullYear()).slice(2);};
+    html+="<div class='sb-foot'>Du "+fmt(p)+" au "+fmt(dn)+" · "+nbSem+" semaine"+(nbSem>1?"s":"")+" concernée"+(nbSem>1?"s":"")+"</div>";
+  }
+  box.innerHTML=html;
+}
+function paceTxt(p){
+  var m=Math.floor(p),sec=Math.round((p-m)*60);
+  if(sec===60){m++;sec=0;}
+  return m+":"+(sec<10?"0":"")+sec+"/km";
+}
+function filtreLabel(){
+  if(histoFiltre==="muscu")return "Muscu";
+  if(histoFiltre==="hiit")return "HIIT";
+  if(histoFiltre.indexOf("act:")===0)return histoFiltre.slice(4);
+  return "Tout";
+}
+function renderHistoFilter(){
+  var box=$("#histoFilter");if(!box)return;
+  box.innerHTML="";
+  if(state.history.length<5){box.style.display="none";return;}
+  box.style.display="flex";
+  var cats=[{k:"tout",lab:"Tout"},{k:"muscu",lab:"Muscu"},{k:"hiit",lab:"HIIT"}];
+  // une puce par type d'activité réellement enregistré
+  var labels={};
+  state.history.forEach(function(h){if(h.type==="act"&&h.label)labels[h.label]=(labels[h.label]||0)+1;});
+  Object.keys(labels).sort(function(a,b){return labels[b]-labels[a];}).forEach(function(l){
+    cats.push({k:"act:"+l,lab:l});
+  });
+  cats.forEach(function(c){
+    var n=state.history.filter(function(h){return histoMatch(h,c.k);}).length;
+    if(n===0&&c.k!=="tout")return;
+    var chip=el("button","hf-chip"+(histoFiltre===c.k?" sel":""),esc(c.lab)+" <b>"+n+"</b>");
+    chip.addEventListener("click",function(){histoFiltre=c.k;renderHisto();});
+    box.appendChild(chip);
+  });
+}
+function histoMatch(h,f){
+  if(f==="tout")return true;
+  if(f==="muscu")return h.type!=="act"&&h.sid!=="HIIT";
+  if(f==="hiit")return h.sid==="HIIT";
+  if(f.indexOf("act:")===0)return h.type==="act"&&h.label===f.slice(4);
+  return true;
+}
 function renderHisto(){
   renderSrvState();
   renderBackupWarn();
@@ -2673,10 +2966,19 @@ function renderHisto(){
     ? muscuCount()+" séance(s) muscu · "+state.history.filter(function(h){return h.type==="act";}).length+" activité(s) · cette semaine : "+wkSess+" muscu + "+wkAct+" autre(s)"
     : "";
   if(!state.history.length){
+    renderHistoStats([]);
+    renderHistoFilter();
     list.appendChild(el("div","empty","Rien pour l'instant.<br>Termine une séance ou ajoute une activité, tout apparaîtra ici."));
     return;
   }
-  state.history.forEach(function(h,idx){
+  renderHistoFilter();
+  var vus=state.history.filter(function(h){return histoMatch(h,histoFiltre);});
+  renderHistoStats(vus);
+  if(!vus.length){
+    list.appendChild(el("div","empty","Rien dans cette catégorie."));
+    return;
+  }
+  vus.forEach(function(h,idx){
     var isAct=h.type==="act";
     var card=el("div","h-card"+(isAct?" act":""));
     var head=el("div","h-head");
@@ -2717,7 +3019,10 @@ function renderHisto(){
     del.addEventListener("click",function(e){
       e.stopPropagation();
       if(!confirm("Supprimer cette entrée de l'historique ?"))return;
-      state.history.splice(idx,1);save();renderHisto();renderPlan();
+      // On supprime l'entrée elle-même (et non un index de la liste filtrée)
+      var pos=state.history.indexOf(h);
+      if(pos>=0)state.history.splice(pos,1);
+      save();renderHisto();renderPlan();
     });
     head.appendChild(del);
     card.appendChild(head);
