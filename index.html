@@ -79,6 +79,21 @@
   .hf-chip{flex:0 0 auto;background:#fff;border:1.5px solid var(--line);border-radius:99px;padding:7px 13px;font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer;white-space:nowrap;font-family:"IBM Plex Sans",sans-serif}
   .hf-chip.sel{background:var(--ink);border-color:var(--ink);color:#fff}
   .hf-chip b{font-family:"Barlow Condensed",sans-serif;font-weight:800;margin-left:5px;opacity:.65}
+  .h-edit{display:block;width:100%;margin-top:10px;padding:9px;background:none;border:1.5px dashed var(--line);border-radius:9px;color:var(--grey);font-size:13px;font-weight:600;cursor:pointer;font-family:"IBM Plex Sans",sans-serif}
+  .h-card.editing{border-color:var(--red)}
+  .ed-row{border:1px solid var(--line);border-radius:10px;padding:10px 11px;margin-bottom:8px;background:#fff}
+  .ed-row.suppr{background:#faf9f6;opacity:.65}
+  .ed-top{display:flex;align-items:center;gap:8px}
+  .ed-name{flex:1;font-weight:600;font-size:14px}
+  .ed-row.suppr .ed-name{text-decoration:line-through}
+  .ed-x{background:none;border:none;color:var(--grey);font-size:16px;cursor:pointer;padding:2px 6px}
+  .ed-ctl{display:flex;gap:12px;align-items:center;margin-top:8px;flex-wrap:wrap}
+  .ed-sets,.ed-charge{display:flex;align-items:center;gap:6px}
+  .ed-lab{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
+  .ed-charge input{width:72px;padding:7px 8px;border:1.5px solid var(--line);border-radius:8px;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:17px;text-align:center}
+  .ed-charge input.bad{border-color:var(--red);background:#fff5f5}
+  .ed-gone{font-size:12px;color:var(--grey);margin-top:4px;font-style:italic}
+  .ed-note{width:100%;padding:9px;border:1px solid var(--line);border-radius:9px;font-family:"IBM Plex Sans",sans-serif;font-size:14px;resize:vertical}
   .verfoot{margin:16px 0 4px;text-align:center}
   .verbtn{background:none;border:none;color:var(--grey);font-size:12px;cursor:pointer;padding:6px;font-family:"IBM Plex Sans",sans-serif}
   .verbtn b{color:var(--ink-2);font-family:"Barlow Condensed",sans-serif;font-size:13px;letter-spacing:.03em}
@@ -725,8 +740,13 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.10.0";
+var APP_VERSION="1.11.0";
 var CHANGELOG=[
+ {v:"1.11.0",d:"2026-11-03",n:[
+   "Historique : corriger une séance enregistrée (charges, séries faites, note)",
+   "Retirer un exercice saisi par erreur, avec possibilité de le rétablir avant d'enregistrer",
+   "Records, progression et « dernier : X kg » se mettent à jour avec la correction"
+ ]},
  {v:"1.10.0",d:"2026-11-03",n:[
    "Réglage du volume des sons dans l'app (de muet à 150 %)",
    "Au-delà de 100 %, son renforcé avec un limiteur pour éviter la saturation",
@@ -2929,6 +2949,122 @@ function drawBars(weeks){
 }
 
 /* ---------- Vue Historique ---------- */
+/* ---------- Correction d'une séance enregistrée ---------- */
+// Retrouve la clé d'un exercice à partir de son nom (l'historique ne stocke que le nom)
+function cleExercice(nom){
+  var lib=typeof allLib==="function"?allLib():LIB;
+  var cles=Object.keys(lib);
+  for(var g=0;g<cles.length;g++){
+    var l=lib[cles[g]];
+    for(var i=0;i<l.length;i++)if(l[i].n===nom)return l[i].k;
+  }
+  if(PLANCHE&&PLANCHE.n===nom)return PLANCHE.k;
+  return null;
+}
+// Charge valide : vide, ou un nombre positif (virgule acceptée)
+function chargeValide(v){
+  v=String(v==null?"":v).trim();
+  if(v==="")return true;
+  var n=parseFloat(v.replace(",","."));
+  return !isNaN(n)&&n>=0&&n<=500&&/^\d+([.,]\d+)?$/.test(v);
+}
+function ouvrirEditeur(h,card,body){
+  card.classList.add("open","editing");
+  body.innerHTML="";
+  // copie de travail : rien n'est modifié tant qu'on n'a pas enregistré
+  var brouillon=(h.items||[]).map(function(i){return {n:i.n,s:i.s,done:i.done,total:i.total,charge:i.charge||"",suppr:false};});
+  var liste=el("div","ed-list");
+  body.appendChild(liste);
+  function dessiner(){
+    liste.innerHTML="";
+    brouillon.forEach(function(it){
+      var row=el("div","ed-row"+(it.suppr?" suppr":""));
+      var top=el("div","ed-top");
+      top.appendChild(el("div","ed-name",esc(it.n)));
+      var x=el("button","ed-x",it.suppr?"↺":"✕");
+      x.setAttribute("aria-label",it.suppr?"Rétablir cet exercice":"Retirer cet exercice");
+      x.addEventListener("click",function(){it.suppr=!it.suppr;dessiner();});
+      top.appendChild(x);
+      row.appendChild(top);
+      if(!it.suppr){
+        var ctl=el("div","ed-ctl");
+        // séries réalisées
+        var sb=el("div","ed-sets");
+        sb.appendChild(el("span","ed-lab","Séries"));
+        var m=el("button","tune-btn","−"),v=el("span","tune-val",it.done+"/"+it.total),pl=el("button","tune-btn","+");
+        m.addEventListener("click",function(){if(it.done>0){it.done--;dessiner();}});
+        pl.addEventListener("click",function(){if(it.done<it.total){it.done++;dessiner();}});
+        sb.appendChild(m);sb.appendChild(v);sb.appendChild(pl);
+        ctl.appendChild(sb);
+        // charge
+        var cb=el("div","ed-charge");
+        cb.appendChild(el("span","ed-lab","kg"));
+        var inp=document.createElement("input");
+        inp.type="text";inp.inputMode="decimal";inp.value=it.charge;inp.placeholder="—";
+        inp.addEventListener("input",function(){
+          it.charge=inp.value;
+          inp.classList.toggle("bad",!chargeValide(inp.value));
+        });
+        cb.appendChild(inp);
+        ctl.appendChild(cb);
+        row.appendChild(ctl);
+      }else{
+        row.appendChild(el("div","ed-gone","Sera retiré de cette séance"));
+      }
+      liste.appendChild(row);
+    });
+  }
+  dessiner();
+  // note de séance
+  var nl=el("div","ed-lab","Note");
+  nl.style.margin="10px 0 4px";
+  body.appendChild(nl);
+  var ta=document.createElement("textarea");
+  ta.className="ed-note";ta.value=h.note||"";ta.rows=2;
+  body.appendChild(ta);
+  // actions
+  var act=el("div","row-btns");
+  act.style.marginTop="10px";
+  var annuler=el("button","btn ghost","Annuler");
+  var ok=el("button","btn red","Enregistrer");
+  annuler.addEventListener("click",function(){renderHisto();});
+  ok.addEventListener("click",function(){
+    var restants=brouillon.filter(function(it){return !it.suppr;});
+    if(!restants.length){toast("Garde au moins un exercice — pour tout supprimer, utilise ✕ en haut");return;}
+    var fautif=restants.find(function(it){return !chargeValide(it.charge);});
+    if(fautif){toast("Charge invalide pour « "+fautif.n+" »");return;}
+    var avant=h.items.map(function(i){return i.n+"|"+i.done+"|"+i.charge;}).join(";")+(h.note||"");
+    h.items=restants.map(function(it){
+      return {n:it.n,s:it.s,done:it.done,total:it.total,charge:String(it.charge).trim()};
+    });
+    h.note=ta.value.trim();
+    // séance partielle recalculée
+    var faits=0,prevus=0;
+    h.items.forEach(function(i){faits+=i.done;prevus+=i.total;});
+    h.ratio=prevus?Math.round(faits/prevus*100):0;
+    h.partial=h.ratio<100;
+    // "dernier : X kg" : si cette séance est la plus récente pour l'exercice, on corrige aussi
+    h.items.forEach(function(i){
+      var plusRecente=null;
+      for(var k=0;k<state.history.length;k++){
+        var e=state.history[k];
+        if(e.type==="act"||!e.items)continue;
+        if(e.items.some(function(x){return x.n===i.n&&x.charge;})){plusRecente=e;break;}
+      }
+      if(plusRecente===h){
+        var cle=cleExercice(i.n);
+        if(cle&&i.charge)state.lastCharges[cle]=i.charge;
+      }
+    });
+    var apres=h.items.map(function(i){return i.n+"|"+i.done+"|"+i.charge;}).join(";")+(h.note||"");
+    save();
+    if(apres!==avant)sauvegardeServeur(state);
+    toast(apres!==avant?"Séance corrigée ✓":"Aucune modification");
+    renderHisto();renderPlan();
+  });
+  act.appendChild(annuler);act.appendChild(ok);
+  body.appendChild(act);
+}
 var histoFiltre="tout";
 // Construit les filtres à partir de ce qui existe réellement dans l'historique
 // Statistiques calculées sur les entrées actuellement affichées (filtre compris)
@@ -3134,6 +3270,9 @@ function renderHisto(){
         line.appendChild(el("span","c",i.charge?esc(i.charge)+" kg":"—"));
         body2.appendChild(line);
       });
+      var edBtn=el("button","h-edit","✎ Modifier les exercices et les charges");
+      edBtn.addEventListener("click",function(e){e.stopPropagation();ouvrirEditeur(h,card,body2);});
+      body2.appendChild(edBtn);
       card.appendChild(body2);
     }
     list.appendChild(card);
