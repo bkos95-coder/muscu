@@ -655,6 +655,12 @@
       <p class="muted" style="font-size:11.5px;margin-top:8px">Une fois le token saisi, l'app envoie ta sauvegarde au serveur à la fin de chaque séance. À configurer depuis l'app installée sur l'écran d'accueil (son stockage est séparé de celui du navigateur).</p>
     </div>
 
+    <div class="srvbox">
+      <div class="lab">🔊 Sons</div>
+      <p class="muted" id="sonState">Joue la séquence complète pour régler le volume avant ta séance. Rien n'est enregistré.</p>
+      <button class="btn ghost block" id="sonTest">▶ Tester les sons</button>
+    </div>
+
     <div class="verfoot">
       <button class="verbtn" id="verBtn">Version <b id="verNum">—</b> · voir les nouveautés</button>
       <div class="verlog" id="verLog"></div>
@@ -709,8 +715,11 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.9.0";
+var APP_VERSION="1.9.1";
 var CHANGELOG=[
+ {v:"1.9.1",d:"2026-11-03",n:[
+   "Bouton « Tester les sons » dans l'Historique : décompte, sifflet et double sifflet, sans rien enregistrer"
+ ]},
  {v:"1.9.0",d:"2026-11-03",n:[
    "Séance mixte : mélange exercices de muscu et blocs HIIT dans la séance libre",
    "Les blocs HIIT se règlent en séries et en durée (pas de 5 s), avec le chrono plein écran",
@@ -1273,6 +1282,36 @@ function whistle(dur,delay){
 // Fin d'un temps de repos ou d'un gainage : un coup de sifflet
 function beepEnd(){whistle(0.45,0);}
 // Fin de la séance complète ou du circuit : double coup de sifflet
+// Test des sons : décompte 5→1, sifflet, puis double sifflet. Aucun enregistrement.
+var sonTestEnCours=false;
+function testSons(){
+  if(sonTestEnCours)return;
+  initAudio();
+  if(!audioCtx){toast("Son indisponible sur cet appareil");return;}
+  sonTestEnCours=true;
+  var btn=$("#sonTest"),etat=$("#sonState");
+  if(btn){btn.disabled=true;btn.textContent="🔊 Écoute…";}
+  var etapes=[
+    {t:0,   f:beepShort,     m:"Décompte : 5"},
+    {t:1000,f:beepShort,     m:"Décompte : 4"},
+    {t:2000,f:beepShort,     m:"Décompte : 3"},
+    {t:3000,f:beepShort,     m:"Décompte : 2"},
+    {t:4000,f:beepShort,     m:"Décompte : 1"},
+    {t:5000,f:beepEnd,       m:"0 · coup de sifflet (fin de repos, fin de gainage)"},
+    {t:7200,f:whistleDouble, m:"Double coup de sifflet (fin de séance, fin de circuit)"}
+  ];
+  etapes.forEach(function(e){
+    setTimeout(function(){
+      try{e.f();}catch(x){}
+      if(etat)etat.textContent=e.m;
+    },e.t);
+  });
+  setTimeout(function(){
+    sonTestEnCours=false;
+    if(btn){btn.disabled=false;btn.textContent="▶ Tester les sons";}
+    if(etat)etat.textContent="Si tu n'as rien entendu : monte le volume média du téléphone et vérifie qu'il n'est pas en silencieux.";
+  },8800);
+}
 function whistleDouble(){
   whistle(0.30,0);
   whistle(0.55,0.42);
@@ -3067,6 +3106,7 @@ renderTemplates();
 renderHiitUI();
 timerIdle();
 if($("#srvConfig")){$("#srvConfig").addEventListener("click",configurerSauvegarde);renderSrvState();}
+if($("#sonTest"))$("#sonTest").addEventListener("click",testSons);
 if($("#verBtn")){
   $("#verBtn").addEventListener("click",function(){
     var l=$("#verLog");
