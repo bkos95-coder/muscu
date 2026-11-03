@@ -94,6 +94,19 @@
   .ed-charge input.bad{border-color:var(--red);background:#fff5f5}
   .ed-gone{font-size:12px;color:var(--grey);margin-top:4px;font-style:italic}
   .ed-note{width:100%;padding:9px;border:1px solid var(--line);border-radius:9px;font-family:"IBM Plex Sans",sans-serif;font-size:14px;resize:vertical}
+  .ed-rep{display:flex;align-items:center;gap:8px;margin-top:8px}
+  .ed-sel{flex:1;min-width:0;padding:7px 8px;border:1.5px solid var(--line);border-radius:8px;font-family:"IBM Plex Sans",sans-serif;font-size:13.5px;background:#fff}
+  .ed-was{font-size:11.5px;color:var(--red);margin-top:4px;font-style:italic}
+  .ed-act{display:flex;flex-direction:column;gap:9px}
+  .ed-field{display:flex;flex-direction:column;gap:4px}
+  .ed-in{padding:8px 9px;border:1.5px solid var(--line);border-radius:8px;font-family:"IBM Plex Sans",sans-serif;font-size:14px;width:100%}
+  .ed-dur{display:flex;align-items:center;gap:6px}
+  .ed-dur .ed-in{width:100%;min-width:0;text-align:center}
+  .wlist{margin-top:8px;border-top:1px solid #f1eee9}
+  .wl-row{display:flex;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px solid #f1eee9}
+  .wl-date{flex:1;font-size:13px;color:var(--ink-2)}
+  .wl-val{font-family:"Barlow Condensed",sans-serif;font-size:17px}
+  .wl-btn{background:none;border:1px solid var(--line);border-radius:7px;width:32px;height:30px;color:var(--grey);font-size:14px;cursor:pointer}
   .verfoot{margin:16px 0 4px;text-align:center}
   .verbtn{background:none;border:none;color:var(--grey);font-size:12px;cursor:pointer;padding:6px;font-family:"IBM Plex Sans",sans-serif}
   .verbtn b{color:var(--ink-2);font-family:"Barlow Condensed",sans-serif;font-size:13px;letter-spacing:.03em}
@@ -630,6 +643,8 @@
       </div>
       <canvas id="weightCanvas" style="display:none"></canvas>
       <div class="muted" id="weightEmpty" style="font-size:12px;text-align:center;margin-top:2px">Note ton poids de temps en temps (1×/semaine suffit) pour suivre l'évolution.</div>
+      <button class="h-edit" id="weightListBtn" style="display:none">Voir et corriger les relevés</button>
+      <div class="wlist" id="weightList" style="display:none"></div>
     </div>
 
     <div class="volcard" id="volCard" style="display:none">
@@ -740,8 +755,13 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.11.0";
+var APP_VERSION="1.12.0";
 var CHANGELOG=[
+ {v:"1.12.0",d:"2026-11-03",n:[
+   "Historique : remplacer un exercice saisi par erreur par le bon, en gardant séries et charges",
+   "Corriger une activité : nom, date, durée, distance, dénivelé et note",
+   "Poids de corps : liste des relevés, avec correction et suppression d'une saisie fausse"
+ ]},
  {v:"1.11.0",d:"2026-11-03",n:[
    "Historique : corriger une séance enregistrée (charges, séries faites, note)",
    "Retirer un exercice saisi par erreur, avec possibilité de le rétablir avant d'enregistrer",
@@ -2833,12 +2853,50 @@ $("#impFile").addEventListener("change",function(){
 });
 
 /* ---------- Poids de corps ---------- */
+/* Liste des relevés de poids : corriger une valeur ou supprimer une saisie */
+var weightListOpen=false;
+function renderWeightList(ws){
+  var btn=$("#weightListBtn"),box=$("#weightList");
+  if(!btn||!box)return;
+  if(!ws.length){btn.style.display="none";box.style.display="none";return;}
+  btn.style.display="block";
+  btn.textContent=weightListOpen?"Masquer les relevés":"Voir et corriger les relevés ("+ws.length+")";
+  box.style.display=weightListOpen?"block":"none";
+  if(!weightListOpen)return;
+  box.innerHTML="";
+  ws.slice().reverse().forEach(function(w){
+    var row=el("div","wl-row");
+    var dt=new Date(w.date);
+    row.appendChild(el("span","wl-date",dt.getDate()+"/"+(dt.getMonth()+1)+"/"+String(dt.getFullYear()).slice(2)));
+    row.appendChild(el("b","wl-val",w.v+" kg"));
+    var ed=el("button","wl-btn","✎");ed.setAttribute("aria-label","Corriger ce relevé");
+    ed.addEventListener("click",function(){
+      var r=prompt("Corriger le poids du "+dt.getDate()+"/"+(dt.getMonth()+1)+" (kg) :",String(w.v));
+      if(r===null)return;
+      var v=parseFloat(String(r).trim().replace(",","."));
+      if(isNaN(v)||v<30||v>250){toast("Poids invalide (entre 30 et 250 kg)");return;}
+      v=Math.round(v*10)/10;
+      if(v===w.v){toast("Aucune modification");return;}
+      w.v=v;save();sauvegardeServeur(state);toast("Relevé corrigé ✓");renderWeight();
+    });
+    var del=el("button","wl-btn","✕");del.setAttribute("aria-label","Supprimer ce relevé");
+    del.addEventListener("click",function(){
+      if(!confirm("Supprimer le relevé du "+dt.getDate()+"/"+(dt.getMonth()+1)+" ("+w.v+" kg) ?"))return;
+      var pos=state.weights.indexOf(w);
+      if(pos>=0)state.weights.splice(pos,1);
+      save();sauvegardeServeur(state);toast("Relevé supprimé");renderWeight();
+    });
+    row.appendChild(ed);row.appendChild(del);
+    box.appendChild(row);
+  });
+}
 function renderWeight(){
   var ws=(state.weights||[]).slice().sort(function(a,b){return a.date<b.date?-1:1;});
   var hasData=ws.length>0;
   $("#weightStats").style.display=hasData?"flex":"none";
   $("#weightCanvas").style.display=ws.length>=2?"block":"none";
   $("#weightEmpty").style.display=hasData?"none":"block";
+  renderWeightList(ws);
   if(!hasData)return;
   var first=ws[0].v,last=ws[ws.length-1].v;
   $("#wLast").textContent=last+" kg";
@@ -2961,6 +3019,31 @@ function cleExercice(nom){
   if(PLANCHE&&PLANCHE.n===nom)return PLANCHE.k;
   return null;
 }
+// Recalcule "dernier : X kg" d'un exercice depuis l'historique (séance la plus récente avec une charge)
+function recalcDerniere(cle){
+  if(!cle)return;
+  for(var k=0;k<state.history.length;k++){
+    var e=state.history[k];
+    if(e.type==="act"||!e.items)continue;
+    for(var j=0;j<e.items.length;j++){
+      var it=e.items[j];
+      if(it.charge&&cleExercice(it.n)===cle){state.lastCharges[cle]=it.charge;return;}
+    }
+  }
+  delete state.lastCharges[cle];
+}
+// Liste de tous les exercices, pour le sélecteur de remplacement
+function optionsExercices(selectionne){
+  var lib=allLib(),html="";
+  Object.keys(lib).forEach(function(g){
+    html+="<optgroup label=\""+esc(g)+"\">";
+    lib[g].forEach(function(e){
+      html+="<option value=\""+esc(e.n)+"\""+(e.n===selectionne?" selected":"")+">"+esc(e.n)+"</option>";
+    });
+    html+="</optgroup>";
+  });
+  return html;
+}
 // Charge valide : vide, ou un nombre positif (virgule acceptée)
 function chargeValide(v){
   v=String(v==null?"":v).trim();
@@ -2972,7 +3055,7 @@ function ouvrirEditeur(h,card,body){
   card.classList.add("open","editing");
   body.innerHTML="";
   // copie de travail : rien n'est modifié tant qu'on n'a pas enregistré
-  var brouillon=(h.items||[]).map(function(i){return {n:i.n,s:i.s,done:i.done,total:i.total,charge:i.charge||"",suppr:false};});
+  var brouillon=(h.items||[]).map(function(i){return {n:i.n,orig:i.n,s:i.s,done:i.done,total:i.total,charge:i.charge||"",suppr:false};});
   var liste=el("div","ed-list");
   body.appendChild(liste);
   function dessiner(){
@@ -2987,6 +3070,19 @@ function ouvrirEditeur(h,card,body){
       top.appendChild(x);
       row.appendChild(top);
       if(!it.suppr){
+        // Remplacer l'exercice (saisi par erreur à la place d'un autre)
+        var rep=el("div","ed-rep");
+        rep.appendChild(el("span","ed-lab","Exercice"));
+        var sel=document.createElement("select");
+        sel.className="ed-sel";
+        sel.innerHTML=optionsExercices(it.n);
+        // si le nom n'existe plus dans la bibliothèque, on le garde en tête de liste
+        if(!cleExercice(it.n))sel.innerHTML="<option value=\""+esc(it.n)+"\" selected>"+esc(it.n)+"</option>"+sel.innerHTML;
+        sel.value=it.n;
+        sel.addEventListener("change",function(){it.n=sel.value;dessiner();});
+        rep.appendChild(sel);
+        row.appendChild(rep);
+        if(it.n!==it.orig)row.appendChild(el("div","ed-was","au lieu de « "+esc(it.orig)+" »"));
         var ctl=el("div","ed-ctl");
         // séries réalisées
         var sb=el("div","ed-sets");
@@ -3033,6 +3129,13 @@ function ouvrirEditeur(h,card,body){
     if(!restants.length){toast("Garde au moins un exercice — pour tout supprimer, utilise ✕ en haut");return;}
     var fautif=restants.find(function(it){return !chargeValide(it.charge);});
     if(fautif){toast("Charge invalide pour « "+fautif.n+" »");return;}
+    var noms=restants.map(function(it){return it.n;});
+    var doublon=noms.find(function(n,i){return noms.indexOf(n)!==i;});
+    if(doublon&&!confirm("« "+doublon+" » apparaît deux fois dans cette séance. Enregistrer quand même ?"))return;
+    // clés touchées avant et après (pour recalculer "dernier : X kg")
+    var clesTouchees={};
+    h.items.forEach(function(i){var c=cleExercice(i.n);if(c)clesTouchees[c]=1;});
+    restants.forEach(function(i){var c=cleExercice(i.n);if(c)clesTouchees[c]=1;});
     var avant=h.items.map(function(i){return i.n+"|"+i.done+"|"+i.charge;}).join(";")+(h.note||"");
     h.items=restants.map(function(it){
       return {n:it.n,s:it.s,done:it.done,total:it.total,charge:String(it.charge).trim()};
@@ -3043,23 +3146,71 @@ function ouvrirEditeur(h,card,body){
     h.items.forEach(function(i){faits+=i.done;prevus+=i.total;});
     h.ratio=prevus?Math.round(faits/prevus*100):0;
     h.partial=h.ratio<100;
-    // "dernier : X kg" : si cette séance est la plus récente pour l'exercice, on corrige aussi
-    h.items.forEach(function(i){
-      var plusRecente=null;
-      for(var k=0;k<state.history.length;k++){
-        var e=state.history[k];
-        if(e.type==="act"||!e.items)continue;
-        if(e.items.some(function(x){return x.n===i.n&&x.charge;})){plusRecente=e;break;}
-      }
-      if(plusRecente===h){
-        var cle=cleExercice(i.n);
-        if(cle&&i.charge)state.lastCharges[cle]=i.charge;
-      }
-    });
+    // "dernier : X kg" recalculé pour chaque exercice concerné (y compris un exercice remplacé ou retiré)
+    Object.keys(clesTouchees).forEach(recalcDerniere);
     var apres=h.items.map(function(i){return i.n+"|"+i.done+"|"+i.charge;}).join(";")+(h.note||"");
     save();
     if(apres!==avant)sauvegardeServeur(state);
     toast(apres!==avant?"Séance corrigée ✓":"Aucune modification");
+    renderHisto();renderPlan();
+  });
+  act.appendChild(annuler);act.appendChild(ok);
+  body.appendChild(act);
+}
+/* ---------- Correction d'une activité (course, trail, padel…) ---------- */
+function ouvrirEditeurAct(h,card,body){
+  card.classList.add("open","editing");
+  body.innerHTML="";
+  var f=el("div","ed-act");
+  function champ(lab,el2){var w=el("div","ed-field");w.appendChild(el("span","ed-lab",lab));w.appendChild(el2);return w;}
+  function input(type,val,mode,ph){var i=document.createElement("input");i.type=type;i.value=val==null?"":val;if(mode)i.inputMode=mode;if(ph)i.placeholder=ph;i.className="ed-in";return i;}
+  var tot=h.minutes?Math.round(h.minutes*60):0;
+  var iNom=input("text",h.label,null,"Course, trail…");
+  var iDate=input("date",(h.date||"").slice(0,10));
+  var iH=input("text",tot?Math.floor(tot/3600):"","numeric","0");
+  var iM=input("text",tot?Math.floor((tot%3600)/60):"","numeric","0");
+  var iS=input("text",tot?tot%60:"","numeric","0");
+  var iDist=input("text",h.distance!=null?String(h.distance).replace(".",","):"","decimal","km");
+  var iDp=input("text",h.dplus!=null?h.dplus:"","numeric","m");
+  f.appendChild(champ("Activité",iNom));
+  f.appendChild(champ("Date",iDate));
+  var dur=el("div","ed-dur");
+  [[iH,"h"],[iM,"min"],[iS,"s"]].forEach(function(x){dur.appendChild(x[0]);dur.appendChild(el("span","dur-u",x[1]));});
+  f.appendChild(champ("Durée",dur));
+  f.appendChild(champ("Distance (km)",iDist));
+  f.appendChild(champ("Dénivelé D+ (m)",iDp));
+  var ta=document.createElement("textarea");ta.className="ed-note";ta.rows=2;ta.value=h.note||"";
+  f.appendChild(champ("Note",ta));
+  body.appendChild(f);
+  var act=el("div","row-btns");act.style.marginTop="10px";
+  var annuler=el("button","btn ghost","Annuler"),ok=el("button","btn red","Enregistrer");
+  annuler.addEventListener("click",function(){renderHisto();});
+  ok.addEventListener("click",function(){
+    var nom=iNom.value.trim();
+    if(!nom){toast("Donne un nom à l'activité");return;}
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(iDate.value)){toast("Date invalide");return;}
+    function ent(v){v=String(v).trim();if(v==="")return 0;return /^\d+$/.test(v)?parseInt(v,10):NaN;}
+    var hh=ent(iH.value),mm=ent(iM.value),ss=ent(iS.value);
+    if(isNaN(hh)||isNaN(mm)||isNaN(ss)||mm>59||ss>59){toast("Durée invalide");return;}
+    var minutes=hh*60+mm+ss/60;
+    var dRaw=iDist.value.trim().replace(",","."),dist=null;
+    if(dRaw!==""){dist=parseFloat(dRaw);if(isNaN(dist)||dist<=0||dist>500||!/^\d+(\.\d+)?$/.test(dRaw)){toast("Distance invalide");return;}dist=Math.round(dist*100)/100;}
+    var pRaw=String(iDp.value).trim(),dp=null;
+    if(pRaw!==""){if(!/^\d+$/.test(pRaw)||parseInt(pRaw,10)>10000){toast("Dénivelé invalide");return;}dp=parseInt(pRaw,10);}
+    var avant=JSON.stringify([h.label,h.date,h.minutes,h.distance,h.dplus,h.note]);
+    h.label=nom;
+    // la date n'est réécrite que si elle a réellement changé
+    if((h.date||"").slice(0,10)!==iDate.value)h.date=new Date(iDate.value+"T12:00:00").toISOString();
+    h.minutes=minutes>0?Math.round(minutes*100)/100:null;
+    h.distance=dist;
+    h.dplus=dp;
+    h.note=ta.value.trim();
+    var apres=JSON.stringify([h.label,h.date,h.minutes,h.distance,h.dplus,h.note]);
+    if(apres===avant){toast("Aucune modification");renderHisto();return;}
+    // la date a pu changer : l'historique reste trié du plus récent au plus ancien
+    state.history.sort(function(a,b){return a.date<b.date?1:-1;});
+    save();sauvegardeServeur(state);
+    toast("Activité corrigée ✓");
     renderHisto();renderPlan();
   });
   act.appendChild(annuler);act.appendChild(ok);
@@ -3245,12 +3396,13 @@ function renderHisto(){
     head.appendChild(del);
     card.appendChild(head);
     if(isAct){
-      if(h.note){
-        head.addEventListener("click",function(){card.classList.toggle("open");});
-        var body=el("div","h-body");
-        body.appendChild(el("div",null,esc(h.note)));
-        card.appendChild(body);
-      }
+      head.addEventListener("click",function(){card.classList.toggle("open");});
+      var body=el("div","h-body");
+      if(h.note)body.appendChild(el("div",null,esc(h.note)));
+      var edA=el("button","h-edit","✎ Corriger cette activité");
+      edA.addEventListener("click",function(e){e.stopPropagation();ouvrirEditeurAct(h,card,body);});
+      body.appendChild(edA);
+      card.appendChild(body);
     }else{
       head.addEventListener("click",function(){card.classList.toggle("open");});
       var body2=el("div","h-body");
@@ -3289,6 +3441,7 @@ renderHiitUI();
 timerIdle();
 if($("#srvConfig")){$("#srvConfig").addEventListener("click",configurerSauvegarde);renderSrvState();}
 if($("#sonTest"))$("#sonTest").addEventListener("click",testSons);
+if($("#weightListBtn"))$("#weightListBtn").addEventListener("click",function(){weightListOpen=!weightListOpen;renderWeight();});
 function renderSonVolume(){
   var v=typeof state.volume==="number"?state.volume:100;
   if($("#volRange"))$("#volRange").value=v;
