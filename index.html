@@ -267,7 +267,7 @@
   .notes li{margin:5px 0;color:var(--ink-2)}
   .notes b{color:var(--ink)}
 
-  .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 20px;border-radius:10px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:all .25s ease;z-index:60;border-bottom:3px solid var(--red);white-space:nowrap}
+  .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 20px;border-radius:10px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:all .25s ease;z-index:120;border-bottom:3px solid var(--red);white-space:normal;max-width:calc(100vw - 32px);width:max-content;text-align:center;line-height:1.35;box-shadow:0 0 0 1px rgba(255,255,255,.22),0 6px 20px rgba(0,0,0,.35)}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
   .prog{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 15px;margin:0 0 14px;box-shadow:var(--shadow)}
@@ -339,6 +339,43 @@
   .overlay.finished .ov-done{display:block}
   .ov-restart{display:none;background:var(--red);border:none;color:#fff;border-radius:12px;padding:15px 40px;font-family:"Barlow Condensed",sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:19px;cursor:pointer;margin-top:6px}
   .overlay.finished .ov-restart{display:block}
+  .flow-edit{background:#2a2a2a;border:1px solid #444;color:#fff;border-radius:9px;padding:8px 14px;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;flex:0 0 auto}
+  .ov-skip{display:none;background:#2a2a2a;border:1px solid #444;color:#fff;border-radius:10px;padding:10px 22px;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.05em;cursor:pointer}
+  .overlay.rest .ov-skip{display:block}
+  .overlay.lead .ov-adjust,.overlay.lead .ov-start{display:none}
+  .overlay.lead .ov-time{color:#f5b301}
+  .sheet{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:90;display:none;align-items:flex-end;justify-content:center}
+  .sheet.open{display:flex}
+  .sheet-card{background:var(--paper,#f4f2ee);width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));max-height:92vh;overflow-y:auto}
+  .sheet-title{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:24px;text-transform:uppercase;margin-bottom:6px}
+  .sheet-lab{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin:14px 0 6px}
+  .seg{display:flex;flex-direction:column;gap:7px}
+  .seg button{text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:11px;padding:10px 13px;cursor:pointer;font-family:"IBM Plex Sans",sans-serif}
+  .seg button b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:18px;text-transform:uppercase;color:var(--ink)}
+  .seg button span{font-size:12.5px;color:var(--grey)}
+  .seg button.sel{border-color:var(--red);background:#fff5f5}
+  .rest-opts.light button{background:#fff;border:1.5px solid var(--line);color:var(--ink-2)}
+  .rest-opts.light button.sel{background:var(--red);border-color:var(--red);color:#fff}
+  .sheet-check{display:flex;align-items:center;gap:9px;margin:16px 0 14px;font-size:14px}
+  .sheet-check input{width:18px;height:18px;accent-color:var(--red)}
+  .do-name{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:clamp(30px,9vw,46px);text-transform:uppercase;line-height:1.02;text-align:center;max-width:92vw}
+  .do-meta{font-size:16px;color:#b8b4ac;text-align:center}
+  .do-charge{display:flex;align-items:center;gap:10px;margin:6px 0}
+  .do-charge span{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:#8a857d}
+  .do-charge input{width:120px;padding:10px;border-radius:12px;border:1.5px solid #444;background:#222;color:#fff;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:30px;text-align:center}
+  .do-done{background:var(--red);border:none;color:#fff;border-radius:22px;width:min(78vw,340px);height:min(42vw,170px);font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:clamp(28px,8vw,40px);text-transform:uppercase;letter-spacing:.03em;cursor:pointer;box-shadow:0 8px 30px rgba(227,6,19,.35)}
+  .do-done:active{transform:scale(.97)}
+  .do-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+
+  .ov-next{display:none;background:var(--red);border:none;color:#fff;border-radius:12px;padding:15px 34px;font-family:"Barlow Condensed",sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.05em;font-size:19px;cursor:pointer;margin-top:6px;max-width:92vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .overlay.finished.has-next .ov-next{display:block}
+  .overlay.finished.has-next .ov-restart{background:#2a2a2a;border:1px solid #444;font-size:16px;padding:12px 30px}
+  .overlay.rest .ov-time{color:#4caf50}
+  .overlay.rest .ov-label{color:#4caf50}
+  .chain-box{margin-top:6px;padding-top:8px;border-top:1px solid #333}
+  .chain-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .chain-lab{font-size:12px;color:#b8b4ac;flex:1;min-width:140px}
+  .ex.ex-next{box-shadow:0 0 0 3px var(--red),var(--shadow)}
   /* Player HIIT */
   .h-phase{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:20px;letter-spacing:.2em;text-transform:uppercase;color:var(--red)}
   #hiitOverlay.rest .h-phase{color:#4caf50}
@@ -464,18 +501,13 @@
 
     <div class="circuit">
       <div class="circ-top">
-        <div class="circ-label">Repos entre séries<small>1 tour = 1 série de chaque exo · 5 tours</small></div>
-        <div class="rest-opts" id="restOpts">
-          <button data-r="60">60s</button>
-          <button data-r="90" class="sel">90s</button>
-          <button data-r="120">2min</button>
-        </div>
+        <div class="circ-label">Enchaînement<small id="flowSummary">Circuit · pause 30 s</small></div>
+        <button class="flow-edit" id="flowEdit">Modifier</button>
       </div>
       <div class="timer-row">
         <div class="timer-display" id="timerDisplay">1:30</div>
         <button class="btn-timer" id="timerBtn">▶ Lancer le repos</button>
       </div>
-      <label class="autorest"><input type="checkbox" id="autoRest" checked> Lancer le repos automatiquement quand je coche une série</label>
       <label class="autorest"><input type="checkbox" id="keepAwake"> Garder l'écran allumé pendant toute la séance</label>
     </div>
 
@@ -732,6 +764,50 @@
   </div>
 </div>
 
+<div class="sheet" id="flowSheet">
+  <div class="sheet-card">
+    <div class="sheet-title">Comment tu enchaînes ?</div>
+    <div class="sheet-lab">Ordre</div>
+    <div class="seg" id="flowOrderOpts">
+      <button data-o="circuit"><b>Circuit</b><span>1 série de chaque exo, puis un tour de plus</span></button>
+      <button data-o="series"><b>Série par série</b><span>toutes les séries d'un exo, puis le suivant</span></button>
+      <button data-o="manuel"><b>Manuel</b><span>je coche à mon rythme</span></button>
+    </div>
+    <div class="sheet-lab">Pause entre deux séries</div>
+    <div class="rest-opts light" id="flowPauseOpts">
+      <button data-p="0">0</button><button data-p="15">15s</button><button data-p="30">30s</button><button data-p="45">45s</button><button data-p="60">1min</button><button data-p="90">1m30</button><button data-p="120">2min</button>
+    </div>
+    <div class="sheet-lab">Mise en place avant un chrono</div>
+    <div class="rest-opts light" id="leadOpts">
+      <button data-l="1">1 s</button><button data-l="3">3 s</button><button data-l="5">5 s</button>
+    </div>
+    <label class="sheet-check"><input type="checkbox" id="voiceOn"> 🔊 Annonce vocale du prochain exercice</label>
+    <button class="btn red block" id="flowGo">C'est parti</button>
+  </div>
+</div>
+
+<div class="overlay" id="doOverlay">
+  <div class="ov-label" id="doStep">À toi</div>
+  <div class="do-name" id="doName">Exercice</div>
+  <div class="do-meta" id="doMeta">Série 1/5</div>
+  <div class="do-charge" id="doChargeBox"><span>kg</span><input type="text" inputmode="decimal" id="doCharge"></div>
+  <button class="do-done" id="doDone">✓ Série faite</button>
+  <div class="do-row">
+    <button class="ov-close" id="doSkip">⏭ Passer</button>
+    <button class="ov-close" id="doList">Voir la liste</button>
+  </div>
+</div>
+
+<div class="overlay" id="endOverlay">
+  <div class="do-name">Séance terminée 💪</div>
+  <div class="do-meta" id="endMeta">Toutes les séries sont cochées</div>
+  <button class="do-done" id="endSave">Enregistrer la séance</button>
+  <div class="do-row">
+    <button class="ov-close" id="endFeel">Ajouter mon ressenti</button>
+    <button class="ov-close" id="endClose">Pas encore</button>
+  </div>
+</div>
+
 <div class="overlay" id="chronoOverlay">
   <div class="ov-label" id="ovLabel">Planche</div>
   <div class="ov-time" id="ovTime">0:50</div>
@@ -741,6 +817,8 @@
     <button id="ovPlus">+10s</button>
   </div>
   <button class="ov-start" id="ovStart">Démarrer</button>
+  <button class="ov-next" id="ovNext">→ Exercice suivant</button>
+  <button class="ov-skip" id="ovSkip">⏭ Passer cet exercice</button>
   <button class="ov-restart" id="ovRestart">↻ Série suivante</button>
   <div class="ov-bar"><i id="ovBar"></i></div>
   <p class="ov-hint" id="ovHint">L'écran reste allumé pendant le chrono</p>
@@ -755,8 +833,30 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.12.0";
+var APP_VERSION="1.15.1";
 var CHANGELOG=[
+ {v:"1.15.1",d:"2026-11-05",n:[
+   "Les messages s'affichent au-dessus des écrans plein écran (récup, « À toi », chrono)",
+   "Les messages longs passent à la ligne au lieu d'être coupés sur les bords"
+ ]},
+ {v:"1.15.0",d:"2026-11-05",n:[
+   "Au lancement de la séance : choix de l'ordre (circuit, série par série ou manuel), de la pause et de la mise en place",
+   "Cocher une série enchaîne vers la suivante : récup plein écran, puis exercice suivant",
+   "Écran « À toi » avec un grand bouton « Série faite » pour les exercices à répétitions",
+   "Annonce vocale du prochain exercice",
+   "Temps de mise en place avant chaque chrono (1, 3 ou 5 s)",
+   "« Passer » un exercice pendant la récup, et proposition d'enregistrer quand tout est coché"
+ ]},
+ {v:"1.14.0",d:"2026-11-05",n:[
+   "Fin de chrono : bouton « → exercice suivant » en plus de « série suivante »",
+   "Option d'enchaînement automatique des exercices chronométrés, en ordre de circuit",
+   "Pause réglable avant l'exercice suivant (0 à 45 s), avec décompte"
+ ]},
+ {v:"1.13.0",d:"2026-11-05",n:[
+   "Exercices chronométrés : la série se coche toute seule quand le chrono va jusqu'au bout",
+   "Rien n'est coché si tu arrêtes le chrono avant la fin",
+   "Fonctionne aussi si l'écran s'est éteint pendant le chrono"
+ ]},
  {v:"1.12.0",d:"2026-11-03",n:[
    "Historique : remplacer un exercice saisi par erreur par le bon, en gardant séries et charges",
    "Corriger une activité : nom, date, durée, distance, dénivelé et note",
@@ -832,7 +932,7 @@ var CHANGELOG=[
    "Récap réel de la semaine, indépendant du programme choisi"
  ]}
 ];
-var state={freq:3,rest:90,dur:40,mode:"equilibre",autoRest:true,keepAwake:false,volume:100,history:[],lastCharges:{},chronoDur:{},autoSave:false,lastSession:null,templates:[],hiitCustom:[],weights:[],lastExport:null};
+var state={freq:3,rest:90,dur:40,mode:"equilibre",keepAwake:false,volume:100,flowOrder:"circuit",flowPause:null,leadIn:1,voice:true,history:[],lastCharges:{},chronoDur:{},autoSave:false,lastSession:null,templates:[],hiitCustom:[],weights:[],lastExport:null};
 var canSave=true;
 try{
   var raw=localStorage.getItem(KEY);
@@ -846,8 +946,11 @@ try{
       state.freq=p.freq||3;
       state.rest=p.rest||90;
       state.dur=p.dur||40;
-      state.autoRest=p.autoRest!==false;
       state.keepAwake=!!p.keepAwake;
+      state.flowOrder=["circuit","series","manuel"].indexOf(p.flowOrder)>=0?p.flowOrder:"circuit";
+      state.flowPause=[0,15,30,45,60,90,120].indexOf(p.flowPause)>=0?p.flowPause:null;
+      state.leadIn=[1,3,5].indexOf(p.leadIn)>=0?p.leadIn:1;
+      state.voice=p.voice!==false;
       state.volume=typeof p.volume==="number"?Math.max(0,Math.min(150,p.volume)):100;
       state.mode=p.mode||"equilibre";
       state.history=Array.isArray(p.history)?p.history:[];
@@ -1208,7 +1311,7 @@ document.querySelectorAll("#modeSel button").forEach(function(b){
   b.addEventListener("click",function(){
     state.mode=b.getAttribute("data-m");
     state.rest=modeRest();
-    save();renderPlan();restOptsSync&&restOptsSync();
+    save();renderPlan();
     var lbl={force:"Force · repos longs",equilibre:"Équilibré",cardio:"Cardio · repos courts"};
     toast("Style : "+lbl[state.mode]);
   });
@@ -1263,19 +1366,6 @@ function timerStart(){
   timer.iv=setInterval(timerTick,250);
 }
 $("#timerBtn").addEventListener("click",timerStart);
-document.querySelectorAll("#restOpts button").forEach(function(b){
-  b.addEventListener("click",function(){
-    state.rest=parseInt(b.getAttribute("data-r"),10);
-    document.querySelectorAll("#restOpts button").forEach(function(x){x.classList.toggle("sel",x===b);});
-    save();
-    if(!timer.iv){timer.left=state.rest;timerRender();}
-  });
-});
-function restOptsSync(){
-  document.querySelectorAll("#restOpts button").forEach(function(b){
-    b.classList.toggle("sel",parseInt(b.getAttribute("data-r"),10)===state.rest);
-  });
-}
 
 /* ---------- Bips sonores ---------- */
 var audioCtx=null,audioMaster=null;
@@ -1442,7 +1532,7 @@ document.addEventListener("visibilitychange",function(){
     if(hiit.iv&&!hiit.paused)hiitTick();
     if(chrono.iv){
       var remain=Math.round((chrono.endAt-Date.now())/1000);
-      if(remain<=0){chrono.left=0;chronoRender();clearInterval(chrono.iv);chrono.iv=null;$("#chronoOverlay").classList.add("finished");beepEnd();if(navigator.vibrate)navigator.vibrate([300,120,300,120,500]);}
+      if(remain<=0){chronoFini();}
       else{chrono.left=remain;chronoRender();}
     }
   }
@@ -1462,12 +1552,18 @@ function chronoRender(){
 }
 function chronoStop(){
   clearInterval(chrono.iv);chrono.iv=null;
-  $("#chronoOverlay").classList.remove("open","finished","ready");
+  clearInterval(chrono.leadIv);chrono.leadIv=null;
+  chrono.nextW=null;
+  $("#chronoOverlay").classList.remove("open","finished","ready","lead","rest","has-next");
   if(document.fullscreenElement){document.exitFullscreen().catch(function(){});}
   if(!timer.iv)lockOff();
 }
-function chronoOpen(label,seconds,key){
+function chronoOpen(label,seconds,key,onDone){
   chrono.key=key||null;
+  chrono.from=null;
+  clearInterval(chrono.leadIv);chrono.leadIv=null;
+  var ovx=$("#chronoOverlay");ovx.classList.remove("rest","has-next","lead");
+  chrono.onDone=typeof onDone==="function"?onDone:null;
   if(chrono.key&&state.chronoDur&&state.chronoDur[chrono.key])seconds=state.chronoDur[chrono.key];
   chrono.total=seconds;chrono.left=seconds;
   $("#ovLabel").textContent=label;
@@ -1477,6 +1573,19 @@ function chronoOpen(label,seconds,key){
   ov.classList.add("open","ready");
   chronoRender();
   if(ov.requestFullscreen){ov.requestFullscreen().catch(function(){});}
+}
+// Fin naturelle du chrono : un seul déclenchement par série,
+// que la fin arrive en direct ou au rattrapage après extinction de l'écran
+function chronoFini(){
+  chrono.left=0;chronoRender();
+  clearInterval(chrono.iv);chrono.iv=null;
+  $("#chronoOverlay").classList.add("finished");
+  beepEnd();
+  if(navigator.vibrate)navigator.vibrate([300,120,300,120,500]);
+  if(!chrono.fired){
+    chrono.fired=true;
+    if(chrono.onDone){try{chrono.onDone();}catch(e){}}
+  }
 }
 function chronoGo(){
   var ov=$("#chronoOverlay");
@@ -1490,16 +1599,13 @@ function chronoGo(){
   chrono.left=chrono.total;
   chrono.endAt=Date.now()+chrono.total*1000;
   chrono.beeped={};
+  chrono.fired=false;
   chronoRender();
   lockOn();
   chrono.iv=setInterval(function(){
     var remain=Math.round((chrono.endAt-Date.now())/1000);
     if(remain<=0){
-      chrono.left=0;chronoRender();
-      clearInterval(chrono.iv);chrono.iv=null;
-      ov.classList.add("finished");
-      beepEnd();
-      if(navigator.vibrate)navigator.vibrate([300,120,300,120,500]);
+      chronoFini();
     }else{
       chrono.left=remain;
       chronoRender();
@@ -1518,10 +1624,21 @@ function chronoAdj(d){
   chronoRender();
 }
 $("#ovClose").addEventListener("click",chronoStop);
-$("#ovStart").addEventListener("click",chronoGo);
+$("#ovNext").addEventListener("click",function(){
+  if(!chrono.from)return;
+  var nx=prochainExercice(chrono.from);
+  if(nx)enchainerVers(nx);
+});
+$("#ovSkip").addEventListener("click",function(){
+  var nx=passer(chrono.nextW);
+  if(!nx)return;
+  chrono.nextW=nx;majRecup();
+  parler("Prochain : "+annonceProchain(nx));
+});
+$("#ovStart").addEventListener("click",function(){demarrerAvecMiseEnPlace(false);});
 $("#ovRestart").addEventListener("click",function(){
   $("#chronoOverlay").classList.remove("finished");
-  chronoGo();
+  demarrerAvecMiseEnPlace(false);
 });
 $("#ovMinus").addEventListener("click",function(){chronoAdj(-10);});
 $("#ovPlus").addEventListener("click",function(){chronoAdj(10);});
@@ -2033,7 +2150,8 @@ function updateSessProgress(){
   }
 }
 function openSession(s){
-  state.rest=modeRest();
+  state.rest=pauseFlux()>0?pauseFlux():60;
+  fermerDo();fermerFin();
   current={session:s,rpe:null,mood:null,note:"",painBefore:0,painAfter:0,work:s.items.map(function(it){
     return {item:it,sets:new Array(it.sets).fill(false),charge:state.lastCharges[it.k]||""};
   })};
@@ -2041,7 +2159,6 @@ function openSession(s){
   $("#sTitle").textContent=s.title;
   $("#sSub").textContent=s.sub;
   $("#sessNote").value="";
-  restOptsSync();
   renderRpe();
   renderMood();
   renderPain("before");
@@ -2052,7 +2169,228 @@ function openSession(s){
   updateSessProgress();
   renderSessionCards();
   show("session");
+  ouvrirFlux();
 }
+// Coche automatiquement la prochaine série d'un exercice chronométré
+// (appelé quand le chrono plein écran est allé jusqu'au bout)
+function cocherSerieSuivante(w){
+  if(!current||current.work.indexOf(w)<0)return;
+  var i=w.sets.indexOf(false);
+  var hint=$("#ovHint");
+  if(i<0){
+    if(hint)hint.textContent="Toutes les séries étaient déjà cochées";
+    return;
+  }
+  w.sets[i]=true;
+  renderSessionCards();
+  updateSessProgress();
+  var faites=w.sets.filter(Boolean).length,total=w.sets.length;
+  var msg=faites>=total?"✓ Série "+faites+"/"+total+" cochée — exercice terminé":"✓ Série "+faites+"/"+total+" cochée automatiquement";
+  if(hint)hint.textContent=msg;
+  toast(msg);
+}
+/* ---------- Déroulé de séance : ordre, pause, mise en place, voix ----------
+   Un seul point d'entrée, serieFaite(w), quelle que soit la façon dont la série
+   a été validée (case cochée, grand bouton, fin naturelle d'un chrono). */
+function pauseFlux(){return typeof state.flowPause==="number"?state.flowPause:modeRest();}
+function toutFait(){return !!current&&current.work.every(function(w){return w.sets.every(Boolean);});}
+function serieNum(w){return Math.min(w.sets.filter(Boolean).length+1,w.sets.length);}
+// Ordre circuit : l'exercice suivant qui a encore des séries (en repartant au début)
+function prochainExercice(w){
+  if(!current)return null;
+  var L=current.work,i=L.indexOf(w);
+  if(i<0)return null;
+  for(var k=1;k<=L.length;k++){
+    var c=L[(i+k)%L.length];
+    if(c.sets.indexOf(false)>=0)return c;
+  }
+  return null;
+}
+function suivantSelonOrdre(w){
+  if(state.flowOrder==="series"&&w.sets.indexOf(false)>=0)return w;
+  return prochainExercice(w);
+}
+// "Passer" : n'importe quel autre exercice restant, jamais celui qu'on passe
+function suivantApresPasse(w){
+  if(!current)return null;
+  var L=current.work,i=L.indexOf(w);
+  for(var k=1;k<L.length;k++){
+    var c=L[(i+k)%L.length];
+    if(c!==w&&c.sets.indexOf(false)>=0)return c;
+  }
+  return null;
+}
+/* Annonce vocale (synthèse du téléphone, fonctionne hors ligne) */
+function parler(txt){
+  if(!state.voice||volumeFactor()===0)return;
+  var ss=window.speechSynthesis;
+  if(!ss||typeof SpeechSynthesisUtterance==="undefined")return;
+  try{
+    ss.cancel();
+    var u=new SpeechSynthesisUtterance(txt);
+    u.lang="fr-FR";u.rate=1.05;u.volume=Math.min(1,volumeFactor());
+    ss.speak(u);
+  }catch(e){}
+}
+function annonceProchain(w){
+  return w.item.n+(w.item.chrono?", "+(state.chronoDur&&state.chronoDur[w.item.k]||w.item.chrono)+" secondes":", série "+serieNum(w)+" sur "+w.sets.length);
+}
+// Point d'entrée unique : une série vient d'être faite
+function serieFaite(w){
+  if(!current)return;
+  if(toutFait()){finSeance();return;}
+  if(state.flowOrder==="manuel")return;
+  var nx=suivantSelonOrdre(w);
+  if(!nx){finSeance();return;}
+  enchainerVers(nx);
+}
+function enchainerVers(nx){
+  var p=pauseFlux();
+  if(p>0)recup(nx,p);
+  else lancerExercice(nx,true);
+}
+// Récupération plein écran, puis départ automatique
+function recup(nx,p){
+  fermerDo();
+  chronoOpen("Récup",p,null,function(){lancerExercice(chrono.nextW,false);});
+  chrono.nextW=nx;
+  $("#chronoOverlay").classList.add("rest");
+  majRecup();
+  parler("Récupération. Prochain : "+annonceProchain(nx));
+  chronoGo();
+}
+function majRecup(){
+  var nx=chrono.nextW;if(!nx)return;
+  var t="Prochain : "+nx.item.n+" · série "+serieNum(nx)+"/"+nx.sets.length;
+  if(nx.item.chrono)t+=" · "+nx.item.chrono+" s";
+  else if(nx.charge||state.lastCharges[nx.item.k])t+=" · "+(nx.charge||state.lastCharges[nx.item.k])+" kg";
+  $("#ovHint").textContent=t;
+}
+// Démarre un exercice : chrono pour les exercices minutés, écran "À toi" sinon
+function lancerExercice(w,miseEnPlace){
+  if(!current||current.work.indexOf(w)<0){chronoStop();return;}
+  if(w.item.chrono){lancerChrono(w,true,miseEnPlace);return;}
+  chronoStop();
+  afficherDo(w);
+}
+// Chrono d'un exercice ; en fin de série : cochage, puis suite du déroulé
+function lancerChrono(w,auto,miseEnPlace){
+  fermerDo();
+  chronoOpen(w.item.n,w.item.chrono,w.item.k,function(){
+    cocherSerieSuivante(w);
+    if(state.flowOrder==="manuel"){
+      if(toutFait())finSeance();else majBoutonSuivant(w);
+    }else serieFaite(w);
+  });
+  chrono.from=w;
+  if(auto){
+    if(miseEnPlace)demarrerAvecMiseEnPlace(true);
+    else{parler(w.item.n);chronoGo();}
+  }
+}
+function majBoutonSuivant(w){
+  var ov=$("#chronoOverlay"),nx=prochainExercice(w);
+  ov.classList.toggle("has-next",!!nx);
+  if(nx)$("#ovNext").textContent="→ "+(nx===w?"Encore : ":"")+nx.item.n;
+}
+// Temps de mise en place avant un chrono : décompte avec un bip par seconde
+function demarrerAvecMiseEnPlace(annoncer){
+  var n=state.leadIn||0;
+  var ov=$("#chronoOverlay");
+  if(annoncer&&chrono.from)parler(annonceProchain(chrono.from));
+  if(n<=0){chronoGo();return;}
+  ov.classList.remove("ready","finished");
+  ov.classList.add("lead");
+  initAudio();
+  chrono.leadEnd=Date.now()+n*1000;
+  var dernier=-1;
+  clearInterval(chrono.leadIv);
+  function tic(){
+    var r=Math.ceil((chrono.leadEnd-Date.now())/1000);
+    if(r<=0){
+      clearInterval(chrono.leadIv);chrono.leadIv=null;
+      ov.classList.remove("lead");
+      chronoGo();
+      return;
+    }
+    if(r!==dernier){
+      dernier=r;
+      $("#ovTime").textContent=String(r);
+      $("#ovHint").textContent="Mise en place…";
+      beepShort();
+    }
+  }
+  tic();
+  chrono.leadIv=setInterval(tic,100);
+}
+/* Écran "À toi" : un exercice à répétitions, avec un grand bouton */
+var doW=null;
+function afficherDo(w){
+  doW=w;
+  $("#doStep").textContent="À toi";
+  $("#doName").textContent=w.item.n;
+  $("#doMeta").textContent="Série "+serieNum(w)+"/"+w.sets.length+" · "+(w.item.s||"");
+  var box=$("#doChargeBox");
+  if(w.item.noCharge){box.style.display="none";}
+  else{
+    box.style.display="flex";
+    $("#doCharge").value=w.charge||state.lastCharges[w.item.k]||"";
+  }
+  $("#doOverlay").classList.add("open");
+  parler("À toi : "+annonceProchain(w));
+}
+function fermerDo(){
+  $("#doOverlay").classList.remove("open");
+  doW=null;
+}
+function validerDo(){
+  var w=doW;if(!w||!current)return;
+  if(!w.item.noCharge){
+    var v=String($("#doCharge").value||"").trim();
+    if(v!==""&&!chargeValide(v)){toast("Charge invalide");return;}
+    w.charge=v;
+  }
+  var i=w.sets.indexOf(false);
+  fermerDo();
+  if(i<0){serieFaite(w);return;}
+  w.sets[i]=true;
+  renderSessionCards();
+  updateSessProgress();
+  serieFaite(w);
+}
+function passer(w){
+  var nx=suivantApresPasse(w);
+  if(!nx){toast("C'est le dernier exercice qui reste");return null;}
+  return nx;
+}
+/* Fin de séance : on propose d'enregistrer */
+function finSeance(){
+  chronoStop();fermerDo();
+  if(!current)return;
+  var n=0;current.work.forEach(function(w){n+=w.sets.length;});
+  $("#endMeta").textContent=n+" séries cochées · "+current.work.length+" exercices";
+  $("#endOverlay").classList.add("open");
+  parler("Séance terminée. Bravo !");
+}
+function fermerFin(){$("#endOverlay").classList.remove("open");}
+/* Feuille de démarrage */
+function resumeFlux(){
+  var o={circuit:"Circuit",series:"Série par série",manuel:"Manuel"}[state.flowOrder]||"Circuit";
+  var p=pauseFlux();
+  return o+" · "+(p?"pause "+(p>=60?(p/60)+" min":p+" s"):"sans pause")+" · mise en place "+state.leadIn+" s";
+}
+function renderFlux(){
+  document.querySelectorAll("#flowOrderOpts button").forEach(function(b){b.classList.toggle("sel",b.getAttribute("data-o")===state.flowOrder);});
+  document.querySelectorAll("#flowPauseOpts button").forEach(function(b){b.classList.toggle("sel",parseInt(b.getAttribute("data-p"),10)===pauseFlux());});
+  document.querySelectorAll("#leadOpts button").forEach(function(b){b.classList.toggle("sel",parseInt(b.getAttribute("data-l"),10)===state.leadIn);});
+  if($("#voiceOn"))$("#voiceOn").checked=state.voice!==false;
+  if($("#flowSummary"))$("#flowSummary").textContent=resumeFlux();
+  var p=pauseFlux();
+  state.rest=p>0?p:60;
+  if(!timer.iv){timer.left=state.rest;timerRender();}
+}
+function ouvrirFlux(){renderFlux();$("#flowSheet").classList.add("open");}
+function fermerFlux(){$("#flowSheet").classList.remove("open");renderFlux();}
 function renderSessionCards(){
   var wrap=$("#sExercises");wrap.innerHTML="";
   current.work.forEach(function(w){
@@ -2088,10 +2426,14 @@ function renderSessionCards(){
         w.sets[i]=!w.sets[i];
         b.classList.toggle("done",w.sets[i]);
         b.setAttribute("aria-checked",w.sets[i]?"true":"false");
-        if(w.sets[i]&&!it.chrono&&state.autoRest!==false){
-          if(!timer.iv)timerStart();
-        }
         updateSessProgress();
+        if(w.sets[i]){
+          if(state.flowOrder==="manuel"){
+            // mode manuel : repos dans le panneau, comme avant
+            if(!it.chrono&&pauseFlux()>0&&!timer.iv)timerStart();
+            if(toutFait())finSeance();
+          }else serieFaite(w);
+        }
       }
       b.addEventListener("click",tg);
       b.addEventListener("keydown",function(e){if(e.key===" "||e.key==="Enter"){e.preventDefault();tg();}});
@@ -2141,7 +2483,7 @@ function renderSessionCards(){
     }
     if(it.chrono){
       var cb=el("button","chrono-btn","⏱ "+it.chrono+" s plein écran");
-      cb.addEventListener("click",function(){chronoOpen(it.n,it.chrono,it.k);});
+      cb.addEventListener("click",function(){lancerChrono(w,false);});
       track.appendChild(cb);
     }
     card.appendChild(track);
@@ -2830,8 +3172,11 @@ $("#impFile").addEventListener("change",function(){
       state.freq=p.freq||3;
       state.rest=p.rest||90;
       state.dur=p.dur||40;
-      state.autoRest=p.autoRest!==false;
       state.keepAwake=!!p.keepAwake;
+      state.flowOrder=["circuit","series","manuel"].indexOf(p.flowOrder)>=0?p.flowOrder:"circuit";
+      state.flowPause=[0,15,30,45,60,90,120].indexOf(p.flowPause)>=0?p.flowPause:null;
+      state.leadIn=[1,3,5].indexOf(p.leadIn)>=0?p.leadIn:1;
+      state.voice=p.voice!==false;
       state.volume=typeof p.volume==="number"?Math.max(0,Math.min(150,p.volume)):100;
       state.mode=p.mode||"equilibre";
       state.history=p.history;
@@ -3477,19 +3822,50 @@ $("#autoSave").addEventListener("change",function(){
   state.autoSave=this.checked;save();
   toast(this.checked?"Sauvegarde auto activée":"Sauvegarde auto désactivée");
 });
+
+
+/* ---------- Écouteurs : feuille de démarrage, écran "À toi", fin de séance ---------- */
+document.querySelectorAll("#flowOrderOpts button").forEach(function(b){
+  b.addEventListener("click",function(){state.flowOrder=b.getAttribute("data-o");save();renderFlux();});
+});
+document.querySelectorAll("#flowPauseOpts button").forEach(function(b){
+  b.addEventListener("click",function(){state.flowPause=parseInt(b.getAttribute("data-p"),10);save();renderFlux();});
+});
+document.querySelectorAll("#leadOpts button").forEach(function(b){
+  b.addEventListener("click",function(){state.leadIn=parseInt(b.getAttribute("data-l"),10);save();renderFlux();});
+});
+$("#voiceOn").addEventListener("change",function(){
+  state.voice=this.checked;save();
+  if(this.checked)parler("Annonce vocale activée");
+});
+$("#flowGo").addEventListener("click",function(){
+  initAudio();fermerFlux();
+  if(state.flowOrder!=="manuel"&&current){
+    var w=current.work.find(function(x){return x.sets.indexOf(false)>=0;});
+    if(w)parler("C'est parti. Premier exercice : "+annonceProchain(w));
+  }
+});
+$("#flowEdit").addEventListener("click",ouvrirFlux);
+$("#doDone").addEventListener("click",validerDo);
+$("#doSkip").addEventListener("click",function(){
+  var w=doW;if(!w)return;
+  var nx=passer(w);if(!nx)return;
+  fermerDo();lancerExercice(nx,true);
+});
+$("#doList").addEventListener("click",fermerDo);
+$("#endSave").addEventListener("click",function(){fermerFin();$("#finishBtn").click();});
+$("#endFeel").addEventListener("click",function(){
+  fermerFin();
+  var c=$("#painBefore");
+  if(c&&c.scrollIntoView)try{c.scrollIntoView({behavior:"smooth",block:"center"});}catch(e){}
+});
+$("#endClose").addEventListener("click",fermerFin);
 if($("#keepAwake")){
   $("#keepAwake").checked=!!state.keepAwake;
   $("#keepAwake").addEventListener("change",function(){
     state.keepAwake=this.checked;save();
     if(this.checked){ if(current)lockOn(); toast("Écran maintenu allumé en séance"); }
     else{ if(!timer.iv&&!chrono.iv&&!hiit.iv)lockOff(); toast("Écran libre (veille normale)"); }
-  });
-}
-if($("#autoRest")){
-  $("#autoRest").checked=state.autoRest!==false;
-  $("#autoRest").addEventListener("change",function(){
-    state.autoRest=this.checked;save();
-    toast(this.checked?"Repos auto activé":"Repos auto désactivé");
   });
 }
 if(!canSave){toast("⚠ Sauvegarde locale indisponible dans ce contexte");}
