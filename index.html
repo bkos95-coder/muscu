@@ -877,8 +877,11 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.18.0";
+var APP_VERSION="1.18.1";
 var CHANGELOG=[
+ {v:"1.18.1",d:"2026-11-07",n:[
+   "Padel : durée pré-remplie à 1h30 (modifiable, jamais imposée si tu as déjà saisi une durée)"
+ ]},
  {v:"1.18.0",d:"2026-11-07",n:[
    "IMC calculé sur ton dernier poids, avec sa catégorie (repères OMS)",
    "Taille réglable (1,85 m par défaut)"
@@ -1141,6 +1144,8 @@ var DOS_SESSION={id:"DOSX",letter:"D+",title:"Dos express",sub:"~12 min · renfo
   DOS_LIB.map(function(e){return Object.assign({},e);}).concat([PLANCHE])};
 
 var ACT_PRESETS=["Course","Trail","Marche","Vélo","Padel","Natation","Randonnée","Étirements"];
+// Durée pré-remplie quand on choisit l'activité (en minutes)
+var ACT_DUREE_DEFAUT={"Padel":90};
 // Activités où la distance a du sens, et celles avec dénivelé
 var ACT_DIST=["Course","Trail","Marche","Vélo","Randonnée"];
 var ACT_DPLUS=["Trail","Randonnée"];
@@ -2996,12 +3001,36 @@ function syncActFields(){
   if($("#actDistRow"))$("#actDistRow").style.display=showDist?"flex":"none";
   if($("#actDplusCol"))$("#actDplusCol").style.display=showDplus?"block":"none";
 }
+/* Durée par défaut d'une activité (ex. Padel 1h30) : remplie seulement si les
+   champs sont vides, et retirée si on change d'activité sans y avoir touché */
+var dureeAuto=false;
+function champsDureeVides(){
+  return ["#actH","#actMin","#actS"].every(function(id){return !$(id)||String($(id).value).trim()==="";});
+}
+function dureeParDefaut(){
+  var mins=ACT_DUREE_DEFAUT[actSel];
+  if(dureeAuto&&!mins){
+    ["#actH","#actMin","#actS"].forEach(function(id){if($(id))$(id).value="";});
+    dureeAuto=false;
+    return;
+  }
+  if(mins&&(dureeAuto||champsDureeVides())){
+    $("#actH").value=String(Math.floor(mins/60));
+    $("#actMin").value=String(mins%60);
+    $("#actS").value="";
+    dureeAuto=true;
+  }
+}
+["#actH","#actMin","#actS"].forEach(function(id){
+  if($(id))$(id).addEventListener("input",function(){dureeAuto=false;});
+});
 function renderChips(){
   var wrap=$("#actChips");wrap.innerHTML="";
   ACT_PRESETS.forEach(function(a){
     var c=el("button","chip"+(actSel===a?" sel":""),esc(a));
     c.addEventListener("click",function(){
       actSel=(actSel===a)?"":a;
+      dureeParDefaut();
       renderChips();syncActFields();
     });
     wrap.appendChild(c);
@@ -3012,7 +3041,7 @@ $("#addActBtn").addEventListener("click",function(){
   f.classList.toggle("open");
   if(f.classList.contains("open")){
     $("#actDate").value=new Date().toISOString().slice(0,10);
-    actSel="";renderChips();
+    actSel="";dureeAuto=false;renderChips();
     $("#actName").value="";$("#actMin").value="";$("#actNote").value="";
     if($("#actH"))$("#actH").value="";
     if($("#actS"))$("#actS").value="";
@@ -3022,7 +3051,7 @@ $("#addActBtn").addEventListener("click",function(){
   }
 });
 if($("#actName"))$("#actName").addEventListener("input",syncActFields);
-$("#actCancel").addEventListener("click",function(){$("#actForm").classList.remove("open");});
+$("#actCancel").addEventListener("click",function(){$("#actForm").classList.remove("open");dureeAuto=false;});
 $("#actSave").addEventListener("click",function(){
   var name=actSel||$("#actName").value.trim();
   if(!name){toast("Choisis ou nomme l'activité");return;}
