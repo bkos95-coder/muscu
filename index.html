@@ -120,7 +120,10 @@
   .pan-btn{background:none;border:1px solid var(--line);border-radius:7px;width:30px;height:30px;color:var(--ink-2);font-size:14px;cursor:pointer;flex:0 0 auto}
   .pan-btn:disabled{opacity:.3;cursor:default}
   .tbtn{background:none;border:1px solid var(--line);border-radius:8px;width:34px;height:34px;color:var(--ink-2);font-size:15px;cursor:pointer;flex:0 0 auto}
-  .wlab{display:block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--grey);margin-bottom:4px}
+  .wform{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:8px}
+  .wcol{min-width:0}
+  .wlab{display:block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--grey);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .wlab i{font-style:normal;text-transform:none;letter-spacing:0}
   .win{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;font-family:"IBM Plex Sans",sans-serif;font-size:15px;font-weight:600;text-align:center}
   .fatwrap{display:flex;gap:4px}
   .fatwrap .win{min-width:0}
@@ -324,9 +327,10 @@
   .notefield:focus{outline:2px solid var(--red);border-color:var(--red)}
   .volcard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 15px;margin:0 0 14px;box-shadow:var(--shadow)}
   .volcard .lab{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin-bottom:8px}
-  .vstats{display:flex;gap:18px;margin-bottom:10px;font-family:"Barlow Condensed",sans-serif}
-  .vstats b{display:block;font-size:24px;line-height:1}
-  .vstats span{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
+  .vstats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:10px;font-family:"Barlow Condensed",sans-serif}
+  .vstats.vgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px;padding-top:10px;border-top:1px solid #f1eee9}
+  .vstats b{display:block;font-size:24px;line-height:1;white-space:nowrap}
+  .vstats span{display:block;margin-top:4px;font-size:10px;line-height:1.25;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
   .volcard canvas{width:100%;height:90px;display:block}
   .exhist{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
   .exhist .eh-line{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:13px;border-bottom:1px solid #f1eee9}
@@ -693,13 +697,13 @@
 
     <div class="volcard" id="weightCard">
       <div class="lab">⚖️ Poids de corps</div>
-      <div class="frow" style="display:flex;gap:8px;align-items:flex-end;margin-bottom:4px">
-        <div style="flex:1;min-width:0"><span class="wlab">Poids (kg)</span><input type="text" inputmode="decimal" id="weightInput" placeholder="Ex : 80" class="win"></div>
-        <div style="flex:1;min-width:0"><span class="wlab">Masse grasse</span>
-          <div class="fatwrap"><input type="text" inputmode="decimal" id="fatInput" placeholder="option." class="win"><button class="fatunit" id="fatUnit" aria-label="Changer l'unité de la masse grasse">%</button></div>
+      <div class="wform">
+        <div class="wcol"><span class="wlab">Poids (kg)</span><input type="text" inputmode="decimal" id="weightInput" placeholder="Ex : 80" class="win"></div>
+        <div class="wcol"><span class="wlab">Masse grasse <i>(option.)</i></span>
+          <div class="fatwrap"><input type="text" inputmode="decimal" id="fatInput" placeholder="Ex : 21" class="win"><button class="fatunit" id="fatUnit" aria-label="Changer l'unité de la masse grasse">%</button></div>
         </div>
-        <button class="btn" id="weightSave" style="white-space:nowrap">+ Noter</button>
       </div>
+      <button class="btn block" id="weightSave" style="margin:0 0 12px">+ Noter</button>
       <div class="vstats" id="weightStats" style="display:none">
         <div><b id="wLast">—</b><span>actuel</span></div>
         <div><b id="wStart">—</b><span>1er relevé</span></div>
@@ -711,8 +715,9 @@
         <button class="imc-h" id="heightEdit" aria-label="Modifier ta taille">1,85 m ✎</button>
       </div>
       <canvas id="weightCanvas" style="display:none"></canvas>
-      <div class="vstats" id="fatStats" style="display:none">
-        <div><b id="fLast">—</b><span>gras actuel</span></div>
+      <div class="vstats vgrid" id="fatStats" style="display:none">
+        <div><b id="fLast">—</b><span>masse grasse</span></div>
+        <div><b id="fKg">—</b><span>de gras</span></div>
         <div><b id="fLean">—</b><span>masse maigre</span></div>
         <div><b id="fDelta">—</b><span>évolution du gras</span></div>
       </div>
@@ -727,7 +732,7 @@
       <div class="lab">Volume cette semaine</div>
       <div class="vstats">
         <div><b id="vSeries">0</b><span>séries</span></div>
-        <div><b id="vTonnage">0</b><span>kg soulevés</span></div>
+        <div><b id="vTonnage">0</b><span>charge soulevée</span></div>
         <div><b id="vSess">0</b><span>séances</span></div>
       </div>
       <canvas id="volCanvas"></canvas>
@@ -897,8 +902,13 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.18.2";
+var APP_VERSION="1.18.3";
 var CHANGELOG=[
+ {v:"1.18.3",d:"2026-11-07",n:[
+   "Poids de corps : masse grasse en % et en kg dans deux cases séparées, valeurs qui ne se coupent plus",
+   "Saisie plus lisible (bouton « + Noter » sous les champs) et virgule française partout",
+   "Volume de la semaine : unité cohérente (« 4 t » de charge soulevée au lieu de « 4t kg soulevés »)"
+ ]},
  {v:"1.18.2",d:"2026-11-07",n:[
    "Séance libre : la sélection ne recouvre plus la liste des exercices",
    "Barre du bas compacte ; « Ma sélection » s'ouvre dans un panneau (ordre, séries, durées, modèle)",
@@ -3463,7 +3473,7 @@ function renderWeightList(ws){
     var row=el("div","wl-row");
     var dt=new Date(w.date);
     row.appendChild(el("span","wl-date",dt.getDate()+"/"+(dt.getMonth()+1)+"/"+String(dt.getFullYear()).slice(2)));
-    row.appendChild(el("b","wl-val",w.v+" kg"+(typeof w.f==="number"?"<small> · "+w.f+" %</small>":"")));
+    row.appendChild(el("b","wl-val",fr(w.v)+" kg"+(typeof w.f==="number"?"<small> · "+fr(w.f)+" %</small>":"")));
     var ed=el("button","wl-btn","✎");ed.setAttribute("aria-label","Corriger ce relevé");
     ed.addEventListener("click",function(){
       var r=prompt("Corriger le poids du "+dt.getDate()+"/"+(dt.getMonth()+1)+" (kg) :",String(w.v));
@@ -3499,17 +3509,17 @@ function renderWeightList(ws){
 function renderWeight(){
   var ws=(state.weights||[]).slice().sort(function(a,b){return a.date<b.date?-1:1;});
   var hasData=ws.length>0;
-  $("#weightStats").style.display=hasData?"flex":"none";
+  $("#weightStats").style.display=hasData?"grid":"none";
   $("#weightCanvas").style.display=ws.length>=2?"block":"none";
   $("#weightEmpty").style.display=hasData?"none":"block";
   renderWeightList(ws);
   renderIMC(ws);
   if(!hasData)return;
   var first=ws[0].v,last=ws[ws.length-1].v;
-  $("#wLast").textContent=last+" kg";
-  $("#wStart").textContent=first+" kg";
+  $("#wLast").textContent=fr(last)+" kg";
+  $("#wStart").textContent=fr(first)+" kg";
   var d=Math.round((last-first)*10)/10;
-  $("#wDelta").textContent=(d>0?"+":"")+d+" kg";
+  $("#wDelta").textContent=(d>0?"+":d<0?"−":"")+fr(Math.abs(d))+" kg";
   $("#wDelta").style.color=d===0?"inherit":(Math.abs(d)<=2?"var(--ok)":"var(--ink)");
   if(ws.length>=2)drawWeight(ws);
   renderGras(ws);
@@ -3517,16 +3527,17 @@ function renderWeight(){
 function renderGras(ws){
   var fs=ws.filter(function(w){return typeof w.f==="number";});
   var has=fs.length>0;
-  $("#fatStats").style.display=has?"flex":"none";
+  $("#fatStats").style.display=has?"grid":"none";
   $("#fatCanvas").style.display=fs.length>=2?"block":"none";
   $("#fatHint").style.display=fs.length>=2?"block":"none";
   if(!has)return;
   var a=fs[0],b=fs[fs.length-1];
   var kgA=a.v*a.f/100,kgB=b.v*b.f/100;
-  $("#fLast").textContent=b.f+" % · "+(Math.round(kgB*10)/10)+" kg";
-  $("#fLean").textContent=(Math.round((b.v-kgB)*10)/10)+" kg";
+  $("#fLast").textContent=fr(b.f)+" %";
+  $("#fKg").textContent=fr(Math.round(kgB*10)/10)+" kg";
+  $("#fLean").textContent=fr(Math.round((b.v-kgB)*10)/10)+" kg";
   var d=Math.round((kgB-kgA)*10)/10;
-  $("#fDelta").textContent=fs.length<2?"—":(d>0?"+":"")+d+" kg";
+  $("#fDelta").textContent=fs.length<2?"—":(d>0?"+":d<0?"−":"")+fr(Math.abs(d))+" kg";
   $("#fDelta").style.color=fs.length<2||d===0?"inherit":(d<0?"var(--ok)":"var(--red)");
   if(fs.length>=2)drawCourbe($("#fatCanvas"),fs.map(function(w){return {v:w.f};}),"#e0a800");
 }
@@ -3550,6 +3561,8 @@ function drawCourbe(cv,ws,couleur){
   ctx.beginPath();ws.forEach(function(p,i){var x=X(i),y=Y(p.v);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
   ws.forEach(function(p,i){ctx.beginPath();ctx.arc(X(i),Y(p.v),3.5,0,Math.PI*2);ctx.fillStyle="#161616";ctx.fill();});
 }
+// Nombres affichés à la française (virgule décimale)
+function fr(n){return String(n).replace(".",",");}
 /* IMC = poids / taille² (repères OMS pour l'adulte) */
 function calculIMC(poids,cm){
   if(!poids||!cm)return null;
@@ -3645,7 +3658,7 @@ if($("#weightSave")){
     }
     save();
     $("#weightInput").value="";$("#fatInput").value="";
-    toast("Noté : "+v+" kg"+(g.vide?"":" · "+g.pct+" % de gras"));
+    toast("Noté : "+fr(v)+" kg"+(g.vide?"":" · "+fr(g.pct)+" % de gras"));
     sauvegardeServeur(state);
     renderWeight();
   });
@@ -3680,7 +3693,7 @@ function renderVolume(){
   var wk=weekKey(new Date().toISOString());
   var cur=bw[wk]||{series:0,tonnage:0,sess:0};
   $("#vSeries").textContent=cur.series;
-  $("#vTonnage").textContent=cur.tonnage>=1000?(Math.round(cur.tonnage/100)/10)+"t":Math.round(cur.tonnage);
+  $("#vTonnage").textContent=cur.tonnage>=1000?fr(Math.round(cur.tonnage/100)/10)+" t":Math.round(cur.tonnage)+" kg";
   $("#vSess").textContent=cur.sess;
   // 8 dernières semaines (barres)
   var now=new Date();
