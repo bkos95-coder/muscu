@@ -107,6 +107,23 @@
   .wl-date{flex:1;font-size:13px;color:var(--ink-2)}
   .wl-val{font-family:"Barlow Condensed",sans-serif;font-size:17px}
   .wl-btn{background:none;border:1px solid var(--line);border-radius:7px;width:32px;height:30px;color:var(--grey);font-size:14px;cursor:pointer}
+  .tpl-edit{display:flex;align-items:center;gap:10px;background:#fff5f5;border:1.5px solid var(--red);border-radius:10px;padding:9px 11px;margin-bottom:10px;font-size:13.5px;font-weight:600}
+  .tpl-edit span{flex:1;min-width:0}
+  .tpl-cancel{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 11px;font-size:13px;cursor:pointer;font-family:"IBM Plex Sans",sans-serif}
+  .pan-title{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin:2px 0 8px}
+  .pan-row{background:#fff;border:1px solid var(--line);border-radius:11px;padding:9px 10px;margin-bottom:8px}
+  .pan-top{display:flex;align-items:center;gap:6px}
+  .pan-num{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:17px;color:var(--red);width:20px;flex:0 0 auto}
+  .pan-name{flex:1;min-width:0;font-weight:600;font-size:14px;line-height:1.25}
+  .pan-name small{display:block;font-weight:400;font-size:12px;color:var(--grey)}
+  .pan-btn{background:none;border:1px solid var(--line);border-radius:7px;width:30px;height:30px;color:var(--ink-2);font-size:14px;cursor:pointer;flex:0 0 auto}
+  .pan-btn:disabled{opacity:.3;cursor:default}
+  .tbtn{background:none;border:1px solid var(--line);border-radius:8px;width:34px;height:34px;color:var(--ink-2);font-size:15px;cursor:pointer;flex:0 0 auto}
+  .wlab{display:block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--grey);margin-bottom:4px}
+  .win{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;font-family:"IBM Plex Sans",sans-serif;font-size:15px;font-weight:600;text-align:center}
+  .fatwrap{display:flex;gap:4px}
+  .fatwrap .win{min-width:0}
+  .fatunit{flex:0 0 auto;width:40px;border:1.5px solid var(--line);border-radius:9px;background:#fff;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:16px;color:var(--ink-2);cursor:pointer}
   .verfoot{margin:16px 0 4px;text-align:center}
   .verbtn{background:none;border:none;color:var(--grey);font-size:12px;cursor:pointer;padding:6px;font-family:"IBM Plex Sans",sans-serif}
   .verbtn b{color:var(--ink-2);font-family:"Barlow Condensed",sans-serif;font-size:13px;letter-spacing:.03em}
@@ -543,11 +560,16 @@
     <div class="groups" id="groupBtns"></div>
     <div id="libList"></div>
     <div class="basket" id="basketWrap" style="display:none">
+      <div class="tpl-edit" id="tplEditBar" style="display:none">
+        <span id="tplEditTxt">Modification du modèle</span>
+        <button class="tpl-cancel" id="tplCancel">Annuler</button>
+      </div>
+      <div id="basketList"></div>
       <div class="frow" style="display:flex;gap:8px;margin-bottom:8px">
         <input type="text" id="tplName" placeholder="Nom du modèle (optionnel)" style="flex:1;padding:11px;border:1px solid var(--line);border-radius:9px;font-family:'IBM Plex Sans';font-size:14px">
         <button class="btn ghost" id="saveTpl" style="white-space:nowrap">💾 Modèle</button>
       </div>
-      <button class="btn red block" id="startLibre">Lancer la séance (<span id="basketCount">0</span> exos + planche 50s)</button>
+      <button class="btn red block" id="startLibre">Lancer la séance (<span id="basketCount">0</span> exos<span id="basketPlus"> + planche finale</span>)</button>
     </div>
   </div>
 
@@ -665,7 +687,10 @@
     <div class="volcard" id="weightCard">
       <div class="lab">⚖️ Poids de corps</div>
       <div class="frow" style="display:flex;gap:8px;align-items:flex-end;margin-bottom:4px">
-        <div style="flex:1"><input type="text" inputmode="decimal" id="weightInput" placeholder="Ex : 80" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;font-family:'IBM Plex Sans';font-size:15px;font-weight:600;text-align:center"></div>
+        <div style="flex:1;min-width:0"><span class="wlab">Poids (kg)</span><input type="text" inputmode="decimal" id="weightInput" placeholder="Ex : 80" class="win"></div>
+        <div style="flex:1;min-width:0"><span class="wlab">Masse grasse</span>
+          <div class="fatwrap"><input type="text" inputmode="decimal" id="fatInput" placeholder="option." class="win"><button class="fatunit" id="fatUnit" aria-label="Changer l'unité de la masse grasse">%</button></div>
+        </div>
         <button class="btn" id="weightSave" style="white-space:nowrap">+ Noter</button>
       </div>
       <div class="vstats" id="weightStats" style="display:none">
@@ -674,6 +699,13 @@
         <div><b id="wDelta">—</b><span>évolution</span></div>
       </div>
       <canvas id="weightCanvas" style="display:none"></canvas>
+      <div class="vstats" id="fatStats" style="display:none">
+        <div><b id="fLast">—</b><span>gras actuel</span></div>
+        <div><b id="fLean">—</b><span>masse maigre</span></div>
+        <div><b id="fDelta">—</b><span>évolution du gras</span></div>
+      </div>
+      <canvas id="fatCanvas" style="display:none"></canvas>
+      <div class="muted" id="fatHint" style="display:none;font-size:11.5px;text-align:center;margin-top:2px">Courbe : masse grasse en %. Mesure par impédance : fie-toi à la tendance, pas aux écarts d'un jour — pèse-toi dans les mêmes conditions (le matin, à jeun).</div>
       <div class="muted" id="weightEmpty" style="font-size:12px;text-align:center;margin-top:2px">Note ton poids de temps en temps (1×/semaine suffit) pour suivre l'évolution.</div>
       <button class="h-edit" id="weightListBtn" style="display:none">Voir et corriger les relevés</button>
       <div class="wlist" id="weightList" style="display:none"></div>
@@ -833,8 +865,18 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.15.1";
+var APP_VERSION="1.17.0";
 var CHANGELOG=[
+ {v:"1.17.0",d:"2026-11-07",n:[
+   "Poids de corps : masse grasse en option, saisie en % ou en kg selon ta balance",
+   "Gras actuel, masse maigre et évolution du gras, avec leur courbe",
+   "Correction des relevés : le gras se corrige aussi"
+ ]},
+ {v:"1.16.0",d:"2026-11-05",n:[
+   "Modèles : ✎ modifier et ⧉ dupliquer (exercices, ordre, séries, répétitions, durées des chronos)",
+   "Séance libre : liste « Ma sélection » avec tous les exercices choisis et leur ordre réglable",
+   "Correction : les durées réglées dans un modèle ou le composeur sont bien celles du chrono"
+ ]},
  {v:"1.15.1",d:"2026-11-05",n:[
    "Les messages s'affichent au-dessus des écrans plein écran (récup, « À toi », chrono)",
    "Les messages longs passent à la ligne au lieu d'être coupés sur les bords"
@@ -932,7 +974,7 @@ var CHANGELOG=[
    "Récap réel de la semaine, indépendant du programme choisi"
  ]}
 ];
-var state={freq:3,rest:90,dur:40,mode:"equilibre",keepAwake:false,volume:100,flowOrder:"circuit",flowPause:null,leadIn:1,voice:true,history:[],lastCharges:{},chronoDur:{},autoSave:false,lastSession:null,templates:[],hiitCustom:[],weights:[],lastExport:null};
+var state={freq:3,rest:90,dur:40,mode:"equilibre",keepAwake:false,volume:100,fatUnit:"%",flowOrder:"circuit",flowPause:null,leadIn:1,voice:true,history:[],lastCharges:{},chronoDur:{},autoSave:false,lastSession:null,templates:[],hiitCustom:[],weights:[],lastExport:null};
 var canSave=true;
 try{
   var raw=localStorage.getItem(KEY);
@@ -951,6 +993,7 @@ try{
       state.flowPause=[0,15,30,45,60,90,120].indexOf(p.flowPause)>=0?p.flowPause:null;
       state.leadIn=[1,3,5].indexOf(p.leadIn)>=0?p.leadIn:1;
       state.voice=p.voice!==false;
+      state.fatUnit=p.fatUnit==="kg"?"kg":"%";
       state.volume=typeof p.volume==="number"?Math.max(0,Math.min(150,p.volume)):100;
       state.mode=p.mode||"equilibre";
       state.history=Array.isArray(p.history)?p.history:[];
@@ -2608,6 +2651,86 @@ function buildScheme(sets,reps,orig){
   if(m&&m[1])suffix=" "+m[1].trim();
   return sets+" × "+(reps===null?"max":reps)+suffix;
 }
+/* Réglages d'un exercice choisi : séries + répétitions, ou séries + durée
+   pour un exercice chronométré. Partagé par la bibliothèque et "Ma sélection". */
+function reglagesPanier(b){
+  var tune=el("div","lib-tune");
+  function stepper(label,getVal,setVal){
+    var box=el("div","tune-box");
+    box.appendChild(el("span","tune-lab",label));
+    var minus=el("button","tune-btn","−");
+    var val=el("span","tune-val",getVal());
+    var plus=el("button","tune-btn","+");
+    minus.addEventListener("click",function(e){e.stopPropagation();setVal(-1);renderLib();});
+    plus.addEventListener("click",function(e){e.stopPropagation();setVal(1);renderLib();});
+    box.appendChild(minus);box.appendChild(val);box.appendChild(plus);
+    return box;
+  }
+  tune.appendChild(stepper("Séries",
+    function(){return b.sets;},
+    function(d){b.sets=Math.max(1,Math.min(10,b.sets+d));b.s=b.chrono?(b.sets+" × "+b.chrono+" s"):buildScheme(b.sets,b._reps,b.s);}
+  ));
+  if(b.chrono){
+    // Exercice chronométré (HIIT, gainage) : durée réglable par pas de 5 s
+    tune.appendChild(stepper("Durée",
+      function(){return b.chrono+" s";},
+      function(d){
+        b.chrono=Math.max(10,Math.min(120,b.chrono+d*5));
+        b._reps=b.chrono;
+        b.s=b.sets+" × "+b.chrono+" s";
+      }
+    ));
+  }else{
+    tune.appendChild(stepper("Reps",
+      function(){return b._reps===null?"max":b._reps;},
+      function(d){
+        if(b._reps===null){b._reps=(d>0?5:null);}
+        else{
+          var nv=b._reps+d;
+          if(nv<1){b._reps=null;}
+          else b._reps=Math.min(50,nv);
+        }
+        b.s=buildScheme(b.sets,b._reps,b.s);
+      }
+    ));
+  }
+  return tune;
+}
+/* "Ma sélection" : tous les exercices choisis, dans l'ordre de la séance,
+   visibles même si leur groupe n'est pas affiché. Ordre modifiable. */
+function deplacerPanier(k,d){
+  var keys=Object.keys(basket),i=keys.indexOf(k),j=i+d;
+  if(i<0||j<0||j>=keys.length)return;
+  keys[i]=keys[j];keys[j]=k;
+  var nb={};keys.forEach(function(x){nb[x]=basket[x];});
+  basket=nb;renderLib();
+}
+function renderPanier(){
+  var box=$("#basketList");if(!box)return;
+  box.innerHTML="";
+  var keys=Object.keys(basket);
+  if(!keys.length)return;
+  box.appendChild(el("div","pan-title","Ma sélection · "+keys.length+" exercice"+(keys.length>1?"s":"")+" · dans l'ordre de la séance"));
+  keys.forEach(function(k,i){
+    var b=basket[k];
+    var row=el("div","pan-row");
+    var top=el("div","pan-top");
+    top.appendChild(el("span","pan-num",String(i+1)));
+    var nm=el("div","pan-name",(b.hiit?"<span class='hiittag'>⚡</span> ":"")+esc(b.n)+(b.w?" <span class='warnbadge'>⚠</span>":"")+"<small>"+esc(b.s)+"</small>");
+    top.appendChild(nm);
+    var up=el("button","pan-btn","↑"),dn=el("button","pan-btn","↓"),x=el("button","pan-btn","✕");
+    up.setAttribute("aria-label","Monter");dn.setAttribute("aria-label","Descendre");x.setAttribute("aria-label","Retirer");
+    if(i===0)up.disabled=true;
+    if(i===keys.length-1)dn.disabled=true;
+    up.addEventListener("click",function(){deplacerPanier(k,-1);});
+    dn.addEventListener("click",function(){deplacerPanier(k,1);});
+    x.addEventListener("click",function(){delete basket[k];renderLib();});
+    top.appendChild(up);top.appendChild(dn);top.appendChild(x);
+    row.appendChild(top);
+    row.appendChild(reglagesPanier(b));
+    box.appendChild(row);
+  });
+}
 function renderLib(){
   var list=$("#libList");list.innerHTML="";
   var sel=[];
@@ -2633,57 +2756,18 @@ function renderLib(){
         renderLib();
       });
       card.appendChild(row);
-      // Réglages séries / reps quand l'exercice est sélectionné
-      if(added){
-        var b=basket[it.k];
-        var tune=el("div","lib-tune");
-        function stepper(label,getVal,setVal){
-          var box=el("div","tune-box");
-          box.appendChild(el("span","tune-lab",label));
-          var minus=el("button","tune-btn","−");
-          var val=el("span","tune-val",getVal());
-          var plus=el("button","tune-btn","+");
-          minus.addEventListener("click",function(e){e.stopPropagation();setVal(-1);renderLib();});
-          plus.addEventListener("click",function(e){e.stopPropagation();setVal(1);renderLib();});
-          box.appendChild(minus);box.appendChild(val);box.appendChild(plus);
-          return box;
-        }
-        tune.appendChild(stepper("Séries",
-          function(){return b.sets;},
-          function(d){b.sets=Math.max(1,Math.min(10,b.sets+d));b.s=it.chrono?(b.sets+" × "+b.chrono+" s"):buildScheme(b.sets,b._reps,it.s);}
-        ));
-        if(it.chrono){
-          // Bloc chronométré (HIIT, gainage) : on règle la durée, par pas de 5 s
-          tune.appendChild(stepper("Durée",
-            function(){return b.chrono+" s";},
-            function(d){
-              b.chrono=Math.max(10,Math.min(120,b.chrono+d*5));
-              b._reps=b.chrono;
-              b.s=b.sets+" × "+b.chrono+" s";
-            }
-          ));
-        }else{
-          tune.appendChild(stepper("Reps",
-            function(){return b._reps===null?"max":b._reps;},
-            function(d){
-              if(b._reps===null){b._reps=(d>0?5:null);}
-              else{
-                var nv=b._reps+d;
-                if(nv<1){b._reps=null;}
-                else b._reps=Math.min(50,nv);
-              }
-              b.s=buildScheme(b.sets,b._reps,it.s);
-            }
-          ));
-        }
-        card.appendChild(tune);
-      }
+      // Réglages séries / reps (ou durée) quand l'exercice est sélectionné
+      if(added)card.appendChild(reglagesPanier(basket[it.k]));
       list.appendChild(card);
     });
   });
   var n=Object.keys(basket).length;
-  $("#basketWrap").style.display=n?"block":"none";
+  $("#basketWrap").style.display=(n||tplEdit)?"block":"none";
   $("#basketCount").textContent=n;
+  var aGainage=Object.keys(basket).some(function(k){return /planche|gainage/i.test(basket[k].n||"");});
+  $("#basketPlus").textContent=aGainage?"":" + planche finale";
+  renderPanier();
+  renderTplEdit();
 }
 // Ajoute la planche de fin, sauf si la séance contient déjà un gainage
 // chronométré choisi par l'utilisateur (évite les doublons de planche)
@@ -2694,14 +2778,53 @@ function ajouterFinisher(items){
   if(!dejaGainage)items.push(PLANCHE);
   return items;
 }
+// La durée réglée dans le composeur ou le modèle fait foi pour le chrono plein écran
+// (sinon la dernière durée utilisée pour cet exercice prendrait le dessus)
+function appliquerDurees(items){
+  if(!state.chronoDur)state.chronoDur={};
+  items.forEach(function(it){if(it.chrono&&!it.fin)state.chronoDur[it.k]=it.chrono;});
+}
+/* ---------- Modifier ou dupliquer un modèle ----------
+   Le modèle est chargé dans le composeur : on règle tout (exercices, ordre,
+   séries, répétitions, durées des chronos), puis on enregistre. */
+var tplEdit=null;   // {ref: modèle d'origine, mode: "edit" | "copy"}
+function chargerModele(t,mode){
+  basket={};
+  t.items.forEach(function(it){
+    var c=Object.assign({},it);
+    c._reps=it.chrono?it.chrono:parseReps(it.s);
+    basket[it.k]=c;
+  });
+  tplEdit={ref:t,mode:mode};
+  $("#tplName").value=mode==="edit"?t.name:t.name+" (copie)";
+  renderLib();
+  var w=$("#basketWrap");
+  if(w&&w.scrollIntoView)try{w.scrollIntoView({behavior:"smooth",block:"start"});}catch(e){}
+  toast(mode==="edit"?"Modifie le modèle puis enregistre":"Copie prête : modifie-la puis enregistre");
+}
+function quitterModele(){
+  tplEdit=null;
+  $("#tplName").value="";
+  renderLib();
+}
+function renderTplEdit(){
+  var bar=$("#tplEditBar"),btn=$("#saveTpl");
+  if(!bar||!btn)return;
+  if(tplEdit){
+    bar.style.display="flex";
+    $("#tplEditTxt").textContent=(tplEdit.mode==="edit"?"✎ Modification de « ":"⧉ Copie de « ")+tplEdit.ref.name+" »";
+    btn.textContent=tplEdit.mode==="edit"?"💾 Mettre à jour":"💾 Enregistrer la copie";
+  }else{
+    bar.style.display="none";
+    btn.textContent="💾 Modèle";
+  }
+}
 $("#startLibre").addEventListener("click",function(){
   var items=Object.keys(basket).map(function(k){
     var o=Object.assign({},basket[k]);delete o._reps;return o;
   });
   if(!items.length)return;
-  // La durée réglée dans le composeur fait foi pour le chrono plein écran
-  if(!state.chronoDur)state.chronoDur={};
-  items.forEach(function(it){if(it.hiit&&it.chrono)state.chronoDur[it.k]=it.chrono;});
+  appliquerDurees(items);
   ajouterFinisher(items);
   // Le finisher ajouté automatiquement ne compte ni comme muscu ni dans le total choisi
   var choisis=items.filter(function(it){return !it.fin;});
@@ -2710,8 +2833,11 @@ $("#startLibre").addEventListener("click",function(){
   var titre=(nH&&nM)?"Séance mixte":(nH?"Séance HIIT libre":"Séance libre");
   var sub=choisis.length+" exercice"+(choisis.length>1?"s":"")+" choisi"+(choisis.length>1?"s":"")+(nH&&nM?" · dont "+nH+" HIIT":"");
   openSession({id:"LIBRE",letter:nH?"⚡":"L",title:titre,sub:sub,items:items});
-  basket={};
-  document.querySelectorAll(".gbtn.sel").forEach(function(b){b.classList.remove("sel");});
+  // pendant la modification d'un modèle, on garde le composeur pour pouvoir enregistrer après l'essai
+  if(!tplEdit){
+    basket={};
+    document.querySelectorAll(".gbtn.sel").forEach(function(b){b.classList.remove("sel");});
+  }
   renderLib();
 });
 $("#saveTpl").addEventListener("click",function(){
@@ -2719,13 +2845,31 @@ $("#saveTpl").addEventListener("click",function(){
   if(!keys.length){toast("Choisis d'abord des exercices");return;}
   var name=$("#tplName").value.trim()||("Modèle "+((state.templates||[]).length+1));
   if(!state.templates)state.templates=[];
-  state.templates.push({name:name,items:keys.map(function(k){
-    var o=Object.assign({},basket[k]);delete o._reps;return o;
-  })});
+  var items=keys.map(function(k){var o=Object.assign({},basket[k]);delete o._reps;return o;});
+  var enEdition=tplEdit&&tplEdit.mode==="edit"&&state.templates.indexOf(tplEdit.ref)>=0;
+  if(enEdition){
+    tplEdit.ref.name=name;
+    tplEdit.ref.items=items;
+  }else{
+    state.templates.push({name:name,items:items});
+  }
   save();
+  sauvegardeServeur(state);
   $("#tplName").value="";
-  toast("Modèle enregistré : "+name);
+  toast((enEdition?"Modèle mis à jour : ":"Modèle enregistré : ")+name);
+  if(tplEdit){
+    // fin de la modification : on repart d'un composeur vide
+    tplEdit=null;basket={};
+    document.querySelectorAll(".gbtn.sel").forEach(function(b){b.classList.remove("sel");});
+    renderLib();
+  }
   renderTemplates();
+});
+$("#tplCancel").addEventListener("click",function(){
+  basket={};
+  document.querySelectorAll(".gbtn.sel").forEach(function(b){b.classList.remove("sel");});
+  quitterModele();
+  toast("Modification annulée");
 });
 function renderTemplates(){
   var wrap=$("#tplList");
@@ -2737,19 +2881,30 @@ function renderTemplates(){
     var row=el("div","tpl-item");
     var mid=el("div",null);mid.style.flex="1";
     mid.appendChild(el("div","tn",esc(t.name)));
-    mid.appendChild(el("div","ts",t.items.length+" exercices"));
+    var nC=t.items.filter(function(it){return it.chrono;}).length;
+    mid.appendChild(el("div","ts",t.items.length+" exercice"+(t.items.length>1?"s":"")+(nC?" · dont "+nC+" chrono"+(nC>1?"s":""):"")));
     row.appendChild(mid);
     var go=el("button","tgo","Lancer");
     go.addEventListener("click",function(){
       var items=t.items.map(function(it){return Object.assign({},it);});
+      appliquerDurees(items);
       ajouterFinisher(items);
       openSession({id:"TPL",letter:"M",title:t.name,sub:items.length+" exercices (modèle)",items:items});
     });
     row.appendChild(go);
-    var del=el("button","tdel","✕");
+    var ed=el("button","tbtn","✎");ed.setAttribute("aria-label","Modifier ce modèle");
+    ed.addEventListener("click",function(){chargerModele(t,"edit");});
+    row.appendChild(ed);
+    var dup=el("button","tbtn","⧉");dup.setAttribute("aria-label","Dupliquer ce modèle");
+    dup.addEventListener("click",function(){chargerModele(t,"copy");});
+    row.appendChild(dup);
+    var del=el("button","tdel","✕");del.setAttribute("aria-label","Supprimer ce modèle");
     del.addEventListener("click",function(){
       if(!confirm("Supprimer le modèle « "+t.name+" » ?"))return;
-      state.templates.splice(idx,1);save();renderTemplates();
+      var pos=state.templates.indexOf(t);
+      if(pos>=0)state.templates.splice(pos,1);
+      if(tplEdit&&tplEdit.ref===t){tplEdit=null;basket={};$("#tplName").value="";renderLib();}
+      save();sauvegardeServeur(state);renderTemplates();
     });
     row.appendChild(del);
     wrap.appendChild(row);
@@ -3177,6 +3332,7 @@ $("#impFile").addEventListener("change",function(){
       state.flowPause=[0,15,30,45,60,90,120].indexOf(p.flowPause)>=0?p.flowPause:null;
       state.leadIn=[1,3,5].indexOf(p.leadIn)>=0?p.leadIn:1;
       state.voice=p.voice!==false;
+      state.fatUnit=p.fatUnit==="kg"?"kg":"%";
       state.volume=typeof p.volume==="number"?Math.max(0,Math.min(150,p.volume)):100;
       state.mode=p.mode||"equilibre";
       state.history=p.history;
@@ -3213,7 +3369,7 @@ function renderWeightList(ws){
     var row=el("div","wl-row");
     var dt=new Date(w.date);
     row.appendChild(el("span","wl-date",dt.getDate()+"/"+(dt.getMonth()+1)+"/"+String(dt.getFullYear()).slice(2)));
-    row.appendChild(el("b","wl-val",w.v+" kg"));
+    row.appendChild(el("b","wl-val",w.v+" kg"+(typeof w.f==="number"?"<small> · "+w.f+" %</small>":"")));
     var ed=el("button","wl-btn","✎");ed.setAttribute("aria-label","Corriger ce relevé");
     ed.addEventListener("click",function(){
       var r=prompt("Corriger le poids du "+dt.getDate()+"/"+(dt.getMonth()+1)+" (kg) :",String(w.v));
@@ -3221,12 +3377,23 @@ function renderWeightList(ws){
       var v=parseFloat(String(r).trim().replace(",","."));
       if(isNaN(v)||v<30||v>250){toast("Poids invalide (entre 30 et 250 kg)");return;}
       v=Math.round(v*10)/10;
-      if(v===w.v){toast("Aucune modification");return;}
-      w.v=v;save();sauvegardeServeur(state);toast("Relevé corrigé ✓");renderWeight();
+      // masse grasse : même unité que la saisie ; vide = retirer, Annuler = ne pas toucher
+      var actuel=typeof w.f==="number"?(state.fatUnit==="kg"?String(Math.round(w.v*w.f/10)/10):String(w.f)):"";
+      var rg=prompt("Masse grasse ("+(state.fatUnit==="kg"?"kg":"%")+") — laisse vide si non mesurée :",actuel);
+      var nf=w.f;
+      if(rg!==null){
+        var g=lireGras(rg,v);
+        if(g.err){toast(msgGrasInvalide());return;}
+        nf=g.vide?undefined:g.pct;
+      }
+      if(v===w.v&&nf===w.f){toast("Aucune modification");return;}
+      w.v=v;
+      if(nf===undefined)delete w.f;else w.f=nf;
+      save();sauvegardeServeur(state);toast("Relevé corrigé ✓");renderWeight();
     });
     var del=el("button","wl-btn","✕");del.setAttribute("aria-label","Supprimer ce relevé");
     del.addEventListener("click",function(){
-      if(!confirm("Supprimer le relevé du "+dt.getDate()+"/"+(dt.getMonth()+1)+" ("+w.v+" kg) ?"))return;
+      if(!confirm("Supprimer le relevé du "+dt.getDate()+"/"+(dt.getMonth()+1)+" ("+w.v+" kg"+(typeof w.f==="number"?" · "+w.f+" %":"")+") ?"))return;
       var pos=state.weights.indexOf(w);
       if(pos>=0)state.weights.splice(pos,1);
       save();sauvegardeServeur(state);toast("Relevé supprimé");renderWeight();
@@ -3250,9 +3417,26 @@ function renderWeight(){
   $("#wDelta").textContent=(d>0?"+":"")+d+" kg";
   $("#wDelta").style.color=d===0?"inherit":(Math.abs(d)<=2?"var(--ok)":"var(--ink)");
   if(ws.length>=2)drawWeight(ws);
+  renderGras(ws);
 }
-function drawWeight(ws){
-  var cv=$("#weightCanvas");
+function renderGras(ws){
+  var fs=ws.filter(function(w){return typeof w.f==="number";});
+  var has=fs.length>0;
+  $("#fatStats").style.display=has?"flex":"none";
+  $("#fatCanvas").style.display=fs.length>=2?"block":"none";
+  $("#fatHint").style.display=fs.length>=2?"block":"none";
+  if(!has)return;
+  var a=fs[0],b=fs[fs.length-1];
+  var kgA=a.v*a.f/100,kgB=b.v*b.f/100;
+  $("#fLast").textContent=b.f+" % · "+(Math.round(kgB*10)/10)+" kg";
+  $("#fLean").textContent=(Math.round((b.v-kgB)*10)/10)+" kg";
+  var d=Math.round((kgB-kgA)*10)/10;
+  $("#fDelta").textContent=fs.length<2?"—":(d>0?"+":"")+d+" kg";
+  $("#fDelta").style.color=fs.length<2||d===0?"inherit":(d<0?"var(--ok)":"var(--red)");
+  if(fs.length>=2)drawCourbe($("#fatCanvas"),fs.map(function(w){return {v:w.f};}),"#e0a800");
+}
+function drawWeight(ws){drawCourbe($("#weightCanvas"),ws,"#E30613");}
+function drawCourbe(cv,ws,couleur){
   var dpr=window.devicePixelRatio||1;
   var W=cv.clientWidth||300,H=150;
   cv.width=W*dpr;cv.height=H*dpr;
@@ -3267,9 +3451,37 @@ function drawWeight(ws){
   ctx.strokeStyle="#e2ded7";ctx.lineWidth=1;ctx.fillStyle="#8a857d";
   ctx.font="10px 'IBM Plex Sans',sans-serif";ctx.textAlign="right";ctx.textBaseline="middle";
   for(var g=0;g<4;g++){var gv=vmin+(vmax-vmin)*g/3;var gy=Y(gv);ctx.beginPath();ctx.moveTo(pad.l,gy);ctx.lineTo(W-pad.r,gy);ctx.stroke();ctx.fillText(Math.round(gv*10)/10,pad.l-5,gy);}
-  ctx.strokeStyle="#E30613";ctx.lineWidth=2.5;ctx.lineJoin="round";
+  ctx.strokeStyle=couleur;ctx.lineWidth=2.5;ctx.lineJoin="round";
   ctx.beginPath();ws.forEach(function(p,i){var x=X(i),y=Y(p.v);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
   ws.forEach(function(p,i){ctx.beginPath();ctx.arc(X(i),Y(p.v),3.5,0,Math.PI*2);ctx.fillStyle="#161616";ctx.fill();});
+}
+/* Masse grasse : stockée en % (champ f), saisie en % ou en kg selon la balance */
+function lireGras(raw,poids){
+  raw=String(raw==null?"":raw).trim().replace(",",".");
+  if(raw==="")return {vide:true};
+  if(!/^\d+(\.\d+)?$/.test(raw))return {err:true};
+  var x=parseFloat(raw),pct;
+  if(state.fatUnit==="kg"){
+    if(x<=0||x>=poids)return {err:true};
+    pct=x/poids*100;
+  }else pct=x;
+  if(pct<3||pct>60)return {err:true};
+  return {pct:Math.round(pct*10)/10};
+}
+function msgGrasInvalide(){
+  return state.fatUnit==="kg"?"Masse grasse invalide (en kg, inférieure au poids)":"Masse grasse invalide (entre 3 et 60 %)";
+}
+function majUniteGras(){
+  if(!$("#fatUnit"))return;
+  $("#fatUnit").textContent=state.fatUnit==="kg"?"kg":"%";
+  $("#fatInput").placeholder=state.fatUnit==="kg"?"Ex : 17":"Ex : 21";
+}
+if($("#fatUnit")){
+  majUniteGras();
+  $("#fatUnit").addEventListener("click",function(){
+    state.fatUnit=state.fatUnit==="kg"?"%":"kg";save();majUniteGras();
+    toast("Masse grasse saisie en "+(state.fatUnit==="kg"?"kg":"%"));
+  });
 }
 if($("#weightSave")){
   $("#weightSave").addEventListener("click",function(){
@@ -3277,14 +3489,22 @@ if($("#weightSave")){
     var v=parseFloat(raw);
     if(isNaN(v)||v<30||v>250){toast("Entre un poids valide (kg)");return;}
     v=Math.round(v*10)/10;
+    var g=lireGras($("#fatInput").value,v);
+    if(g.err){toast(msgGrasInvalide());return;}
     if(!state.weights)state.weights=[];
     var today=new Date().toISOString().slice(0,10);
     var existing=state.weights.find(function(w){return w.date.slice(0,10)===today;});
-    if(existing)existing.v=v;
-    else state.weights.push({date:new Date().toISOString(),v:v});
+    if(existing){
+      existing.v=v;
+      if(!g.vide)existing.f=g.pct;
+    }else{
+      var e={date:new Date().toISOString(),v:v};
+      if(!g.vide)e.f=g.pct;
+      state.weights.push(e);
+    }
     save();
-    $("#weightInput").value="";
-    toast("Poids noté : "+v+" kg");
+    $("#weightInput").value="";$("#fatInput").value="";
+    toast("Noté : "+v+" kg"+(g.vide?"":" · "+g.pct+" % de gras"));
     sauvegardeServeur(state);
     renderWeight();
   });
