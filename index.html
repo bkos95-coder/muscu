@@ -112,6 +112,7 @@
   .tpl-cancel{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 11px;font-size:13px;cursor:pointer;font-family:"IBM Plex Sans",sans-serif}
   .pan-title{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin:2px 0 8px}
   .pan-row{background:#fff;border:1px solid var(--line);border-radius:11px;padding:9px 10px;margin-bottom:8px}
+  .pan-row .lib-tune{border:none;border-radius:9px;margin-top:8px;padding:8px 10px}
   .pan-top{display:flex;align-items:center;gap:6px}
   .pan-num{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:17px;color:var(--red);width:20px;flex:0 0 auto}
   .pan-name{flex:1;min-width:0;font-weight:600;font-size:14px;line-height:1.25}
@@ -245,13 +246,20 @@
   .lib-card{margin:8px 0}
   .lib-card .lib-ex{margin:0}
   .lib-card.added .lib-ex{border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom:none}
-  .lib-tune{display:flex;gap:10px;background:#faf9f6;border:1.5px solid var(--ink);border-top:none;border-radius:0 0 10px 10px;padding:10px 12px}
-  .tune-box{display:flex;align-items:center;gap:6px;flex:1}
+  .lib-tune{display:flex;flex-wrap:wrap;gap:8px 10px;background:#faf9f6;border:1.5px solid var(--ink);border-top:none;border-radius:0 0 10px 10px;padding:10px 12px}
+  .tune-box{display:flex;align-items:center;gap:4px;flex:1 1 140px;min-width:0}
   .tune-lab{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);flex:1}
   .tune-btn{width:30px;height:30px;border:1.5px solid var(--line);background:#fff;border-radius:8px;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:18px;color:var(--ink);cursor:pointer;line-height:1;flex:0 0 auto}
   .tune-btn:active{background:var(--red);color:#fff;border-color:var(--red)}
   .tune-val{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:17px;min-width:32px;text-align:center}
-  .basket{position:sticky;bottom:64px;margin-top:14px}
+  .basket{position:sticky;bottom:calc(var(--navh,64px) - 1px);margin-top:14px;z-index:5;background:var(--paper);padding:10px 0 8px;box-shadow:0 -10px 14px -10px rgba(0,0,0,.25)}
+  .pan-open{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;background:#fff;border:1.5px solid var(--ink);border-radius:11px;padding:11px 14px;margin-bottom:8px;font-family:"IBM Plex Sans",sans-serif;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;text-align:left}
+  .pan-open span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pan-open b{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:15px;text-transform:uppercase;color:var(--red);flex:0 0 auto}
+  .pan-open.editing{border-color:var(--red);background:#fff5f5}
+  .sheet-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+  .sheet-head .sheet-title{margin:0}
+  .sheet-x{background:#fff;border:1px solid var(--line);border-radius:9px;width:36px;height:36px;font-size:16px;color:var(--ink-2);cursor:pointer;flex:0 0 auto}
 
   .h-card{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin-bottom:10px;overflow:hidden}
   .h-head{display:flex;align-items:center;gap:12px;padding:13px 15px;cursor:pointer}
@@ -567,15 +575,7 @@
     <div class="groups" id="groupBtns"></div>
     <div id="libList"></div>
     <div class="basket" id="basketWrap" style="display:none">
-      <div class="tpl-edit" id="tplEditBar" style="display:none">
-        <span id="tplEditTxt">Modification du modèle</span>
-        <button class="tpl-cancel" id="tplCancel">Annuler</button>
-      </div>
-      <div id="basketList"></div>
-      <div class="frow" style="display:flex;gap:8px;margin-bottom:8px">
-        <input type="text" id="tplName" placeholder="Nom du modèle (optionnel)" style="flex:1;padding:11px;border:1px solid var(--line);border-radius:9px;font-family:'IBM Plex Sans';font-size:14px">
-        <button class="btn ghost" id="saveTpl" style="white-space:nowrap">💾 Modèle</button>
-      </div>
+      <button class="pan-open" id="panOpen"><span id="panOpenTxt">Ma sélection · 0 exercice</span><b>Régler ▸</b></button>
       <button class="btn red block" id="startLibre">Lancer la séance (<span id="basketCount">0</span> exos<span id="basketPlus"> + planche finale</span>)</button>
     </div>
   </div>
@@ -830,6 +830,26 @@
   </div>
 </div>
 
+<div class="sheet" id="panSheet">
+  <div class="sheet-card">
+    <div class="sheet-head">
+      <div class="sheet-title">Ma sélection</div>
+      <button class="sheet-x" id="panClose" aria-label="Fermer">✕</button>
+    </div>
+    <div class="tpl-edit" id="tplEditBar" style="display:none">
+      <span id="tplEditTxt">Modification du modèle</span>
+      <button class="tpl-cancel" id="tplCancel">Annuler</button>
+    </div>
+    <div id="basketList"></div>
+    <div class="sheet-lab">Enregistrer comme modèle</div>
+    <div class="frow" style="display:flex;gap:8px;margin-bottom:12px">
+      <input type="text" id="tplName" placeholder="Nom du modèle (optionnel)" style="flex:1;min-width:0;padding:11px;border:1px solid var(--line);border-radius:9px;font-family:'IBM Plex Sans';font-size:14px">
+      <button class="btn ghost" id="saveTpl" style="white-space:nowrap">💾 Modèle</button>
+    </div>
+    <button class="btn red block" id="panLaunch">Lancer la séance</button>
+  </div>
+</div>
+
 <div class="overlay" id="doOverlay">
   <div class="ov-label" id="doStep">À toi</div>
   <div class="do-name" id="doName">Exercice</div>
@@ -877,8 +897,13 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.18.1";
+var APP_VERSION="1.18.2";
 var CHANGELOG=[
+ {v:"1.18.2",d:"2026-11-07",n:[
+   "Séance libre : la sélection ne recouvre plus la liste des exercices",
+   "Barre du bas compacte ; « Ma sélection » s'ouvre dans un panneau (ordre, séries, durées, modèle)",
+   "Réglages séries / durée qui ne débordent plus sur les petits écrans"
+ ]},
  {v:"1.18.1",d:"2026-11-07",n:[
    "Padel : durée pré-remplie à 1h30 (modifiable, jamais imposée si tu as déjà saisi une durée)"
  ]},
@@ -2718,6 +2743,18 @@ function reglagesPanier(b){
   }
   return tune;
 }
+/* La barre du bas vient se coller exactement au menu, quelle que soit sa hauteur réelle
+   (police, téléphone, zone système) : on la mesure au lieu de la supposer */
+function majHauteurNav(){
+  var n=document.querySelector("nav"),r=document.documentElement;
+  if(n&&r&&r.style&&n.offsetHeight)r.style.setProperty("--navh",n.offsetHeight+"px");
+}
+majHauteurNav();
+window.addEventListener("resize",majHauteurNav);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(majHauteurNav);
+/* Panneau "Ma sélection" : s'ouvre par-dessus l'écran, ne recouvre jamais la liste */
+function ouvrirPanier(){renderPanier();renderTplEdit();$("#panSheet").classList.add("open");}
+function fermerPanier(){var p=$("#panSheet");if(p)p.classList.remove("open");}
 /* "Ma sélection" : tous les exercices choisis, dans l'ordre de la séance,
    visibles même si leur groupe n'est pas affiché. Ordre modifiable. */
 function deplacerPanier(k,d){
@@ -2732,7 +2769,7 @@ function renderPanier(){
   box.innerHTML="";
   var keys=Object.keys(basket);
   if(!keys.length)return;
-  box.appendChild(el("div","pan-title","Ma sélection · "+keys.length+" exercice"+(keys.length>1?"s":"")+" · dans l'ordre de la séance"));
+  box.appendChild(el("div","pan-title",keys.length+" exercice"+(keys.length>1?"s":"")+" · dans l'ordre de la séance"));
   keys.forEach(function(k,i){
     var b=basket[k];
     var row=el("div","pan-row");
@@ -2786,6 +2823,11 @@ function renderLib(){
   var n=Object.keys(basket).length;
   $("#basketWrap").style.display=(n||tplEdit)?"block":"none";
   $("#basketCount").textContent=n;
+  var po=$("#panOpenTxt");
+  if(po)po.textContent=tplEdit?("✎ "+tplEdit.ref.name+" · "+n+" exo"+(n>1?"s":"")):("Ma sélection · "+n+" exercice"+(n>1?"s":""));
+  if($("#panOpen"))$("#panOpen").classList.toggle("editing",!!tplEdit);
+  // plus rien à régler : on referme le panneau
+  if(!n&&!tplEdit)fermerPanier();
   var aGainage=Object.keys(basket).some(function(k){return /planche|gainage/i.test(basket[k].n||"");});
   $("#basketPlus").textContent=aGainage?"":" + planche finale";
   renderPanier();
@@ -2820,8 +2862,7 @@ function chargerModele(t,mode){
   tplEdit={ref:t,mode:mode};
   $("#tplName").value=mode==="edit"?t.name:t.name+" (copie)";
   renderLib();
-  var w=$("#basketWrap");
-  if(w&&w.scrollIntoView)try{w.scrollIntoView({behavior:"smooth",block:"start"});}catch(e){}
+  ouvrirPanier();
   toast(mode==="edit"?"Modifie le modèle puis enregistre":"Copie prête : modifie-la puis enregistre");
 }
 function quitterModele(){
@@ -2842,6 +2883,7 @@ function renderTplEdit(){
   }
 }
 $("#startLibre").addEventListener("click",function(){
+  fermerPanier();
   var items=Object.keys(basket).map(function(k){
     var o=Object.assign({},basket[k]);delete o._reps;return o;
   });
@@ -2878,6 +2920,7 @@ $("#saveTpl").addEventListener("click",function(){
   save();
   sauvegardeServeur(state);
   $("#tplName").value="";
+  fermerPanier();
   toast((enEdition?"Modèle mis à jour : ":"Modèle enregistré : ")+name);
   if(tplEdit){
     // fin de la modification : on repart d'un composeur vide
@@ -2887,10 +2930,14 @@ $("#saveTpl").addEventListener("click",function(){
   }
   renderTemplates();
 });
+$("#panOpen").addEventListener("click",ouvrirPanier);
+$("#panClose").addEventListener("click",fermerPanier);
+$("#panLaunch").addEventListener("click",function(){fermerPanier();$("#startLibre").click();});
 $("#tplCancel").addEventListener("click",function(){
   basket={};
   document.querySelectorAll(".gbtn.sel").forEach(function(b){b.classList.remove("sel");});
   quitterModele();
+  fermerPanier();
   toast("Modification annulée");
 });
 function renderTemplates(){
