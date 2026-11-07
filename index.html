@@ -124,6 +124,13 @@
   .fatwrap{display:flex;gap:4px}
   .fatwrap .win{min-width:0}
   .fatunit{flex:0 0 auto;width:40px;border:1.5px solid var(--line);border-radius:9px;background:#fff;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:16px;color:var(--ink-2);cursor:pointer}
+  .imc-row{display:flex;align-items:center;gap:8px;margin:-2px 0 10px;flex-wrap:wrap}
+  .imc-lab{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
+  .imc-row b{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:20px}
+  .imc-cat{font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;background:#eef6ee;color:#2e7d32}
+  .imc-cat.warn{background:#fff4e0;color:#b26a00}
+  .imc-cat.bad{background:#fdecec;color:var(--red)}
+  .imc-h{margin-left:auto;background:none;border:1px solid var(--line);border-radius:8px;padding:5px 9px;font-size:12.5px;color:var(--ink-2);cursor:pointer;font-family:"IBM Plex Sans",sans-serif}
   .verfoot{margin:16px 0 4px;text-align:center}
   .verbtn{background:none;border:none;color:var(--grey);font-size:12px;cursor:pointer;padding:6px;font-family:"IBM Plex Sans",sans-serif}
   .verbtn b{color:var(--ink-2);font-family:"Barlow Condensed",sans-serif;font-size:13px;letter-spacing:.03em}
@@ -698,6 +705,11 @@
         <div><b id="wStart">—</b><span>1er relevé</span></div>
         <div><b id="wDelta">—</b><span>évolution</span></div>
       </div>
+      <div class="imc-row" id="imcRow" style="display:none">
+        <span class="imc-lab">IMC</span><b id="imcVal">—</b>
+        <span class="imc-cat" id="imcCat">—</span>
+        <button class="imc-h" id="heightEdit" aria-label="Modifier ta taille">1,85 m ✎</button>
+      </div>
       <canvas id="weightCanvas" style="display:none"></canvas>
       <div class="vstats" id="fatStats" style="display:none">
         <div><b id="fLast">—</b><span>gras actuel</span></div>
@@ -865,8 +877,12 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.17.0";
+var APP_VERSION="1.18.0";
 var CHANGELOG=[
+ {v:"1.18.0",d:"2026-11-07",n:[
+   "IMC calculé sur ton dernier poids, avec sa catégorie (repères OMS)",
+   "Taille réglable (1,85 m par défaut)"
+ ]},
  {v:"1.17.0",d:"2026-11-07",n:[
    "Poids de corps : masse grasse en option, saisie en % ou en kg selon ta balance",
    "Gras actuel, masse maigre et évolution du gras, avec leur courbe",
@@ -974,7 +990,7 @@ var CHANGELOG=[
    "Récap réel de la semaine, indépendant du programme choisi"
  ]}
 ];
-var state={freq:3,rest:90,dur:40,mode:"equilibre",keepAwake:false,volume:100,fatUnit:"%",flowOrder:"circuit",flowPause:null,leadIn:1,voice:true,history:[],lastCharges:{},chronoDur:{},autoSave:false,lastSession:null,templates:[],hiitCustom:[],weights:[],lastExport:null};
+var state={freq:3,rest:90,dur:40,mode:"equilibre",keepAwake:false,volume:100,fatUnit:"%",height:185,flowOrder:"circuit",flowPause:null,leadIn:1,voice:true,history:[],lastCharges:{},chronoDur:{},autoSave:false,lastSession:null,templates:[],hiitCustom:[],weights:[],lastExport:null};
 var canSave=true;
 try{
   var raw=localStorage.getItem(KEY);
@@ -994,6 +1010,7 @@ try{
       state.leadIn=[1,3,5].indexOf(p.leadIn)>=0?p.leadIn:1;
       state.voice=p.voice!==false;
       state.fatUnit=p.fatUnit==="kg"?"kg":"%";
+      state.height=(typeof p.height==="number"&&p.height>=120&&p.height<=230)?p.height:185;
       state.volume=typeof p.volume==="number"?Math.max(0,Math.min(150,p.volume)):100;
       state.mode=p.mode||"equilibre";
       state.history=Array.isArray(p.history)?p.history:[];
@@ -3333,6 +3350,7 @@ $("#impFile").addEventListener("change",function(){
       state.leadIn=[1,3,5].indexOf(p.leadIn)>=0?p.leadIn:1;
       state.voice=p.voice!==false;
       state.fatUnit=p.fatUnit==="kg"?"kg":"%";
+      state.height=(typeof p.height==="number"&&p.height>=120&&p.height<=230)?p.height:185;
       state.volume=typeof p.volume==="number"?Math.max(0,Math.min(150,p.volume)):100;
       state.mode=p.mode||"equilibre";
       state.history=p.history;
@@ -3409,6 +3427,7 @@ function renderWeight(){
   $("#weightCanvas").style.display=ws.length>=2?"block":"none";
   $("#weightEmpty").style.display=hasData?"none":"block";
   renderWeightList(ws);
+  renderIMC(ws);
   if(!hasData)return;
   var first=ws[0].v,last=ws[ws.length-1].v;
   $("#wLast").textContent=last+" kg";
@@ -3454,6 +3473,52 @@ function drawCourbe(cv,ws,couleur){
   ctx.strokeStyle=couleur;ctx.lineWidth=2.5;ctx.lineJoin="round";
   ctx.beginPath();ws.forEach(function(p,i){var x=X(i),y=Y(p.v);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
   ws.forEach(function(p,i){ctx.beginPath();ctx.arc(X(i),Y(p.v),3.5,0,Math.PI*2);ctx.fillStyle="#161616";ctx.fill();});
+}
+/* IMC = poids / taille² (repères OMS pour l'adulte) */
+function calculIMC(poids,cm){
+  if(!poids||!cm)return null;
+  var m=cm/100;
+  return Math.round(poids/(m*m)*10)/10;
+}
+function categorieIMC(i){
+  if(i<18.5)return {t:"insuffisance pondérale",c:"warn"};
+  if(i<25)return {t:"corpulence normale",c:""};
+  if(i<30)return {t:"surpoids",c:"warn"};
+  if(i<35)return {t:"obésité modérée",c:"bad"};
+  if(i<40)return {t:"obésité sévère",c:"bad"};
+  return {t:"obésité morbide",c:"bad"};
+}
+function tailleTxt(cm){return (cm/100).toFixed(2).replace(".",",")+" m";}
+function renderIMC(ws){
+  var row=$("#imcRow");if(!row)return;
+  if(!ws.length){row.style.display="none";return;}
+  row.style.display="flex";
+  var i=calculIMC(ws[ws.length-1].v,state.height||185);
+  var cat=categorieIMC(i);
+  $("#imcVal").textContent=String(i).replace(".",",");
+  $("#imcCat").textContent=cat.t;
+  $("#imcCat").className="imc-cat"+(cat.c?" "+cat.c:"");
+  $("#heightEdit").textContent=tailleTxt(state.height||185)+" ✎";
+}
+// Taille : accepte 185, 1.85 ou 1,85
+function lireTaille(r){
+  r=String(r==null?"":r).trim().replace(",",".").replace(/\s*(cm|m)$/i,"");
+  if(!/^\d+(\.\d+)?$/.test(r))return null;
+  var x=parseFloat(r);
+  var cm=x<3?Math.round(x*100):Math.round(x);
+  return (cm>=120&&cm<=230)?cm:null;
+}
+if($("#heightEdit")){
+  $("#heightEdit").addEventListener("click",function(){
+    var r=prompt("Ta taille (en cm ou en m) :",String(state.height||185));
+    if(r===null)return;
+    var cm=lireTaille(r);
+    if(!cm){toast("Taille invalide (entre 1,20 et 2,30 m)");return;}
+    if(cm===state.height){toast("Aucune modification");return;}
+    state.height=cm;save();sauvegardeServeur(state);
+    toast("Taille : "+tailleTxt(cm));
+    renderWeight();
+  });
 }
 /* Masse grasse : stockée en % (champ f), saisie en % ou en kg selon la balance */
 function lireGras(raw,poids){
