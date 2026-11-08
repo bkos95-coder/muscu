@@ -2,7 +2,7 @@
 
 Application de suivi de musculation, HIIT, callisthénie, course et santé du dos, construite sur mesure pour Benjamin.
 
-**Version actuelle : 1.27.0** — 8 novembre 2026
+**Version actuelle : 1.28.0** — 8 novembre 2026
 
 ---
 
@@ -62,7 +62,7 @@ Application de suivi de musculation, HIIT, callisthénie, course et santé du do
 
 ### 🧩 Libre et modèles
 
-- **Fiche de chaque exercice** : toucher un exercice déplie sa fiche (type, schéma, consigne, guide complet, ⚠ expliqué) avec un bouton « + Ajouter à ma sélection » ; le « + » à droite reste l'ajout direct.
+- **Fiche de chaque exercice** : toucher un exercice déplie sa fiche (type, schéma animé, consigne, guide complet, ⚠ expliqué) avec un bouton « + Ajouter à ma sélection » ; le « + » à droite reste l'ajout direct.
 - **Bibliothèque** :
   - musculation par groupe musculaire ;
   - **28 exercices de callisthénie** en 4 groupes 🤸 : Tirage, Poussée, Jambes, Gainage & statiques ;
@@ -71,6 +71,13 @@ Application de suivi de musculation, HIIT, callisthénie, course et santé du do
 - **« Ma sélection »** dans un panneau : ordre, séries, durées, répétitions, retrait.
 - **« Tout régler d'un coup »** : séries, durée ou répétitions de tous les exercices en un appui.
 - **Modèles** : 👁 aperçu (exercices, séries, **durée estimée**) · ▶ lancer · ✎ modifier · ⧉ dupliquer · ✕ supprimer.
+
+### 🎞 Schémas animés
+
+- **Les 127 exercices** ont un schéma animé en boucle (silhouette de profil, ou de face pour les mouvements latéraux), avec la consigne du moment écrite dessous.
+- Visibles dans la **fiche du Libre**, la page **« À toi »**, l'écran du **chrono** (mise en place et effort), le **lecteur HIIT** (exercice suivant pendant la récup) et le **« Comment faire »** des cartes de séance.
+- Codes couleur : **ligne verte** = ce qui reste droit (dos, alignement du corps) · **orange** = le membre qui travaille · **gris** = le côté éloigné.
+- Schémas de principe : les consignes écrites et les ⚠ restent la référence pour le dos, les cervicales et le pied.
 
 ### ⚡ HIIT
 
@@ -142,6 +149,7 @@ Application de suivi de musculation, HIIT, callisthénie, course et santé du do
 | 1.25.0 | Lecteur HIIT aligné, fractionné course avec verrou, circuit HIIT en modèle |
 | 1.26.0 | Calories estimées partout |
 | 1.27.0 | Fiche dépliable de chaque exercice dans le Libre, 108 apostrophes rétablies dans les guides — première version publiée directement depuis la conversation |
+| 1.28.0 | Schémas animés pour les 127 exercices (fiche, « À toi », chrono, lecteur HIIT, « Comment faire »), affichage adapté aux petits écrans |
 
 ---
 
@@ -149,6 +157,7 @@ Application de suivi de musculation, HIIT, callisthénie, course et santé du do
 
 - Chaque version est validée par des **tests automatisés** de la logique.
 - Depuis la 1.18.2, chaque modification d'écran est aussi vérifiée **dans un vrai navigateur au format téléphone** : captures, débordements, clic sur chaque bouton, parcours complets (séance, HIIT, fractionné).
+- 1.28.0 : toutes les positions clés des 127 schémas rendues en images et passées en revue (15 schémas corrigés), puis 125 fiches ouvertes une par une dans le navigateur.
 - **Audit complet** en 1.22.2 : 128 tests de logique, 73 boutons cliqués par taille d'écran, 11 écrans superposés contrôlés sur 3 tailles de téléphone.
 
 ---
@@ -157,6 +166,7 @@ Application de suivi de musculation, HIIT, callisthénie, course et santé du do
 
 ### À tester en conditions réelles
 
+- Les **schémas animés**, au fil des séances : signaler tout geste faux ou peu clair (capture + un mot).
 - Le **fractionné téléphone verrouillé en poche** : vérifier que le sifflet et la voix sortent bien (sinon, régler l'économie de batterie de MagicOS pour l'application).
 - Le **sifflet de départ** et le **nouvel écran du lecteur HIIT**.
 
@@ -185,3 +195,4 @@ Application de suivi de musculation, HIIT, callisthénie, course et santé du do
 | Minuteurs | Basés sur l'horloge réelle : ils restent justes après un gel d'écran Android |
 | Écran allumé | Wake lock avec réacquisition automatique |
 | Audio | Bus avec volume et limiteur ; voix française du téléphone |
+| Schémas | Moteur SVG intégré (cinématique inverse : longueurs de membres constantes), une seule boucle d'animation, ~50 Ko pour 127 schémas |
