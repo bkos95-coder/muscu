@@ -380,6 +380,7 @@
   .overlay.rest .ov-skip{display:block}
   .overlay.lead .ov-adjust,.overlay.lead .ov-start{display:none}
   .overlay.lead .ov-time{color:#f5b301}
+  .overlay.lead .ov-bar{visibility:hidden}
   .sheet{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:90;display:none;align-items:flex-end;justify-content:center}
   .sheet.open{display:flex}
   .sheet-card{background:var(--paper,#f4f2ee);width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));max-height:92vh;overflow-y:auto}
@@ -390,8 +391,10 @@
   .seg button b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:18px;text-transform:uppercase;color:var(--ink)}
   .seg button span{font-size:12.5px;color:var(--grey)}
   .seg button.sel{border-color:var(--red);background:#fff5f5}
+  .rest-opts.light{flex-wrap:wrap;gap:6px}
   .rest-opts.light button{background:#fff;border:1.5px solid var(--line);color:var(--ink-2)}
   .rest-opts.light button.sel{background:var(--red);border-color:var(--red);color:#fff}
+  .sheet-sub{font-style:normal;text-transform:none;letter-spacing:0;font-size:11.5px;color:var(--grey)}
   .sheet-check{display:flex;align-items:center;gap:9px;margin:16px 0 14px;font-size:14px}
   .sheet-check input{width:18px;height:18px;accent-color:var(--red)}
   .do-name{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:clamp(30px,9vw,46px);text-transform:uppercase;line-height:1.02;text-align:center;max-width:92vw}
@@ -401,6 +404,12 @@
   .do-charge input{width:120px;padding:10px;border-radius:12px;border:1.5px solid #444;background:#222;color:#fff;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:30px;text-align:center}
   .do-done{background:var(--red);border:none;color:#fff;border-radius:22px;width:min(78vw,340px);height:min(42vw,170px);font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:clamp(28px,8vw,40px);text-transform:uppercase;letter-spacing:.03em;cursor:pointer;box-shadow:0 8px 30px rgba(227,6,19,.35)}
   .do-done:active{transform:scale(.97)}
+  .do-tip{font-size:14px;color:#d6d2ca;text-align:center;max-width:34ch;line-height:1.35}
+  .do-how{background:none;border:none;color:#f5b301;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;padding:4px 8px}
+  .do-guide{display:none;max-width:min(92vw,420px);max-height:30vh;overflow-y:auto;background:#222;border:1px solid #333;border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.45;color:#ddd;text-align:left}
+  .do-guide.open{display:block}
+  .do-guide .warnbox{color:var(--ink-2)}
+  .do-next{font-size:14px;color:#9a958d;text-align:center;min-height:1.2em}
   .do-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 
   .ov-next{display:none;background:var(--red);border:none;color:#fff;border-radius:12px;padding:15px 34px;font-family:"Barlow Condensed",sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.05em;font-size:19px;cursor:pointer;margin-top:6px;max-width:92vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -815,18 +824,22 @@
 
 <div class="sheet" id="flowSheet">
   <div class="sheet-card">
-    <div class="sheet-title">Comment tu enchaînes ?</div>
+    <div class="sheet-title">Comment tu enchaînes&nbsp;?</div>
     <div class="sheet-lab">Ordre</div>
     <div class="seg" id="flowOrderOpts">
       <button data-o="circuit"><b>Circuit</b><span>1 série de chaque exo, puis un tour de plus</span></button>
       <button data-o="series"><b>Série par série</b><span>toutes les séries d'un exo, puis le suivant</span></button>
       <button data-o="manuel"><b>Manuel</b><span>je coche à mon rythme</span></button>
     </div>
-    <div class="sheet-lab">Pause entre deux séries</div>
+    <div class="sheet-lab">Repos entre deux séries <i class="sheet-sub">en circuit : après chaque exercice</i></div>
     <div class="rest-opts light" id="flowPauseOpts">
       <button data-p="0">0</button><button data-p="15">15s</button><button data-p="30">30s</button><button data-p="45">45s</button><button data-p="60">1min</button><button data-p="90">1m30</button><button data-p="120">2min</button>
     </div>
-    <div class="sheet-lab">Mise en place avant un chrono</div>
+    <div class="sheet-lab">Mise en place <i class="sheet-sub">avant un exercice chronométré qui démarre seul</i></div>
+    <div class="rest-opts light" id="setupOpts">
+      <button data-s="0">0</button><button data-s="3">3s</button><button data-s="5">5s</button><button data-s="10">10s</button><button data-s="15">15s</button><button data-s="20">20s</button>
+    </div>
+    <div class="sheet-lab">Décompte <i class="sheet-sub">quand tu lances un chrono à la main</i></div>
     <div class="rest-opts light" id="leadOpts">
       <button data-l="1">1 s</button><button data-l="3">3 s</button><button data-l="5">5 s</button>
     </div>
@@ -859,8 +872,12 @@
   <div class="ov-label" id="doStep">À toi</div>
   <div class="do-name" id="doName">Exercice</div>
   <div class="do-meta" id="doMeta">Série 1/5</div>
+  <div class="do-tip" id="doTip"></div>
+  <button class="do-how" id="doHowBtn">Comment faire ▸</button>
+  <div class="do-guide" id="doGuide"></div>
   <div class="do-charge" id="doChargeBox"><span>kg</span><input type="text" inputmode="decimal" id="doCharge"></div>
-  <button class="do-done" id="doDone">✓ Série faite</button>
+  <button class="do-done" id="doDone">✓ Fait · suivant</button>
+  <div class="do-next" id="doNext"></div>
   <div class="do-row">
     <button class="ov-close" id="doSkip">⏭ Passer</button>
     <button class="ov-close" id="doList">Voir la liste</button>
@@ -902,8 +919,17 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.18.3";
+var APP_VERSION="1.20.0";
 var CHANGELOG=[
+ {v:"1.20.0",d:"2026-11-08",n:[
+   "Pendant un exercice chronométré : « Ensuite : … » affiché, et annoncé à la voix 10 s avant la fin",
+   "Page d'exercice à répétitions : consigne, « Comment faire », suite annoncée et bouton « Fait · suivant »"
+ ]},
+ {v:"1.19.0",d:"2026-11-08",n:[
+   "Déroulé : repos et mise en place réglables séparément",
+   "Après le repos, une mise en place (0 à 20 s) avant chaque exercice chronométré, avec le prochain annoncé",
+   "Le décompte d'un chrono lancé à la main reste réglable à part (1, 3 ou 5 s)"
+ ]},
  {v:"1.18.3",d:"2026-11-07",n:[
    "Poids de corps : masse grasse en % et en kg dans deux cases séparées, valeurs qui ne se coupent plus",
    "Saisie plus lisible (bouton « + Noter » sous les champs) et virgule française partout",
@@ -1028,7 +1054,7 @@ var CHANGELOG=[
    "Récap réel de la semaine, indépendant du programme choisi"
  ]}
 ];
-var state={freq:3,rest:90,dur:40,mode:"equilibre",keepAwake:false,volume:100,fatUnit:"%",height:185,flowOrder:"circuit",flowPause:null,leadIn:1,voice:true,history:[],lastCharges:{},chronoDur:{},autoSave:false,lastSession:null,templates:[],hiitCustom:[],weights:[],lastExport:null};
+var state={freq:3,rest:90,dur:40,mode:"equilibre",keepAwake:false,volume:100,fatUnit:"%",height:185,flowOrder:"circuit",flowPause:null,flowSetup:5,leadIn:1,voice:true,history:[],lastCharges:{},chronoDur:{},autoSave:false,lastSession:null,templates:[],hiitCustom:[],weights:[],lastExport:null};
 var canSave=true;
 try{
   var raw=localStorage.getItem(KEY);
@@ -1046,6 +1072,7 @@ try{
       state.flowOrder=["circuit","series","manuel"].indexOf(p.flowOrder)>=0?p.flowOrder:"circuit";
       state.flowPause=[0,15,30,45,60,90,120].indexOf(p.flowPause)>=0?p.flowPause:null;
       state.leadIn=[1,3,5].indexOf(p.leadIn)>=0?p.leadIn:1;
+      state.flowSetup=[0,3,5,10,15,20].indexOf(p.flowSetup)>=0?p.flowSetup:5;
       state.voice=p.voice!==false;
       state.fatUnit=p.fatUnit==="kg"?"kg":"%";
       state.height=(typeof p.height==="number"&&p.height>=120&&p.height<=230)?p.height:185;
@@ -1700,6 +1727,10 @@ function chronoGo(){
   chrono.endAt=Date.now()+chrono.total*1000;
   chrono.beeped={};
   chrono.fired=false;
+  chrono.annonce=false;
+  // pendant l'effort, on affiche ce qui vient après (déroulé automatique uniquement)
+  var ens=chrono.from?texteEnsuite(chrono.from):"";
+  if(ens)$("#ovHint").textContent=ens;
   chronoRender();
   lockOn();
   chrono.iv=setInterval(function(){
@@ -1709,6 +1740,12 @@ function chronoGo(){
     }else{
       chrono.left=remain;
       chronoRender();
+      // annonce vocale de la suite, 10 s avant la fin (si l'effort dure au moins 20 s)
+      if(remain===10&&chrono.total>=20&&!chrono.annonce&&chrono.from&&state.flowOrder!=="manuel"){
+        chrono.annonce=true;
+        var nx=suivantApres(chrono.from);
+        if(nx)parler("Ensuite : "+nx.item.n);
+      }
       if(remain<=5&&!chrono.beeped[remain]){
         chrono.beeped[remain]=true;
         beepShort();
@@ -2335,6 +2372,26 @@ function parler(txt){
 function annonceProchain(w){
   return w.item.n+(w.item.chrono?", "+(state.chronoDur&&state.chronoDur[w.item.k]||w.item.chrono)+" secondes":", série "+serieNum(w)+" sur "+w.sets.length);
 }
+/* "Ensuite" : ce qui vient après la série en cours, pour prévenir à l'avance.
+   On simule la série en cours comme faite, puis on applique l'ordre choisi. */
+function suivantApres(w){
+  if(!current||!w)return null;
+  var i=w.sets.indexOf(false);
+  if(i<0)return suivantSelonOrdre(w);
+  w.sets[i]=true;
+  var nx=suivantSelonOrdre(w);
+  w.sets[i]=false;
+  return nx;
+}
+function texteEnsuite(w){
+  if(!w||state.flowOrder==="manuel")return "";
+  var nx=suivantApres(w);
+  if(!nx)return "Dernière série de la séance 💪";
+  var n=serieNum(nx);
+  // série de même exercice : on compte celle en cours
+  if(nx===w)n=Math.min(w.sets.filter(Boolean).length+2,w.sets.length);
+  return "Ensuite : "+nx.item.n+" · série "+n+"/"+nx.sets.length;
+}
 // Point d'entrée unique : une série vient d'être faite
 function serieFaite(w){
   if(!current)return;
@@ -2352,7 +2409,7 @@ function enchainerVers(nx){
 // Récupération plein écran, puis départ automatique
 function recup(nx,p){
   fermerDo();
-  chronoOpen("Récup",p,null,function(){lancerExercice(chrono.nextW,false);});
+  chronoOpen("Récup",p,null,function(){lancerExercice(chrono.nextW,true);});
   chrono.nextW=nx;
   $("#chronoOverlay").classList.add("rest");
   majRecup();
@@ -2384,7 +2441,7 @@ function lancerChrono(w,auto,miseEnPlace){
   });
   chrono.from=w;
   if(auto){
-    if(miseEnPlace)demarrerAvecMiseEnPlace(true);
+    if(miseEnPlace)demarrerAvecMiseEnPlace(true,state.flowSetup);
     else{parler(w.item.n);chronoGo();}
   }
 }
@@ -2394,10 +2451,13 @@ function majBoutonSuivant(w){
   if(nx)$("#ovNext").textContent="→ "+(nx===w?"Encore : ":"")+nx.item.n;
 }
 // Temps de mise en place avant un chrono : décompte avec un bip par seconde
-function demarrerAvecMiseEnPlace(annoncer){
-  var n=state.leadIn||0;
+/* Décompte avant le départ d'un chrono.
+   - lancé à la main (Démarrer, Série suivante) : décompte court (state.leadIn)
+   - démarré tout seul dans le déroulé : temps de mise en place (state.flowSetup) */
+function demarrerAvecMiseEnPlace(annoncer,secondes){
+  var n=typeof secondes==="number"?secondes:(state.leadIn||0);
   var ov=$("#chronoOverlay");
-  if(annoncer&&chrono.from)parler(annonceProchain(chrono.from));
+  if(annoncer&&chrono.from)parler((n>0?"Mise en place. ":"")+annonceProchain(chrono.from));
   if(n<=0){chronoGo();return;}
   ov.classList.remove("ready","finished");
   ov.classList.add("lead");
@@ -2416,8 +2476,8 @@ function demarrerAvecMiseEnPlace(annoncer){
     if(r!==dernier){
       dernier=r;
       $("#ovTime").textContent=String(r);
-      $("#ovHint").textContent="Mise en place…";
-      beepShort();
+      $("#ovHint").textContent="Mise en place…"+(chrono.total?" puis "+chrono.total+" s d'effort":"");
+      if(r<=5)beepShort();   // bips sur les 5 dernières secondes seulement
     }
   }
   tic();
@@ -2430,6 +2490,14 @@ function afficherDo(w){
   $("#doStep").textContent="À toi";
   $("#doName").textContent=w.item.n;
   $("#doMeta").textContent="Série "+serieNum(w)+"/"+w.sets.length+" · "+(w.item.s||"");
+  $("#doTip").textContent=w.item.v||"";
+  $("#doTip").style.display=w.item.v?"block":"none";
+  var g=w.item.g||"";
+  $("#doGuide").innerHTML=esc(g)+(w.item.w?"<div class='warnbox'>⚠ <b>À savoir :</b> "+esc(w.item.w)+"</div>":"");
+  $("#doGuide").classList.remove("open");
+  $("#doHowBtn").style.display=g?"inline-block":"none";
+  $("#doHowBtn").textContent="Comment faire ▸";
+  $("#doNext").textContent=texteEnsuite(w);
   var box=$("#doChargeBox");
   if(w.item.noCharge){box.style.display="none";}
   else{
@@ -2477,12 +2545,14 @@ function fermerFin(){$("#endOverlay").classList.remove("open");}
 function resumeFlux(){
   var o={circuit:"Circuit",series:"Série par série",manuel:"Manuel"}[state.flowOrder]||"Circuit";
   var p=pauseFlux();
-  return o+" · "+(p?"pause "+(p>=60?(p/60)+" min":p+" s"):"sans pause")+" · mise en place "+state.leadIn+" s";
+  if(state.flowOrder==="manuel")return o+" · repos "+(p>=60?fr(p/60)+" min":p+" s");
+  return o+" · repos "+(p?(p>=60?fr(p/60)+" min":p+" s"):"aucun")+" · mise en place "+(state.flowSetup||0)+" s";
 }
 function renderFlux(){
   document.querySelectorAll("#flowOrderOpts button").forEach(function(b){b.classList.toggle("sel",b.getAttribute("data-o")===state.flowOrder);});
   document.querySelectorAll("#flowPauseOpts button").forEach(function(b){b.classList.toggle("sel",parseInt(b.getAttribute("data-p"),10)===pauseFlux());});
   document.querySelectorAll("#leadOpts button").forEach(function(b){b.classList.toggle("sel",parseInt(b.getAttribute("data-l"),10)===state.leadIn);});
+  document.querySelectorAll("#setupOpts button").forEach(function(b){b.classList.toggle("sel",parseInt(b.getAttribute("data-s"),10)===state.flowSetup);});
   if($("#voiceOn"))$("#voiceOn").checked=state.voice!==false;
   if($("#flowSummary"))$("#flowSummary").textContent=resumeFlux();
   var p=pauseFlux();
@@ -3434,6 +3504,7 @@ $("#impFile").addEventListener("change",function(){
       state.flowOrder=["circuit","series","manuel"].indexOf(p.flowOrder)>=0?p.flowOrder:"circuit";
       state.flowPause=[0,15,30,45,60,90,120].indexOf(p.flowPause)>=0?p.flowPause:null;
       state.leadIn=[1,3,5].indexOf(p.leadIn)>=0?p.leadIn:1;
+      state.flowSetup=[0,3,5,10,15,20].indexOf(p.flowSetup)>=0?p.flowSetup:5;
       state.voice=p.voice!==false;
       state.fatUnit=p.fatUnit==="kg"?"kg":"%";
       state.height=(typeof p.height==="number"&&p.height>=120&&p.height<=230)?p.height:185;
@@ -4208,6 +4279,9 @@ document.querySelectorAll("#flowPauseOpts button").forEach(function(b){
 document.querySelectorAll("#leadOpts button").forEach(function(b){
   b.addEventListener("click",function(){state.leadIn=parseInt(b.getAttribute("data-l"),10);save();renderFlux();});
 });
+document.querySelectorAll("#setupOpts button").forEach(function(b){
+  b.addEventListener("click",function(){state.flowSetup=parseInt(b.getAttribute("data-s"),10);save();renderFlux();});
+});
 $("#voiceOn").addEventListener("change",function(){
   state.voice=this.checked;save();
   if(this.checked)parler("Annonce vocale activée");
@@ -4221,6 +4295,10 @@ $("#flowGo").addEventListener("click",function(){
 });
 $("#flowEdit").addEventListener("click",ouvrirFlux);
 $("#doDone").addEventListener("click",validerDo);
+$("#doHowBtn").addEventListener("click",function(){
+  var o=$("#doGuide").classList.toggle("open");
+  this.textContent=o?"Comment faire ▾":"Comment faire ▸";
+});
 $("#doSkip").addEventListener("click",function(){
   var w=doW;if(!w)return;
   var nx=passer(w);if(!nx)return;
