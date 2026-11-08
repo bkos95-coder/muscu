@@ -350,8 +350,18 @@
   .pain button.sel[data-p="3"]{background:#f57c00}
   .pain button.sel[data-p="4"]{background:#e8590c}
   .pain button.sel[data-p="5"]{background:#c62828}
-  .tpl-item{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:8px}
-  .tpl-item .tn{font-weight:600;font-size:14px;flex:1}
+  .tpl-item{background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:8px}
+  .tpl-top{cursor:pointer}
+  .tpl-item .tn{font-weight:600;font-size:15px}
+  .tpl-acts{display:flex;gap:8px;align-items:center;margin-top:10px}
+  .tpl-acts .tgo{flex:1;padding:9px 10px}
+  .tview{background:#fff;border:1.5px solid var(--ink);border-radius:8px;padding:8px 12px;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;cursor:pointer;color:var(--ink);white-space:nowrap}
+  .tv-meta{font-size:14px;font-weight:600;color:var(--ink-2);margin:0 0 10px}
+  .tv-row{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:6px}
+  .tv-row.auto{background:transparent;border-style:dashed}
+  .tv-name{flex:1;min-width:0;font-weight:600;font-size:14px;line-height:1.25}
+  .tv-name small{display:block;font-weight:400;font-size:12px;color:var(--grey)}
+  .tv-note{font-size:12px;color:var(--grey);margin-top:8px;line-height:1.4}
   .tpl-item .ts{font-size:12px;color:var(--grey)}
   .tpl-item .tgo{background:var(--red);border:none;color:#fff;border-radius:8px;padding:8px 13px;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;cursor:pointer}
   .tpl-item .tdel{background:none;border:none;color:var(--grey);font-size:16px;cursor:pointer;padding:4px}
@@ -386,8 +396,8 @@
   .sheet-card{background:var(--paper,#f4f2ee);width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));max-height:92vh;overflow-y:auto}
   .sheet-title{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:24px;text-transform:uppercase;margin-bottom:6px}
   .sheet-lab{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin:14px 0 6px}
-  .seg{display:flex;flex-direction:column;gap:7px}
-  .seg button{text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:11px;padding:10px 13px;cursor:pointer;font-family:"IBM Plex Sans",sans-serif}
+  .seg{display:flex;flex-direction:column;gap:6px}
+  .seg button{text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:11px;padding:7px 13px;cursor:pointer;font-family:"IBM Plex Sans",sans-serif}
   .seg button b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:18px;text-transform:uppercase;color:var(--ink)}
   .seg button span{font-size:12.5px;color:var(--grey)}
   .seg button.sel{border-color:var(--red);background:#fff5f5}
@@ -395,6 +405,9 @@
   .rest-opts.light button{background:#fff;border:1.5px solid var(--line);color:var(--ink-2)}
   .rest-opts.light button.sel{background:var(--red);border-color:var(--red);color:#fff}
   .sheet-sub{font-style:normal;text-transform:none;letter-spacing:0;font-size:11.5px;color:var(--grey)}
+  .flow-card{display:flex;flex-direction:column;overflow:hidden;padding-bottom:0}
+  .flow-card .sheet-body{flex:1 1 auto;min-height:0;overflow-y:auto;padding-bottom:4px}
+  .sheet-foot{flex:0 0 auto;padding:10px 0 calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--paper)}
   .sheet-check{display:flex;align-items:center;gap:9px;margin:16px 0 14px;font-size:14px}
   .sheet-check input{width:18px;height:18px;accent-color:var(--red)}
   .do-name{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:clamp(30px,9vw,46px);text-transform:uppercase;line-height:1.02;text-align:center;max-width:92vw}
@@ -823,7 +836,8 @@
 </div>
 
 <div class="sheet" id="flowSheet">
-  <div class="sheet-card">
+  <div class="sheet-card flow-card">
+   <div class="sheet-body">
     <div class="sheet-title">Comment tu enchaînes&nbsp;?</div>
     <div class="sheet-lab">Ordre</div>
     <div class="seg" id="flowOrderOpts">
@@ -831,7 +845,11 @@
       <button data-o="series"><b>Série par série</b><span>toutes les séries d'un exo, puis le suivant</span></button>
       <button data-o="manuel"><b>Manuel</b><span>je coche à mon rythme</span></button>
     </div>
-    <div class="sheet-lab">Repos entre deux séries <i class="sheet-sub">en circuit : après chaque exercice</i></div>
+    <div class="sheet-lab">Repos entre deux exercices <i class="sheet-sub">le temps de passer à l'exercice suivant</i></div>
+    <div class="rest-opts light" id="flowPauseExOpts">
+      <button data-x="0">0</button><button data-x="5">5s</button><button data-x="10">10s</button><button data-x="15">15s</button><button data-x="20">20s</button><button data-x="30">30s</button>
+    </div>
+    <div class="sheet-lab">Repos entre deux tours <i class="sheet-sub">série par série : entre deux séries du même exercice</i></div>
     <div class="rest-opts light" id="flowPauseOpts">
       <button data-p="0">0</button><button data-p="15">15s</button><button data-p="30">30s</button><button data-p="45">45s</button><button data-p="60">1min</button><button data-p="90">1m30</button><button data-p="120">2min</button>
     </div>
@@ -844,7 +862,24 @@
       <button data-l="1">1 s</button><button data-l="3">3 s</button><button data-l="5">5 s</button>
     </div>
     <label class="sheet-check"><input type="checkbox" id="voiceOn"> 🔊 Annonce vocale du prochain exercice</label>
-    <button class="btn red block" id="flowGo">C'est parti</button>
+   </div>
+   <div class="sheet-foot"><button class="btn red block" id="flowGo">C'est parti</button></div>
+  </div>
+</div>
+
+<div class="sheet" id="tplView">
+  <div class="sheet-card">
+    <div class="sheet-head">
+      <div class="sheet-title" id="tvName">Modèle</div>
+      <button class="sheet-x" id="tvClose" aria-label="Fermer">✕</button>
+    </div>
+    <div class="tv-meta" id="tvMeta"></div>
+    <div id="tvList"></div>
+    <div class="tv-note" id="tvNote"></div>
+    <div class="row-btns" style="margin-top:12px">
+      <button class="btn ghost" id="tvEdit">✎ Modifier</button>
+      <button class="btn red" id="tvGo">▶ Lancer</button>
+    </div>
   </div>
 </div>
 
@@ -919,8 +954,13 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.20.1";
+var APP_VERSION="1.21.0";
 var CHANGELOG=[
+ {v:"1.21.0",d:"2026-11-08",n:[
+   "Deux repos distincts : entre deux exercices (0 à 30 s) et entre deux tours (jusqu'à 2 min)",
+   "Modèles : bouton 👁 Voir pour consulter le contenu avant de lancer, avec la durée estimée",
+   "En fin de tour de circuit, l'écran de récup l'indique (« Fin du tour »)"
+ ]},
  {v:"1.20.1",d:"2026-11-08",n:[
    "« C'est parti » lance directement le premier exercice (circuit et série par série)"
  ]},
@@ -1057,7 +1097,7 @@ var CHANGELOG=[
    "Récap réel de la semaine, indépendant du programme choisi"
  ]}
 ];
-var state={freq:3,rest:90,dur:40,mode:"equilibre",keepAwake:false,volume:100,fatUnit:"%",height:185,flowOrder:"circuit",flowPause:null,flowSetup:5,leadIn:1,voice:true,history:[],lastCharges:{},chronoDur:{},autoSave:false,lastSession:null,templates:[],hiitCustom:[],weights:[],lastExport:null};
+var state={freq:3,rest:90,dur:40,mode:"equilibre",keepAwake:false,volume:100,fatUnit:"%",height:185,flowOrder:"circuit",flowPause:null,flowPauseEx:10,flowSetup:5,leadIn:1,voice:true,history:[],lastCharges:{},chronoDur:{},autoSave:false,lastSession:null,templates:[],hiitCustom:[],weights:[],lastExport:null};
 var canSave=true;
 try{
   var raw=localStorage.getItem(KEY);
@@ -1076,6 +1116,7 @@ try{
       state.flowPause=[0,15,30,45,60,90,120].indexOf(p.flowPause)>=0?p.flowPause:null;
       state.leadIn=[1,3,5].indexOf(p.leadIn)>=0?p.leadIn:1;
       state.flowSetup=[0,3,5,10,15,20].indexOf(p.flowSetup)>=0?p.flowSetup:5;
+      state.flowPauseEx=[0,5,10,15,20,30].indexOf(p.flowPauseEx)>=0?p.flowPauseEx:10;
       state.voice=p.voice!==false;
       state.fatUnit=p.fatUnit==="kg"?"kg":"%";
       state.height=(typeof p.height==="number"&&p.height>=120&&p.height<=230)?p.height:185;
@@ -1767,7 +1808,7 @@ $("#ovClose").addEventListener("click",chronoStop);
 $("#ovNext").addEventListener("click",function(){
   if(!chrono.from)return;
   var nx=prochainExercice(chrono.from);
-  if(nx)enchainerVers(nx);
+  if(nx)enchainerVers(nx,chrono.from);
 });
 $("#ovSkip").addEventListener("click",function(){
   var nx=passer(chrono.nextW);
@@ -2404,21 +2445,32 @@ function serieFaite(w){
   if(state.flowOrder==="manuel")return;
   var nx=suivantSelonOrdre(w);
   if(!nx){finSeance();return;}
-  enchainerVers(nx);
+  enchainerVers(nx,w);
 }
-function enchainerVers(nx){
-  var p=pauseFlux();
-  if(p>0)recup(nx,p);
+/* Quel repos ? — "exo" : on passe à l'exercice suivant du même tour (repos court)
+                 "tour" : on revient au début du circuit (fin de tour, vraie récup)
+                 "serie" : même exercice, série suivante (série par série) */
+function typePause(w,nx){
+  if(!w||!current||nx===w)return "serie";
+  var L=current.work;
+  return L.indexOf(nx)<=L.indexOf(w)?"tour":"exo";
+}
+function pauseEx(){return typeof state.flowPauseEx==="number"?state.flowPauseEx:10;}
+function enchainerVers(nx,w){
+  var type=typePause(w,nx);
+  var p=type==="exo"?pauseEx():pauseFlux();
+  if(p>0)recup(nx,p,type);
   else lancerExercice(nx,true);
 }
 // Récupération plein écran, puis départ automatique
-function recup(nx,p){
+function recup(nx,p,type){
   fermerDo();
-  chronoOpen("Récup",p,null,function(){lancerExercice(chrono.nextW,true);});
+  var finTour=type==="tour";
+  chronoOpen(finTour?"Fin du tour · récup":"Récup",p,null,function(){lancerExercice(chrono.nextW,true);});
   chrono.nextW=nx;
   $("#chronoOverlay").classList.add("rest");
   majRecup();
-  parler("Récupération. Prochain : "+annonceProchain(nx));
+  parler((finTour?"Fin du tour. ":"")+"Récupération. Prochain : "+annonceProchain(nx));
   chronoGo();
 }
 function majRecup(){
@@ -2550,14 +2602,16 @@ function fermerFin(){$("#endOverlay").classList.remove("open");}
 function resumeFlux(){
   var o={circuit:"Circuit",series:"Série par série",manuel:"Manuel"}[state.flowOrder]||"Circuit";
   var p=pauseFlux();
-  if(state.flowOrder==="manuel")return o+" · repos "+(p>=60?fr(p/60)+" min":p+" s");
-  return o+" · repos "+(p?(p>=60?fr(p/60)+" min":p+" s"):"aucun")+" · mise en place "+(state.flowSetup||0)+" s";
+  function t(x){return x?(x>=60?fr(x/60)+" min":x+" s"):"0";}
+  if(state.flowOrder==="manuel")return o+" · repos "+t(p);
+  return o+" · "+t(pauseEx())+" entre exos · "+t(p)+" entre "+(state.flowOrder==="series"?"séries":"tours")+" · mise en place "+(state.flowSetup||0)+" s";
 }
 function renderFlux(){
   document.querySelectorAll("#flowOrderOpts button").forEach(function(b){b.classList.toggle("sel",b.getAttribute("data-o")===state.flowOrder);});
   document.querySelectorAll("#flowPauseOpts button").forEach(function(b){b.classList.toggle("sel",parseInt(b.getAttribute("data-p"),10)===pauseFlux());});
   document.querySelectorAll("#leadOpts button").forEach(function(b){b.classList.toggle("sel",parseInt(b.getAttribute("data-l"),10)===state.leadIn);});
   document.querySelectorAll("#setupOpts button").forEach(function(b){b.classList.toggle("sel",parseInt(b.getAttribute("data-s"),10)===state.flowSetup);});
+  document.querySelectorAll("#flowPauseExOpts button").forEach(function(b){b.classList.toggle("sel",parseInt(b.getAttribute("data-x"),10)===pauseEx());});
   if($("#voiceOn"))$("#voiceOn").checked=state.voice!==false;
   if($("#flowSummary"))$("#flowSummary").textContent=resumeFlux();
   var p=pauseFlux();
@@ -3016,6 +3070,9 @@ $("#saveTpl").addEventListener("click",function(){
   renderTemplates();
 });
 $("#panOpen").addEventListener("click",ouvrirPanier);
+$("#tvClose").addEventListener("click",fermerApercu);
+$("#tvGo").addEventListener("click",function(){var t=tvTpl;fermerApercu();if(t)lancerModele(t);});
+$("#tvEdit").addEventListener("click",function(){var t=tvTpl;fermerApercu();if(t)chargerModele(t,"edit");});
 $("#panClose").addEventListener("click",fermerPanier);
 $("#panLaunch").addEventListener("click",function(){fermerPanier();$("#startLibre").click();});
 $("#tplCancel").addEventListener("click",function(){
@@ -3025,6 +3082,60 @@ $("#tplCancel").addEventListener("click",function(){
   fermerPanier();
   toast("Modification annulée");
 });
+/* ---------- Aperçu d'un modèle avant de le lancer ---------- */
+// Durée estimée avec les réglages de déroulé actuels (effort + repos + mise en place)
+function dureeEstimee(items){
+  var its=items.map(function(it){return Object.assign({},it);});
+  var nAvant=its.length;
+  ajouterFinisher(its);
+  var sets=its.map(function(it){return it.sets||3;});
+  var travail=0,nbChrono=0;
+  its.forEach(function(it,i){
+    var w=it.chrono?((it.fin&&state.chronoDur&&state.chronoDur[it.k])||it.chrono):40;
+    travail+=w*sets[i];
+    if(it.chrono)nbChrono+=sets[i];
+  });
+  var o=state.flowOrder,ex=pauseEx(),tour=pauseFlux(),repos=0;
+  var total=sets.reduce(function(a,b){return a+b;},0);
+  if(o==="circuit"){
+    var tours=Math.max.apply(null,sets);
+    for(var r=1;r<=tours;r++){
+      var n=sets.filter(function(x){return x>=r;}).length;
+      repos+=Math.max(0,n-1)*ex;
+    }
+    repos+=(tours-1)*tour;
+  }else if(o==="series"){
+    sets.forEach(function(n){repos+=(n-1)*tour;});
+    repos+=(its.length-1)*ex;
+  }else{
+    repos+=Math.max(0,total-1)*tour;
+  }
+  var mep=o==="manuel"?0:nbChrono*(state.flowSetup||0);
+  return {min:Math.max(1,Math.round((travail+repos+mep)/60)),series:total,items:its,finisher:its.length>nAvant};
+}
+var tvTpl=null;
+function ouvrirApercu(t){
+  tvTpl=t;
+  var d=dureeEstimee(t.items);
+  $("#tvName").textContent=t.name;
+  $("#tvMeta").textContent=t.items.length+" exercice"+(t.items.length>1?"s":"")+" · "+d.series+" séries · ≈ "+d.min+" min";
+  var box=$("#tvList");box.innerHTML="";
+  d.items.forEach(function(it,i){
+    var row=el("div","tv-row"+(it.fin?" auto":""));
+    row.appendChild(el("span","pan-num",String(i+1)));
+    row.appendChild(el("div","tv-name",(it.hiit?"<span class='hiittag'>⚡</span> ":"")+esc(it.n)+(it.w?" <span class='warnbadge'>⚠</span>":"")+"<small>"+esc(it.s||"")+(it.fin?" · ajoutée automatiquement":"")+"</small>"));
+    box.appendChild(row);
+  });
+  $("#tvNote").textContent="Durée estimée avec tes réglages : "+resumeFlux()+".";
+  $("#tplView").classList.add("open");
+}
+function fermerApercu(){$("#tplView").classList.remove("open");tvTpl=null;}
+function lancerModele(t){
+  var items=t.items.map(function(it){return Object.assign({},it);});
+  appliquerDurees(items);
+  ajouterFinisher(items);
+  openSession({id:"TPL",letter:"M",title:t.name,sub:items.length+" exercices (modèle)",items:items});
+}
 function renderTemplates(){
   var wrap=$("#tplList");
   var tpls=state.templates||[];
@@ -3033,25 +3144,25 @@ function renderTemplates(){
   wrap.innerHTML="";
   tpls.forEach(function(t,idx){
     var row=el("div","tpl-item");
-    var mid=el("div",null);mid.style.flex="1";
+    var mid=el("div","tpl-top");
     mid.appendChild(el("div","tn",esc(t.name)));
     var nC=t.items.filter(function(it){return it.chrono;}).length;
-    mid.appendChild(el("div","ts",t.items.length+" exercice"+(t.items.length>1?"s":"")+(nC?" · dont "+nC+" chrono"+(nC>1?"s":""):"")));
+    mid.appendChild(el("div","ts",t.items.length+" exercice"+(t.items.length>1?"s":"")+(nC?" · dont "+nC+" chrono"+(nC>1?"s":""):"")+" · ≈ "+dureeEstimee(t.items).min+" min"));
+    mid.addEventListener("click",function(){ouvrirApercu(t);});
     row.appendChild(mid);
-    var go=el("button","tgo","Lancer");
-    go.addEventListener("click",function(){
-      var items=t.items.map(function(it){return Object.assign({},it);});
-      appliquerDurees(items);
-      ajouterFinisher(items);
-      openSession({id:"TPL",letter:"M",title:t.name,sub:items.length+" exercices (modèle)",items:items});
-    });
-    row.appendChild(go);
+    var acts=el("div","tpl-acts");
+    var voir=el("button","tview","👁 Voir");voir.setAttribute("aria-label","Voir le contenu de ce modèle");
+    voir.addEventListener("click",function(){ouvrirApercu(t);});
+    acts.appendChild(voir);
+    var go=el("button","tgo","▶ Lancer");
+    go.addEventListener("click",function(){lancerModele(t);});
+    acts.appendChild(go);
     var ed=el("button","tbtn","✎");ed.setAttribute("aria-label","Modifier ce modèle");
     ed.addEventListener("click",function(){chargerModele(t,"edit");});
-    row.appendChild(ed);
+    acts.appendChild(ed);
     var dup=el("button","tbtn","⧉");dup.setAttribute("aria-label","Dupliquer ce modèle");
     dup.addEventListener("click",function(){chargerModele(t,"copy");});
-    row.appendChild(dup);
+    acts.appendChild(dup);
     var del=el("button","tdel","✕");del.setAttribute("aria-label","Supprimer ce modèle");
     del.addEventListener("click",function(){
       if(!confirm("Supprimer le modèle « "+t.name+" » ?"))return;
@@ -3060,7 +3171,8 @@ function renderTemplates(){
       if(tplEdit&&tplEdit.ref===t){tplEdit=null;basket={};$("#tplName").value="";renderLib();}
       save();sauvegardeServeur(state);renderTemplates();
     });
-    row.appendChild(del);
+    acts.appendChild(del);
+    row.appendChild(acts);
     wrap.appendChild(row);
   });
 }
@@ -3510,6 +3622,7 @@ $("#impFile").addEventListener("change",function(){
       state.flowPause=[0,15,30,45,60,90,120].indexOf(p.flowPause)>=0?p.flowPause:null;
       state.leadIn=[1,3,5].indexOf(p.leadIn)>=0?p.leadIn:1;
       state.flowSetup=[0,3,5,10,15,20].indexOf(p.flowSetup)>=0?p.flowSetup:5;
+      state.flowPauseEx=[0,5,10,15,20,30].indexOf(p.flowPauseEx)>=0?p.flowPauseEx:10;
       state.voice=p.voice!==false;
       state.fatUnit=p.fatUnit==="kg"?"kg":"%";
       state.height=(typeof p.height==="number"&&p.height>=120&&p.height<=230)?p.height:185;
@@ -4286,6 +4399,9 @@ document.querySelectorAll("#leadOpts button").forEach(function(b){
 });
 document.querySelectorAll("#setupOpts button").forEach(function(b){
   b.addEventListener("click",function(){state.flowSetup=parseInt(b.getAttribute("data-s"),10);save();renderFlux();});
+});
+document.querySelectorAll("#flowPauseExOpts button").forEach(function(b){
+  b.addEventListener("click",function(){state.flowPauseEx=parseInt(b.getAttribute("data-x"),10);save();renderFlux();});
 });
 $("#voiceOn").addEventListener("change",function(){
   state.voice=this.checked;save();
