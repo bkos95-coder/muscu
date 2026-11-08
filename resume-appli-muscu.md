@@ -2,7 +2,7 @@
 
 Application de suivi de musculation, HIIT, callisthénie, course et santé du dos, construite sur mesure pour Benjamin.
 
-**Version actuelle : 1.26.0** — 8 novembre 2026
+**Version actuelle : 1.27.0** — 8 novembre 2026
 
 ---
 
@@ -21,7 +21,8 @@ Application de suivi de musculation, HIIT, callisthénie, course et santé du do
 
 - Application **mono-fichier** installée en **PWA** sur le téléphone (Honor Magic 6 Pro) : icône d'accueil, plein écran, **fonctionne hors réseau**.
 - En ligne : **https://bkos95-coder.github.io/muscu/** (GitHub, dépôt `muscu`).
-- **Mise à jour** : remplacer `index.html` et `sw.js` sur GitHub, puis vérifier le numéro de version en bas de l'onglet Historique.
+- **Mise à jour** : Claude publie directement chaque nouvelle version sur GitHub depuis la conversation (envoi groupé de `index.html` et `sw.js`, puis vérification de la publication et des fichiers en ligne). Sur le téléphone, il suffit de fermer et rouvrir l'appli : elle se recharge toute seule.
+- **Jeton GitHub « Claude muscu »** : accès limité au seul dépôt `muscu` (contenu en lecture/écriture, Pages, métadonnées), **valable jusqu'au 31 mars 2027**. À recoller dans chaque nouvelle conversation ; à l'échéance, *Regenerate token* dans GitHub. Le jeton n'est stocké ni dans ce document ni en mémoire.
 - **Sauvegarde** : automatique sur le serveur AGEOTERRA en fin de séance, plus export / import d'un fichier JSON.
 
 ---
@@ -61,6 +62,7 @@ Application de suivi de musculation, HIIT, callisthénie, course et santé du do
 
 ### 🧩 Libre et modèles
 
+- **Fiche de chaque exercice** : toucher un exercice déplie sa fiche (type, schéma, consigne, guide complet, ⚠ expliqué) avec un bouton « + Ajouter à ma sélection » ; le « + » à droite reste l'ajout direct.
 - **Bibliothèque** :
   - musculation par groupe musculaire ;
   - **28 exercices de callisthénie** en 4 groupes 🤸 : Tirage, Poussée, Jambes, Gainage & statiques ;
@@ -139,6 +141,7 @@ Application de suivi de musculation, HIIT, callisthénie, course et santé du do
 | 1.24.0 | « Tout régler d'un coup » |
 | 1.25.0 | Lecteur HIIT aligné, fractionné course avec verrou, circuit HIIT en modèle |
 | 1.26.0 | Calories estimées partout |
+| 1.27.0 | Fiche dépliable de chaque exercice dans le Libre, 108 apostrophes rétablies dans les guides — première version publiée directement depuis la conversation |
 
 ---
 
@@ -168,7 +171,6 @@ Application de suivi de musculation, HIIT, callisthénie, course et santé du do
 - Semaines allégées planifiées
 - Rappels de régularité
 - Import GPX Garmin
-- Nettoyage des apostrophes manquantes dans certains guides d'exercice
 
 ---
 
@@ -176,7 +178,8 @@ Application de suivi de musculation, HIIT, callisthénie, course et santé du do
 
 | | |
 |---|---|
-| Fichiers à déployer | `index.html` · `sw.js` (les deux numéros de version doivent correspondre) |
+| Fichiers à déployer | `index.html` · `sw.js` (les deux numéros de version doivent correspondre), envoyés en un seul commit sur la branche `main` |
+| Publication | API GitHub (jeton à portée limitée), puis contrôle de la publication GitHub Pages et comparaison octet par octet des fichiers en ligne |
 | Autres fichiers PWA | `manifest.webmanifest` · icônes 192, 512 et maskable |
 | Stockage | `localStorage`, clé `monProgMuscu_v3` (migration automatique depuis la v2) |
 | Minuteurs | Basés sur l'horloge réelle : ils restent justes après un gel d'écran Android |
