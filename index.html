@@ -919,8 +919,11 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.20.0";
+var APP_VERSION="1.20.1";
 var CHANGELOG=[
+ {v:"1.20.1",d:"2026-11-08",n:[
+   "« C'est parti » lance directement le premier exercice (circuit et série par série)"
+ ]},
  {v:"1.20.0",d:"2026-11-08",n:[
    "Pendant un exercice chronométré : « Ensuite : … » affiché, et annoncé à la voix 10 s avant la fin",
    "Page d'exercice à répétitions : consigne, « Comment faire », suite annoncée et bouton « Fait · suivant »"
@@ -2358,7 +2361,9 @@ function suivantApresPasse(w){
   return null;
 }
 /* Annonce vocale (synthèse du téléphone, fonctionne hors ligne) */
+var voixPrefixe="";   // ex. "C'est parti. " ajouté à l'annonce suivante
 function parler(txt){
+  txt=voixPrefixe+txt;voixPrefixe="";
   if(!state.voice||volumeFactor()===0)return;
   var ss=window.speechSynthesis;
   if(!ss||typeof SpeechSynthesisUtterance==="undefined")return;
@@ -4288,10 +4293,21 @@ $("#voiceOn").addEventListener("change",function(){
 });
 $("#flowGo").addEventListener("click",function(){
   initAudio();fermerFlux();
-  if(state.flowOrder!=="manuel"&&current){
-    var w=current.work.find(function(x){return x.sets.indexOf(false)>=0;});
-    if(w)parler("C'est parti. Premier exercice : "+annonceProchain(w));
+  if(state.flowOrder==="manuel"||!current)return;
+  // seulement au tout début de la séance : si on rouvre le panneau en cours
+  // de route pour changer un réglage, on ne relance pas tout
+  if(current.work.some(function(x){return x.sets.some(Boolean);}))return;
+  var w=current.work.find(function(x){return x.sets.indexOf(false)>=0;});
+  if(!w)return;
+  voixPrefixe="C'est parti. ";
+  if(w.item.chrono){
+    // premier exercice chronométré : au moins le décompte, le temps de poser le téléphone
+    lancerChrono(w,false);
+    demarrerAvecMiseEnPlace(true,Math.max(state.flowSetup||0,state.leadIn||1));
+  }else{
+    afficherDo(w);
   }
+  voixPrefixe="";
 });
 $("#flowEdit").addEventListener("click",ouvrirFlux);
 $("#doDone").addEventListener("click",validerDo);
