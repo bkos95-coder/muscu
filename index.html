@@ -419,6 +419,30 @@
   .h-skip,.h-lock{font-size:14px;padding:9px 20px}
   .h-lock{display:none}
   .wr-kcal{font-size:12.5px;color:#b8550b;margin-top:3px;font-weight:600}
+  .anim{--an-n:var(--ink);--an-f:#b9b3aa;--an-eq:#9a958d;--an-sol:#dcd7cf;max-width:300px;margin:0 auto}
+  .anim.sombre{--an-n:#f1eee8;--an-f:#6f6a63;--an-eq:#8a857d;--an-sol:#3a3734}
+  .anim svg{width:100%;height:auto;display:block}
+  .an-sol{stroke:var(--an-sol);stroke-width:2}.an-eq{fill:var(--an-eq)}.an-barre{stroke:var(--an-eq);stroke-width:5;stroke-linecap:round}
+  .an-near{stroke:var(--an-n)}.an-far{stroke:var(--an-f)}.an-mv{stroke:#e0603a}
+  .an-jambe,.an-bras,.an-torse,.an-ep{fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .an-jambe{stroke-width:7}.an-bras{stroke-width:6}.an-torse{stroke-width:11}.an-ep{stroke-width:7}
+  .an-tete{fill:var(--an-n)}.an-ok{stroke:#1D9E75;stroke-width:3;stroke-dasharray:6 5;stroke-linecap:round}.an-poids{fill:var(--an-eq)}
+  .an-ph{font-size:12.5px;color:var(--grey);text-align:center;min-height:1.3em;margin-top:2px}
+  .anim.sombre .an-ph{color:#b9b3aa}
+  .ld-anim{background:#faf9f6;border-radius:10px;padding:6px 8px;margin:2px 0 10px;max-width:none}
+  .ex-guide .anim{background:#faf9f6;border-radius:10px;padding:6px 8px;margin:0 0 8px;max-width:none}
+  .do-anim{width:min(46vw,180px)}
+  .ov-anim{width:min(34vw,140px)}
+  /* écrans plein écran : rien ne s'écrase, et ça défile si le téléphone est petit */
+  #doOverlay,#hiitOverlay,#chronoOverlay{overflow-y:auto;justify-content:safe center}
+  #doOverlay>*,#hiitOverlay>*,#chronoOverlay>*{flex-shrink:0}
+  @media (max-height:780px){
+    .overlay{gap:6px;padding:18px 20px}
+    .ov-time{font-size:clamp(96px,30vw,180px)}
+    #doOverlay .do-done{height:min(30vw,112px)}
+    .ov-anim{width:min(28vw,110px)}
+    .do-anim{width:min(40vw,150px)}
+  }
   .run-reps{display:flex;align-items:center;gap:14px}
   .run-reps b{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:26px;min-width:34px;text-align:center}
   .run-sum{margin-top:14px;font-size:14px;font-weight:600;color:var(--ink-2)}
@@ -902,6 +926,7 @@
   <div class="ov-total" id="hTotal"><span>Séance</span><b id="hTotalVal">0:00</b></div>
   <div class="ov-serie on" id="hTourBox"><span id="hTourLab">Tour</span><b id="hTourNum">1 / 2</b></div>
   <div class="h-phase" id="hPhase">EFFORT</div>
+  <div class="anim sombre ov-anim" id="hAnim" style="display:none"></div>
   <div class="h-exname" id="hExName">Squat</div>
   <div class="ov-time" id="hTime">0:30</div>
   <div class="ov-bar"><i id="hBar"></i></div>
@@ -997,6 +1022,7 @@
   <div class="ov-label" id="doStep">À toi</div>
   <div class="do-name" id="doName">Exercice</div>
   <div class="do-meta" id="doMeta">Série 1/5</div>
+  <div class="anim sombre do-anim" id="doAnim"></div>
   <div class="do-tip" id="doTip"></div>
   <button class="do-how" id="doHowBtn">Comment faire ▸</button>
   <div class="do-guide" id="doGuide"></div>
@@ -1022,6 +1048,7 @@
 <div class="overlay" id="chronoOverlay">
   <div class="ov-total" id="ovTotal"><span>Séance</span><b id="ovTotalVal">0:00</b></div>
   <div class="ov-serie" id="ovSerie"><span>Série</span><b id="ovSerieNum">1 / 5</b></div>
+  <div class="anim sombre ov-anim" id="ovAnim" style="display:none"></div>
   <div class="ov-label" id="ovLabel">Planche</div>
   <div class="ov-time" id="ovTime">0:50</div>
   <div class="ov-done">Terminé 💪</div>
@@ -1050,8 +1077,12 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.27.0";
+var APP_VERSION="1.28.0";
 var CHANGELOG=[
+ {v:"1.28.0",d:"2026-11-08",n:[
+   "Schémas animés pour les 127 exercices : fiche du Libre, page « À toi », écran du chrono, lecteur HIIT et « Comment faire » des séances",
+   "Ligne verte = ce qui reste droit (dos, alignement) · orange = le membre qui travaille · consigne du moment sous le schéma"
+ ]},
  {v:"1.27.0",d:"2026-11-08",n:[
    "Libre : toucher un exercice ouvre sa fiche (type, consigne, comment faire, ⚠) avec un bouton pour l’ajouter ; « + » reste l’ajout direct",
    "Guides d’exercice : 108 apostrophes rétablies (« c’est », « jusqu’à », « l’avant-pied »…)"
@@ -1937,6 +1968,7 @@ function chronoOpen(label,seconds,key,onDone){
   var ovx=$("#chronoOverlay");ovx.classList.remove("rest","has-next","lead","running","paused");
   if($("#ovEnsuite")){$("#ovEnsuite").textContent="";$("#ovEnsuite").classList.remove("imminent");}
   if($("#ovSerie"))$("#ovSerie").classList.remove("on");
+  anCacher($("#ovAnim"));
   chrono.onDone=typeof onDone==="function"?onDone:null;
   if(chrono.key&&state.chronoDur&&state.chronoDur[chrono.key])seconds=state.chronoDur[chrono.key];
   chrono.total=seconds;chrono.left=seconds;
@@ -2337,6 +2369,7 @@ function hiitRenderPhase(){
   for(var j=hiit.idx+1;j<hiit.seq.length;j++){var q=hiit.seq[j];if(q.type==="work"||q.type==="run"){nxt=q;break;}}
   var boite=$("#hTourBox");
   if(course){
+    anCacher($("#hAnim"));
     if(p.rep){boite.classList.add("on");$("#hTourLab").textContent="Répétition";$("#hTourNum").innerHTML="<em>"+p.rep+"</em> / "+hiit.reps;}
     else boite.classList.remove("on");
     if(p.type==="lead"){
@@ -2358,6 +2391,9 @@ function hiitRenderPhase(){
     $("#hSkip").textContent=p.type==="run"?"⏭ Passer à la marche":p.type==="lead"?"⏭ Partir maintenant":"⏭ Passer";
     return;
   }
+  // schéma : l'exercice en cours, ou le prochain pendant la récup
+  var exAnim=(p.type==="work"||p.type==="lead")?p.ex:(nxt?nxt.ex:null);
+  if(exAnim)anAfficher($("#hAnim"),exAnim);else anCacher($("#hAnim"));
   boite.classList.add("on");$("#hTourLab").textContent="Tour";
   $("#hTourNum").innerHTML="<em>"+p.tour+"</em> / "+hiit.tours;
   if(p.type==="work"||p.type==="lead"){
@@ -2993,6 +3029,7 @@ function lancerChrono(w,auto,miseEnPlace){
   });
   chrono.from=w;
   majSerie();
+  anAfficher($("#ovAnim"),w.item);
   if(auto){
     if(miseEnPlace)demarrerAvecMiseEnPlace(true,state.flowSetup);
     else{parler(w.item.n);chronoGo();}
@@ -3044,6 +3081,7 @@ function afficherDo(w){
   $("#doStep").textContent="À toi";
   $("#doName").textContent=w.item.n;
   $("#doMeta").textContent="Série "+serieNum(w)+"/"+w.sets.length+" · "+(w.item.s||"");
+  anMonter($("#doAnim"),w.item,{label:true});
   $("#doTip").textContent=w.item.v||"";
   $("#doTip").style.display=w.item.v?"block":"none";
   var g=w.item.g||"";
@@ -3136,6 +3174,10 @@ function renderSessionCards(){
       gt.addEventListener("click",function(){
         card.classList.toggle("showg");
         gt.textContent=card.classList.contains("showg")?"▾ Comment faire":"▸ Comment faire";
+        // le schéma n'est créé qu'à la première ouverture
+        if(card.classList.contains("showg")&&!gd._an&&gd.insertBefore){
+          var anS=el("div","anim");gd.insertBefore(anS,gd.firstChild);anMonter(anS,it,{label:true});gd._an=true;
+        }
       });
       card.appendChild(gt);
       card.appendChild(gd);
@@ -3329,6 +3371,325 @@ var CALI_LIB={
   {k:"cali_compressions",n:"Compressions assis",s:"3 × 10",sets:3,v:"Jambes tendues · lever sans élan",g:"Assis jambes tendues, mains posées à côté des genoux. Soulève les deux talons du sol en contractant les fléchisseurs de hanche et les abdos, sans te pencher en arrière. Prépare au L-sit."}]
 };
 CALI_LIB&&Object.keys(CALI_LIB).forEach(function(g){CALI_LIB[g].forEach(function(e){e.noCharge=true;e.cali=true;});});
+/* ---------- Schémas animés des exercices ----------
+   Silhouette en fil de fer, de profil (vue "side") ou de face (vue "front").
+   Chaque exercice = une suite de poses-clés ; les bras et jambes sont calculés
+   par cinématique inverse (longueurs constantes), donc aucune déformation. */
+var AN_L={TO:60,TH:46,SH:46,UA:30,FA:30},AN_NS="http://www.w3.org/2000/svg";
+function anIK(a,t,l1,l2,s){var dx=t[0]-a[0],dy=t[1]-a[1],d=Math.min(Math.hypot(dx,dy)||0.01,l1+l2-0.01),b=Math.atan2(dy,dx),c=(l1*l1+d*d-l2*l2)/(2*l1*d);c=Math.max(-1,Math.min(1,c));var g=b+s*Math.acos(c),m=[a[0]+l1*Math.cos(g),a[1]+l1*Math.sin(g)],e=Math.atan2(t[1]-m[1],t[0]-m[0]);return [m,[m[0]+l2*Math.cos(e),m[1]+l2*Math.sin(e)]];}
+function anLerp(a,b,k){if(a===undefined)return b;if(b===undefined)return a;if(typeof a==="number")return a+(b-a)*k;return [a[0]+(b[0]-a[0])*k,a[1]+(b[1]-a[1])*k];}
+function anMix(A,B,k){var p={},keys={};for(var x in A)keys[x]=1;for(var y in B)keys[y]=1;for(var z in keys)p[z]=anLerp(A[z],B[z],k);return p;}
+function anEase(u){return u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2;}
+/* Pose calculée : épaule, tête, genoux, coudes, mains, pieds */
+function anCompute(sp,q){
+  var front=sp.v==="front",S=sp.s||{},o={};
+  var sh;
+  if(q.sh)sh=q.sh;else{var t=(q.t||0)*Math.PI/180;sh=[q.hip[0]+AN_L.TO*Math.sin(t),q.hip[1]-AN_L.TO*Math.cos(t)];}
+  o.hip=q.hip;o.sh=sh;
+  var dx=sh[0]-q.hip[0],dy=sh[1]-q.hip[1],len=Math.hypot(dx,dy)||1;o.u=[dx/len,dy/len];
+  o.hc=q.hd?[sh[0]+q.hd[0],sh[1]+q.hd[1]]:[sh[0]+o.u[0]*18,sh[1]+o.u[1]*18];
+  var hr=front?[q.hip[0]+10,q.hip[1]]:q.hip,hl=front?[q.hip[0]-10,q.hip[1]]:q.hip;
+  var sr=front?[sh[0]+16,sh[1]]:sh,sl=front?[sh[0]-16,sh[1]]:sh;
+  var ll={lf:[hr,AN_L.TH,AN_L.SH,S.lf!==undefined?S.lf:(front?-1:-1)],lb:[hl,AN_L.TH,AN_L.SH,S.lb!==undefined?S.lb:(front?1:-1)],
+          af:[sr,AN_L.UA,AN_L.FA,S.af!==undefined?S.af:(front?1:1)],ab:[sl,AN_L.UA,AN_L.FA,S.ab!==undefined?S.ab:(front?-1:1)]};
+  for(var k in ll){var r=ll[k],j=anIK(r[0],q[k],r[1],r[2],r[3]);o[k]=[r[0],j[0],j[1]];}
+  o.toe={lf:q.tf,lb:q.tb};o.q=q;
+  return o;
+}
+function anEl(p,tag,at){var e=document.createElementNS(AN_NS,tag);for(var k in at)e.setAttribute(k,at[k]);p.appendChild(e);return e;}
+/* Matériel fixe (banc, barre, mur, box…) */
+function anDecor(svg,sp){
+  anEl(svg,"line",{x1:-10,y1:190,x2:270,y2:190,"class":"an-sol"});
+  (sp.eq||[]).forEach(function(e){
+    var c={"class":"an-eq"};
+    if(e[0]==="banc"){anEl(svg,"rect",{x:e[1],y:e[3],width:e[2]-e[1],height:8,rx:3,"class":"an-eq"});anEl(svg,"rect",{x:e[1]+8,y:e[3]+8,width:5,height:182-e[3],"class":"an-eq"});anEl(svg,"rect",{x:e[2]-13,y:e[3]+8,width:5,height:182-e[3],"class":"an-eq"});}
+    else if(e[0]==="barre"){anEl(svg,"line",{x1:e[1],y1:e[3],x2:e[2],y2:e[3],"class":"an-barre"});}
+    else if(e[0]==="mur"){anEl(svg,"rect",{x:e[1],y:10,width:7,height:180,"class":"an-eq"});}
+    else if(e[0]==="box"){anEl(svg,"rect",{x:e[1],y:190-e[3],width:e[2],height:e[3],rx:3,"class":"an-eq"});}
+    else if(e[0]==="poteau"){anEl(svg,"rect",{x:e[1],y:e[2],width:6,height:190-e[2],"class":"an-eq"});}
+    else if(e[0]==="incline"){anEl(svg,"line",{x1:e[1],y1:e[2],x2:e[3],y2:e[4],"class":"an-barre"});anEl(svg,"rect",{x:e[3]-4,y:e[4],width:6,height:190-e[4],"class":"an-eq"});}
+    else if(e[0]==="pupitre"){anEl(svg,"line",{x1:e[1],y1:e[2],x2:e[3],y2:e[4],"class":"an-barre"});anEl(svg,"rect",{x:(e[1]+e[3])/2-3,y:Math.max(e[2],e[4]),width:6,height:190-Math.max(e[2],e[4]),"class":"an-eq"});}
+  });
+}
+function anBuild(svg,sp){
+  anDecor(svg,sp);
+  var mv=sp.move||[],front=sp.v==="front";
+  function cl(k){return mv.indexOf(k)>=0?"an-mv":(front?"an-near":(k[1]==="b"?"an-far":"an-near"));}
+  var g={};
+  g.lb=anEl(svg,"polyline",{"class":cl("lb")+" an-jambe"});g.ab=anEl(svg,"polyline",{"class":cl("ab")+" an-bras"});
+  g.hl=anEl(svg,"line",{"class":"an-ok"});
+  g.torse=anEl(svg,"path",{"class":"an-near an-torse"});
+  if(front){g.ep=anEl(svg,"line",{"class":"an-near an-ep"});g.ha=anEl(svg,"line",{"class":"an-near an-ep"});}
+  g.lf=anEl(svg,"polyline",{"class":cl("lf")+" an-jambe"});g.af=anEl(svg,"polyline",{"class":cl("af")+" an-bras"});
+  g.tete=anEl(svg,"circle",{r:11,"class":"an-tete"});
+  g.dyn=(sp.dyn||[]).map(function(d){return anEl(svg,d[0]==="disque"?"circle":"rect",{rx:2,"class":"an-poids"});});
+  return g;
+}
+function anPts(a){return a.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1);}).join(" ");}
+function anDraw(g,sp,q){
+  var o=anCompute(sp,q),front=sp.v==="front";
+  ["lf","lb"].forEach(function(k){var c=o[k],pts=[c[0],c[1],c[2]];var toe=o.toe[k];
+    if(toe)pts.push(toe);else if(sp.pied!==0){var f=sp.pied||[12,3];pts.push([c[2][0]+(front?(k==="lf"?6:-6):f[0]),c[2][1]+(front?3:f[1])]);}
+    g[k].setAttribute("points",anPts(pts));});
+  ["af","ab"].forEach(function(k){g[k].setAttribute("points",anPts(o[k]));});
+  var hp=o.hip,s=o.sh,cb=q.cb||0;
+  var mx=(hp[0]+s[0])/2+o.u[1]*cb,my=(hp[1]+s[1])/2-o.u[0]*cb;
+  g.torse.setAttribute("d","M"+hp[0].toFixed(1)+","+hp[1].toFixed(1)+" Q"+mx.toFixed(1)+","+my.toFixed(1)+" "+s[0].toFixed(1)+","+s[1].toFixed(1));
+  if(front){g.ep.setAttribute("x1",s[0]-16);g.ep.setAttribute("y1",s[1]);g.ep.setAttribute("x2",s[0]+16);g.ep.setAttribute("y2",s[1]);
+    g.ha.setAttribute("x1",hp[0]-10);g.ha.setAttribute("y1",hp[1]);g.ha.setAttribute("x2",hp[0]+10);g.ha.setAttribute("y2",hp[1]);}
+  g.tete.setAttribute("cx",o.hc[0].toFixed(1));g.tete.setAttribute("cy",o.hc[1].toFixed(1));
+  var a=null,b=null;
+  if(sp.hl==="dos"&&!front){var n=[o.u[1],-o.u[0]],sg=sp.dosCote||1;a=[hp[0]+n[0]*10*sg,hp[1]+n[1]*10*sg];b=[s[0]+n[0]*10*sg,s[1]+n[1]*10*sg];}
+  else if(sp.hl==="corps"){a=[o.lf[2][0],o.lf[2][1]-9];b=[o.hc[0],o.hc[1]-9];}
+  else if(sp.hl==="pont"){var jp=o.lf[2][1]>=o.lb[2][1]?o.lf:o.lb;a=[s[0],s[1]-10];b=[jp[1][0],jp[1][1]-10];}
+  else if(sp.hl==="vertical"){a=[hp[0]-14,hp[1]];b=[s[0]-14,s[1]];}
+  if(a){g.hl.setAttribute("x1",a[0].toFixed(1));g.hl.setAttribute("y1",a[1].toFixed(1));g.hl.setAttribute("x2",b[0].toFixed(1));g.hl.setAttribute("y2",b[1].toFixed(1));g.hl.style.display="";}
+  else g.hl.style.display="none";
+  (sp.dyn||[]).forEach(function(d,i){var e=g.dyn[i],h;
+    if(d[1]==="mains"){var A=o.af[2],B=o.ab[2];h=[(A[0]+B[0])/2,(A[1]+B[1])/2];}else if(d[1]==="hanche"){h=[hp[0],hp[1]-12];}else if(d[1]==="nuque"){h=[s[0]+o.u[1]*9-o.u[0]*2,s[1]-o.u[0]*9-o.u[1]*2];}else h=o[d[1]][2];
+    if(d[0]==="disque"){e.setAttribute("cx",h[0].toFixed(1));e.setAttribute("cy",h[1].toFixed(1));e.setAttribute("r",d[2]||9);}
+    else{var w=d[0]==="hv"?9:22,ht=d[0]==="hv"?22:9;e.setAttribute("x",(h[0]-w/2).toFixed(1));e.setAttribute("y",(h[1]-ht/2).toFixed(1));e.setAttribute("width",w);e.setAttribute("height",ht);}});
+}
+/* Position dans le cycle : poses-clés enchaînées, avec un temps d'arrêt sur chacune */
+function anEtat(sp,t){
+  var K=sp.K,n=K.length;if(n===1)return {q:K[0],lab:(sp.ph&&sp.ph[0])||"Tiens…"};
+  var H=sp.h!==undefined?sp.h:0.35,D=[],cyc=0,i;
+  for(i=0;i<n;i++){D.push((sp.mm&&sp.mm[i])||sp.m||1.1);cyc+=D[i]+H;}
+  var u=((t%cyc)+cyc)%cyc;i=0;while(i<n-1&&u>=D[i]+H){u-=D[i]+H;i++;}
+  var a=K[i],b=K[(i+1)%n],lab=(sp.ph&&sp.ph[i])||"";
+  if(u<H)return {q:a,lab:lab};
+  return {q:anMix(a,b,anEase(Math.min(1,(u-H)/D[i]))),lab:lab};
+}
+/* Poses des exercices (coordonnées : sol y=190, chevilles debout y=184, tête vers y≈0) */
+function P(b,o){var r={};for(var k in b)r[k]=b[k];for(var j in o)r[j]=o[j];return r;}
+var AN_ST={hip:[130,92],t:0,lf:[134,184],lb:[127,184],af:[133,160],ab:[128,160]};
+var AN_FR={hip:[130,94],sh:[130,34],lf:[138,184],lb:[122,184],af:[150,160],ab:[110,160]};
+/* pompes : corps rectiligne depuis la cheville, angle th (degrés) */
+function anCorps(an,th,lj){lj=lj||92;var r=th*Math.PI/180,c=Math.cos(r),s=Math.sin(r);return {hip:[an[0]+lj*c,an[1]-lj*s],sh:[an[0]+(lj+60)*c,an[1]-(lj+60)*s]};}
+function anPompe(o){o=o||{};var an=o.an||[58,184],h=o.mains||[204,186],ht=anCorps(an,o.thH!==undefined?o.thH:22.4),bs=anCorps(an,o.thB!==undefined?o.thB:6);
+  var base={lf:an,lb:[an[0]-4,an[1]],af:h,ab:[h[0]-4,h[1]]};
+  return {haut:P(base,ht),bas:P(base,bs)};}
+var PU=anPompe();
+var PLANCHE_C=P(anCorps([58,184],11.5),{lf:[58,184],lb:[54,184],af:[226,186],ab:[222,186]});
+PLANCHE_C.sh=[196,156];PLANCHE_C.hip=[148,166];
+/* couché sur le dos, tête à gauche */
+var AN_DOS={hip:[120,180],sh:[60,180],hd:[-17,0],lf:[178,184],lb:[174,184],af:[122,187],ab:[118,187]};
+/* à plat ventre, tête à droite */
+var AN_VENTRE={hip:[110,180],sh:[170,180],hd:[17,-1],lf:[18,183],lb:[22,183],af:[230,183],ab:[226,183]};
+/* quatre pattes */
+var AN_QP={hip:[100,138],sh:[158,122],lf:[56,184],lb:[54,184],af:[163,184],ab:[159,184]};
+/* suspendu à la barre */
+var AN_PEND={hip:[152,130],sh:[154,70],lf:[110,176],lb:[114,176],af:[160,10],ab:[156,10]};
+var AN_TRACT={hip:[152,82],sh:[154,22],lf:[110,128],lb:[114,128],af:[160,10],ab:[156,10]};
+var BARRE_H=["barre",96,214,10];
+/* couché sur un banc (développés) */
+var AN_BANC={hip:[134,138],sh:[74,138],hd:[-17,0],lf:[176,184],lb:[172,184]};
+var DEB_SQ={hip:[150,96],t:0,lf:[156,184],lb:[150,184]},BAS_SQ={hip:[127,146],t:28,lf:[156,184],lb:[150,184]};
+var FENTE={hip:[122,136],t:0,lf:[172,184],lb:[78,184],tb:[88,189],af:[132,140],ab:[128,140]};
+var FENTE2={hip:[122,136],t:0,lb:[172,184],lf:[78,184],tf:[88,189],af:[132,140],ab:[128,140]};
+var DEB_F=P(AN_ST,{hip:[125,92],lf:[128,184],lb:[122,184],af:[132,140],ab:[128,140]});
+
+var AN_SPECS={};
+function S(k,sp){AN_SPECS[k]=sp;}
+/* ----- Squats ----- */
+S("gobelet",{K:[P(DEB_SQ,{af:[168,40],ab:[165,42]}),P(BAS_SQ,{af:[173,97],ab:[170,99]})],dyn:[["hv","af"]],hl:"dos",ph:["Descends, buste droit","Pousse dans les talons"]});
+S("squat",{K:[P(DEB_SQ,{t:4,af:[143,40],ab:[140,42]}),P(BAS_SQ,{hip:[124,146],t:36,af:[148,100],ab:[145,102]})],dyn:[["disque","nuque",8]],hl:"dos",s:{af:-1,ab:-1},ph:["Descends, dos gainé","Remonte en poussant le sol"]});
+S("hiit_squat_poids_de_corps",{K:[P(DEB_SQ,{af:[152,160],ab:[149,160]}),P(BAS_SQ,{af:[214,96],ab:[211,98]})],hl:"dos",ph:["Descends, bras devant","Remonte"]});
+S("hiit_squat_pulse",{K:[P(BAS_SQ,{hip:[134,132],t:24,af:[214,90],ab:[211,92]}),P(BAS_SQ,{af:[214,96],ab:[211,98]})],m:0.45,h:0.05,hl:"dos",ph:["Petites pulsations en bas","…"]});
+S("hiit_squats_sautes",{K:[P(BAS_SQ,{af:[214,96],ab:[211,98]}),P(DEB_SQ,{hip:[150,86],lf:[158,174],lb:[152,174],af:[176,-24],ab:[172,-22]})],m:0.55,h:0.1,hl:"dos",ph:["Saute","Réception amortie"]});
+S("hiit_squat_sumo",{v:"front",K:[P(AN_FR,{lf:[168,184],lb:[92,184],af:[134,124],ab:[126,124]}),P(AN_FR,{hip:[130,136],sh:[130,76],lf:[168,184],lb:[92,184],af:[134,164],ab:[126,164]})],dyn:[["hv","mains"]],ph:["Descends, genoux vers l’extérieur","Remonte"]});
+S("hiit_chaise_au_mur",{eq:[["mur",88]],K:[{hip:[112,140],t:0,lf:[158,184],lb:[154,184],af:[152,136],ab:[148,138]}],hl:"dos",ph:["Tiens, dos collé au mur"]});
+S("hiit_chaise_au_mur_bras",{eq:[["mur",88]],K:[{hip:[112,140],t:0,lf:[158,184],lb:[154,184],af:[172,80],ab:[168,82]},{hip:[112,140],t:0,lf:[158,184],lb:[154,184],af:[120,22],ab:[116,24]}],hl:"dos",ph:["Monte les bras","Redescends"]});
+S("cali_pistol_assiste",{eq:[["poteau",212,30]],K:[P(DEB_SQ,{lb:[176,176],af:[208,74],ab:[190,90]}),{hip:[124,140],t:32,lf:[156,184],lb:[216,140],af:[208,112],ab:[214,100]}],hl:"dos",ph:["Descends sur une jambe","Remonte, talon au sol"]});
+S("cali_shrimp_squat",{K:[P(DEB_SQ,{lb:[120,128],ab:[122,128],af:[190,70]}),{hip:[120,140],t:30,lf:[156,184],lb:[82,152],ab:[84,150],af:[204,96]}],s:{lb:-1},hl:"dos",ph:["Genou arrière vers le sol","Remonte"]});
+S("cali_sissy",{eq:[["poteau",212,30]],K:[P(DEB_SQ,{tf:[166,190],tb:[160,190],lf:[154,184],af:[206,74],ab:[200,80]}),{hip:[146,128],t:-26,lf:[154,176],lb:[150,176],tf:[166,190],tb:[162,190],af:[206,100],ab:[200,104]}],ph:["Genoux vers l’avant, corps droit","Remonte"]});
+S("cali_cossack",{v:"front",K:[P(AN_FR,{hip:[130,100],sh:[130,40],lf:[172,184],lb:[88,184],af:[138,78],ab:[122,78]}),{hip:[160,140],sh:[152,82],lf:[178,184],lb:[80,184],tb:[78,170],af:[160,118],ab:[146,118]},P(AN_FR,{hip:[130,100],sh:[130,40],lf:[172,184],lb:[88,184],af:[138,78],ab:[122,78]}),{hip:[100,140],sh:[108,82],lf:[180,184],tf:[182,170],lb:[82,184],af:[114,118],ab:[100,118]}],ph:["Descends d’un côté","Reviens au centre","Descends de l’autre côté","Reviens"]});
+S("hiit_fentes_laterales",{v:"front",K:[P(AN_FR,{lf:[140,184],lb:[120,184],af:[138,78],ab:[122,78]}),{hip:[154,132],sh:[148,74],lf:[188,184],lb:[96,184],af:[156,110],ab:[142,110]},P(AN_FR,{lf:[140,184],lb:[120,184],af:[138,78],ab:[122,78]}),{hip:[106,132],sh:[112,74],lf:[164,184],lb:[72,184],af:[118,110],ab:[104,110]}],ph:["Grand pas de côté","Reviens","De l’autre côté","Reviens"]});
+S("hiit_box_step_up",{eq:[["box",150,72,34]],K:[{hip:[118,92],t:0,lf:[166,150],lb:[114,184],af:[120,150],ab:[116,150]},{hip:[164,60],t:0,lf:[168,150],lb:[162,150],af:[166,120],ab:[162,120]}],ph:["Monte, pousse sur le talon","Redescends en contrôle"]});
+/* ----- Fentes ----- */
+S("hiit_fentes_alternees",{K:[DEB_F,FENTE,DEB_F,FENTE2],ph:["Grand pas, genou vers le sol","Reviens","Change de jambe","Reviens"]});
+S("hiit_fentes_marchees",AN_SPECS.hiit_fentes_alternees);
+S("fentesm",AN_SPECS.hiit_fentes_alternees);
+S("bulg",{eq:[["banc",14,72,150]],K:[{hip:[120,100],t:0,lf:[152,184],lb:[62,144],tb:[50,147],af:[124,158],ab:[120,158]},{hip:[114,140],t:6,lf:[152,184],lb:[62,144],tb:[50,147],af:[124,190],ab:[120,190]}],s:{lb:-1},dyn:[["hv","af"]],hl:"dos",ph:["Descends sur la jambe avant","Remonte"]});
+S("hiit_fentes_bulgares",AN_SPECS.bulg);
+S("hiit_fentes_sautees",{K:[FENTE,P(DEB_F,{hip:[125,84],lf:[132,174],lb:[120,174]}),FENTE2,P(DEB_F,{hip:[125,84],lf:[132,174],lb:[120,174]})],m:0.5,h:0.1,ph:["Saute et change","Réception amortie","Saute et change","Réception amortie"]});
+/* ----- Charnière de hanche ----- */
+var CH_H={hip:[140,92],t:0,lf:[142,184],lb:[138,184],af:[146,160],ab:[142,160]};
+S("sdtjt",{K:[CH_H,{hip:[110,96],t:80,lf:[142,184],lb:[138,184],af:[174,170],ab:[170,170]}],dyn:[["disque","mains",8]],hl:"dos",ph:["Recule les hanches, dos plat","Remonte en serrant les fessiers"]});
+S("sdt",{K:[CH_H,{hip:[112,126],t:60,lf:[146,184],lb:[142,184],af:[164,172],ab:[160,172]}],dyn:[["disque","mains",8]],hl:"dos",ph:["Descends, dos plat","Pousse le sol, hanches en avant"]});
+S("hiit_good_morning_poids_de_corps",{K:[P(CH_H,{af:[132,18],ab:[128,20]}),{hip:[114,100],t:74,lf:[142,184],lb:[138,184],af:[160,72],ab:[156,74]}],s:{af:-1,ab:-1},hl:"dos",ph:["Penche le buste, dos plat","Remonte"]});
+S("rowbar",{K:[{hip:[118,104],t:70,lf:[140,184],lb:[136,184],af:[176,160],ab:[172,160]},{hip:[118,104],t:70,lf:[140,184],lb:[136,184],af:[146,112],ab:[142,112]}],dyn:[["disque","mains",8]],hl:"dos",move:["af"],ph:["Tire la barre vers le nombril","Redescends en contrôle"]});
+/* ----- Ponts et hip thrust ----- */
+var PT_B=P(AN_DOS,{hip:[118,178],sh:[58,178],lf:[180,184],lb:[176,184]}),PT_H=P(PT_B,{hip:[110,149]});
+S("hiit_pont_fessier",{K:[PT_B,PT_H],h:0.5,hl:"pont",ph:["Monte, serre les fessiers","Redescends doucement"]});
+S("pont1j",{K:[P(PT_B,{lb:[196,130]}),P(PT_H,{lb:[204,104]})],h:0.5,hl:"pont",move:["lb"],ph:["Monte sur une jambe","Redescends"]});
+S("hiit_pont_fessier_1_jambe",AN_SPECS.pont1j);
+S("hiit_pont_fessier_marche",{K:[PT_H,P(PT_H,{lf:[160,126]}),PT_H,P(PT_H,{lb:[156,126]})],m:0.7,h:0.15,hl:"pont",ph:["Lève un genou","Repose","L’autre genou","Repose"]});
+var HT_B={hip:[112,178],sh:[64,146],hd:[-16,-4],lf:[178,184],lb:[174,184],af:[112,166],ab:[108,166]},HT_H=P(HT_B,{hip:[120,140],af:[118,130],ab:[114,130]});
+S("hipthrust",{eq:[["banc",20,78,150]],K:[HT_B,HT_H],dyn:[["disque","hanche",9]],h:0.5,hl:"pont",ph:["Pousse les hanches vers le haut","Redescends"]});
+S("hipthrustd",{eq:[["banc",20,78,150]],K:[HT_B,HT_H],h:0.5,hl:"pont",ph:["Monte, serre les fessiers","Redescends"]});
+S("cali_hip_thrust_banc",{eq:[["banc",20,78,150]],K:[P(HT_B,{lb:[184,126]}),P(HT_H,{lb:[206,108]})],h:0.5,hl:"pont",move:["lb"],ph:["Monte sur une jambe","Redescends"]});
+/* ----- Pompes ----- */
+var POMPE={K:[PU.haut,PU.bas],hl:"corps",pied:[-3,6],ph:["Poitrine vers le sol","Pousse, sans creuser"]};
+["pompes","hiit_pompes_classiques","hiit_pompes_larges","hiit_pompes_serrees","hiit_pompes_diamant","hiit_pompes_sur_poings","hiit_pompes_archer"].forEach(function(k){S(k,POMPE);});
+S("hiit_pompes_tempo",P(POMPE,{mm:[2.4,1.0],ph:["Descends lentement (3 s)","Remonte"]}));
+var PG=anPompe({an:[100,184]});
+var GEN_H=P(anCorps([100,184],30,46),{lf:[64,160],lb:[60,160],af:[198,186],ab:[194,186]}),GEN_B=P(anCorps([100,184],9,46),{lf:[64,160],lb:[60,160],af:[198,186],ab:[194,186]});
+S("hiit_pompes_sur_genoux",{K:[GEN_H,GEN_B],hl:"dos",pied:[-4,4],ph:["Poitrine vers le sol","Pousse"]});
+var DEC=anPompe({an:[60,148],thH:8.3,thB:-7.6,mains:[208,186]});
+S("hiit_pompes_declinees",{eq:[["banc",14,80,150]],K:[DEC.haut,DEC.bas],hl:"corps",pied:[-3,6],ph:["Poitrine vers le sol","Pousse"]});
+var INC=anPompe({an:[70,184],thH:37,thB:17.6,mains:[208,150]});
+S("hiit_pompes_inclinees",{eq:[["banc",180,246,150]],K:[INC.haut,INC.bas],hl:"corps",pied:[-3,6],ph:["Poitrine vers le banc","Pousse"]});
+S("cali_pompes_un_bras",{eq:[["banc",180,246,150]],K:[P(INC.haut,{ab:[150,150]}),P(INC.bas,{ab:[150,170]})],hl:"corps",pied:[-3,6],ph:["Descends sur un bras","Pousse"]});
+S("hiit_pompes_spiderman",{K:[PU.haut,P(PU.bas,{lf:[152,182]}),PU.haut,P(PU.bas,{lb:[148,182]})],move:["lf","lb"],pied:[-3,6],ph:["Descends, genou vers le coude","Remonte","De l’autre côté","Remonte"]});
+S("hiit_pompes_avec_rotation",{K:[PU.haut,PU.bas,PU.haut,P(PU.haut,{af:[202,64]})],move:["af"],pied:[-3,6],ph:["Descends","Remonte","Ouvre le bras vers le ciel","Repose"]});
+S("hiit_pompes_pike",{K:[{hip:[118,96],sh:[166,136],lf:[74,184],lb:[70,184],af:[184,186],ab:[180,186]},{hip:[126,110],sh:[176,158],lf:[74,184],lb:[70,184],af:[184,186],ab:[180,186]}],pied:[-3,6],ph:["Tête vers le sol","Repousse"]});
+S("cali_pike_sureleves",{eq:[["banc",14,80,130]],K:[{hip:[146,74],sh:[172,128],lf:[62,124],lb:[58,124],af:[176,186],ab:[172,186]},{hip:[150,96],sh:[176,150],lf:[62,124],lb:[58,124],af:[176,186],ab:[172,186]}],pied:[-3,6],ph:["Tête vers le sol","Repousse"]});
+S("cali_pompes_mur",{eq:[["mur",196]],K:[{hip:[180,66],sh:[176,126],lf:[190,-24],lb:[186,-24],af:[178,186],ab:[174,186]},{hip:[180,86],sh:[176,146],lf:[190,-4],lb:[186,-4],af:[178,186],ab:[174,186]}],pied:0,ph:["Descends un peu, sans poser la tête","Repousse"]});
+var PSP=anPompe({mains:[168,186]});PSP.haut.sh=[190,130];PSP.haut.hip=[143,149];PSP.bas.sh=[204,166];PSP.bas.hip=[149,173];
+S("cali_pseudo_planche",{K:[PSP.haut,PSP.bas],hl:"corps",pied:[-3,6],ph:["Épaules en avant des mains","Repousse"]});
+S("cali_pompes_explosives",{K:[PU.haut,PU.bas,P(PU.haut,{hip:[146,141],sh:[202,116],af:[206,172],ab:[202,172]})],m:0.6,h:0.1,hl:"corps",pied:[-3,6],ph:["Descends","Pousse fort, mains décollées","Réception bras souples"]});
+S("cali_pompes_hindoues",{K:[{hip:[104,112],sh:[160,132],lf:[44,184],lb:[40,184],af:[176,186],ab:[172,186]},{hip:[132,166],sh:[190,170],lf:[44,184],lb:[40,184],af:[176,186],ab:[172,186]},{hip:[136,174],sh:[176,130],hd:[10,-14],lf:[44,184],lb:[40,184],af:[178,186],ab:[174,186]}],pied:[-3,6],ph:["Plonge vers l’avant","Remonte la poitrine","Repousse les hanches"]});
+S("hiit_dips_sur_banc",{eq:[["banc",56,112,140]],K:[{hip:[116,134],sh:[106,76],lf:[196,184],lb:[192,184],af:[104,136],ab:[100,136]},{hip:[116,160],sh:[108,102],lf:[196,184],lb:[192,184],af:[104,136],ab:[100,136]}],hl:"vertical",ph:["Descends en pliant les coudes","Repousse"]});
+/* ----- Planches et gainage ----- */
+var PL_H=PU.haut;
+["planche","planchex","hiit_planche"].forEach(function(k){S(k,{K:[PLANCHE_C],hl:"corps",pied:[-3,6],s:{af:1,ab:1},ph:["Tiens, corps aligné"]});});
+S("cali_planche_rkc",{K:[PLANCHE_C],hl:"corps",pied:[-3,6],ph:["Contracte tout, tiens"]});
+S("hiit_planche_epaule_touches",{K:[PL_H,P(PL_H,{af:[198,132]}),PL_H,P(PL_H,{ab:[196,134]})],m:0.6,h:0.15,move:["af","ab"],hl:"corps",pied:[-3,6],ph:["Main à l’épaule opposée","Repose","L’autre main","Repose"]});
+S("hiit_planche_dynamique_up_down",{K:[PLANCHE_C,PL_H],m:0.8,hl:"corps",pied:[-3,6],ph:["Monte sur les mains","Redescends sur les avant-bras"]});
+S("hiit_planche_commando",AN_SPECS.hiit_planche_dynamique_up_down);
+S("hiit_mountain_climbers",{K:[P(PL_H,{lf:[140,176]}),P(PL_H,{lb:[136,176]})],m:0.35,h:0.05,move:["lf","lb"],pied:[-3,6],ph:["Genou vers la poitrine","Change"]});
+var GL=P(PLANCHE_C,{ab:[198,96]});
+["glat","glatx","hiit_gainage_lateral"].forEach(function(k){S(k,{K:[GL],hl:"corps",pied:[-3,6],ph:["Tiens, hanches hautes"]});});
+var BU_D={hip:[130,92],t:0,lf:[134,184],lb:[128,184],af:[133,160],ab:[128,160]},BU_S={hip:[118,150],t:70,lf:[130,184],lb:[126,184],af:[178,186],ab:[174,186]};
+S("hiit_burpees",{K:[BU_D,BU_S,P(PU.haut,{af:[204,186]}),PU.bas,P(PU.haut,{}),BU_S,{hip:[130,84],t:0,lf:[134,174],lb:[128,174],af:[140,-24],ab:[136,-22]}],m:0.55,h:0.1,pied:[-3,6],ph:["Accroupis, mains au sol","Jambes en arrière","Pompe","Remonte","Ramène les pieds","Saute, bras en l’air","Réception"]});
+S("hiit_burpees_sans_saut_ni_pompe",{K:[BU_D,BU_S,P(PU.haut,{}),BU_S],m:0.8,h:0.2,pied:[-3,6],ph:["Accroupis, mains au sol","Recule un pied puis l’autre","Ramène les pieds","Relève-toi"]});
+/* ----- Abdos et gainage au sol ----- */
+S("curlup",{K:[P(AN_DOS,{lb:[212,184]}),P(AN_DOS,{sh:[62,170],hd:[-16,-4],lb:[212,184],af:[124,187],ab:[120,187]})],h:1.0,ph:["Décolle tête et épaules, 10 s","Repose"]});
+S("hiit_crunchs",{K:[P(AN_DOS,{af:[46,168],ab:[44,170]}),P(AN_DOS,{sh:[70,156],hd:[-14,-8],af:[56,146],ab:[54,148]})],m:0.6,ph:["Enroule le haut du dos","Repose"]});
+S("hiit_sit_ups",{K:[P(AN_DOS,{af:[62,140],ab:[60,140]}),P(AN_DOS,{sh:[110,122],hd:[4,-18],af:[168,118],ab:[166,120]})],m:0.8,ph:["Monte jusqu’à t’asseoir","Redescends"]});
+var HOL={hip:[120,180],sh:[66,166],hd:[-15,-6],lf:[208,158],lb:[206,160],af:[8,150],ab:[10,152]};
+S("hiit_hollow_hold",{K:[HOL],ph:["Tiens, bas du dos plaqué"]});
+S("cali_hollow_rocks",{K:[P(HOL,{sh:[66,176],lf:[206,144],lb:[204,146],af:[8,168],ab:[10,170]}),P(HOL,{sh:[68,156],lf:[208,172],lb:[206,174],af:[10,138],ab:[12,140]})],m:0.6,h:0.05,ph:["Balance vers l’avant","Balance vers l’arrière"]});
+var DB0=P(AN_DOS,{lf:[166,134],lb:[162,134],af:[60,120],ab:[56,120]});
+S("hiit_dead_bug",{K:[DB0,P(DB0,{af:[2,176],lb:[212,172]}),DB0,P(DB0,{ab:[2,174],lf:[212,172]})],ph:["Bras et jambe opposés vers le sol","Reviens","De l’autre côté","Reviens"]});
+S("hiit_dead_bug_rapide",P(AN_SPECS.hiit_dead_bug,{m:0.6,h:0.1}));
+S("hiit_flutter_kicks",{K:[P(HOL,{lf:[212,160],lb:[212,176],af:[100,186],ab:[96,186]}),P(HOL,{lf:[212,176],lb:[212,160],af:[100,186],ab:[96,186]})],m:0.35,h:0.03,ph:["Petits battements","…"]});
+S("hiit_releves_de_jambes",{K:[P(AN_DOS,{lf:[212,180],lb:[210,180]}),P(AN_DOS,{lf:[128,90],lb:[124,90]})],ph:["Monte les jambes tendues","Redescends sans toucher"]});
+S("hiit_v_ups",{K:[P(AN_DOS,{af:[2,180],ab:[2,182],lf:[212,182],lb:[210,182]}),P(AN_DOS,{sh:[95,126],hd:[2,-18],af:[150,98],ab:[148,100],lf:[164,100],lb:[162,102]})],m:0.7,ph:["Ferme le V","Reviens à plat"]});
+S("hiit_russian_twists",{v:"front",K:[{hip:[130,172],sh:[122,114],lf:[166,184],lb:[94,184],af:[188,168],ab:[172,170]},{hip:[130,172],sh:[138,114],lf:[166,184],lb:[94,184],af:[88,170],ab:[72,168]}],m:0.6,h:0.1,pied:0,ph:["Tourne d’un côté","De l’autre"]});
+S("cali_dragon_flag",{eq:[["banc",26,200,150]],K:[{hip:[90,88],sh:[66,144],hd:[-15,6],lf:[124,6],lb:[120,8],af:[40,150],ab:[38,150]},{hip:[124,128],sh:[66,144],hd:[-17,2],lf:[214,110],lb:[212,112],af:[40,150],ab:[38,150]}],mm:[2.2,1.0],hl:"corps",pied:0,ph:["Descends le corps droit, lentement","Remonte"]});
+S("cali_compressions",{K:[{hip:[100,178],sh:[100,118],lf:[192,184],lb:[190,184],af:[138,186],ab:[134,186]},{hip:[100,178],sh:[100,118],lf:[190,164],lb:[188,166],af:[138,186],ab:[134,186]}],m:0.6,ph:["Décolle les talons","Repose"]});
+S("cali_l_sit",{eq:[["box",100,26,22]],K:[{hip:[112,160],sh:[112,100],lf:[204,160],lb:[202,162],af:[114,168],ab:[110,168]}],ph:["Tiens, jambes tendues"]});
+S("cali_tuck_l_sit",{eq:[["box",100,26,22]],K:[{hip:[112,160],sh:[112,100],lf:[140,166],lb:[138,168],af:[114,168],ab:[110,168]}],ph:["Tiens, genoux repliés"]});
+S("cali_nordic",{K:[{hip:[118,138],sh:[118,78],lf:[72,184],lb:[68,184],af:[132,108],ab:[128,110]},{hip:[153,154],sh:[199,116],lf:[72,184],lb:[68,184],af:[216,166],ab:[212,168]}],mm:[2.6,1.2],pied:0,ph:["Descends le plus lentement possible","Remonte en poussant"]});
+/* ----- Au sol, dos et mobilité ----- */
+S("superman",{K:[AN_VENTRE,P(AN_VENTRE,{sh:[168,166],hd:[16,-6],lf:[22,164],lb:[24,166],af:[226,158],ab:[222,160]})],h:0.6,ph:["Décolle bras et jambes","Repose"]});
+S("hiit_superman_doux",{K:[AN_VENTRE,P(AN_VENTRE,{sh:[169,172],hd:[16,-4],lf:[20,174],lb:[22,176],af:[228,170],ab:[224,172]})],h:0.4,ph:["Décolle légèrement","Repose"]});
+S("birddog",{K:[AN_QP,P(AN_QP,{lb:[10,128],af:[218,110]})],h:0.8,hl:"dos",move:["af","lb"],pied:[-2,5],ph:["Tends bras et jambe opposés","Reviens sans bouger le dos"]});
+S("hiit_bird_dog_rythme",{K:[AN_QP,P(AN_QP,{lb:[10,128],af:[218,110]}),AN_QP,P(AN_QP,{lf:[12,130],ab:[216,112]})],h:0.2,m:0.7,hl:"dos",pied:[-2,5],ph:["Bras et jambe opposés","Reviens","De l’autre côté","Reviens"]});
+S("chatvache",{K:[P(AN_QP,{cb:-9,hd:[16,-10]}),P(AN_QP,{cb:13,hd:[12,10]})],m:1.6,h:0.4,pied:[-2,5],ph:["Arrondis le dos","Creuse doucement"]});
+/* ----- Tirages à la barre fixe ----- */
+S("tractions",{eq:[BARRE_H],K:[AN_PEND,AN_TRACT],ph:["Tire, poitrine vers la barre","Redescends bras tendus"]});
+S("chinups",AN_SPECS.tractions);
+S("cali_tractions_negatives",{eq:[BARRE_H],K:[AN_TRACT,AN_PEND],mm:[3.0,0.8],ph:["Descends en 5 s","Remonte (saut ou aide)"]});
+S("cali_tractions_scapulaires",{eq:[BARRE_H],K:[AN_PEND,P(AN_PEND,{sh:[154,64],hip:[152,124],lf:[110,170],lb:[114,170],af:[160,4],ab:[156,4]})],m:0.6,ph:["Abaisse les omoplates","Relâche"]});
+S("cali_suspension",{eq:[BARRE_H],K:[AN_PEND],ph:["Tiens, laisse le dos se détendre"]});
+S("cali_muscle_up_prog",{eq:[BARRE_H],K:[AN_PEND,P(AN_TRACT,{sh:[156,12],hip:[154,72],lf:[112,118],lb:[116,118]})],m:0.55,h:0.2,ph:["Tire explosif, le plus haut possible","Redescends en contrôle"]});
+S("cali_tractions_archer",{v:"front",eq:[["barre",40,220,10]],K:[{hip:[130,134],sh:[130,74],lf:[138,190],lb:[122,190],af:[206,10],ab:[54,10]},{hip:[166,92],sh:[168,32],lf:[172,148],lb:[158,148],af:[206,10],ab:[54,10]},{hip:[130,134],sh:[130,74],lf:[138,190],lb:[122,190],af:[206,10],ab:[54,10]},{hip:[94,92],sh:[92,32],lf:[102,148],lb:[88,148],af:[206,10],ab:[54,10]}],pied:0,ph:["Tire vers une main","Redescends","Vers l’autre main","Redescends"]});
+S("cali_releves_suspendu",{eq:[BARRE_H],K:[AN_PEND,P(AN_PEND,{lf:[194,152],lb:[190,154]})],ph:["Monte les genoux sans balancer","Redescends"]});
+S("releves",AN_SPECS.cali_releves_suspendu);
+S("cali_tuck_front_lever",{eq:[BARRE_H],K:[{hip:[96,64],sh:[150,58],hd:[18,0],lf:[118,42],lb:[114,44],af:[160,10],ab:[156,10]}],pied:0,ph:["Tiens, dos horizontal"]});
+/* ----- Rowings ----- */
+S("row1",{eq:[["banc",52,222,150]],K:[{hip:[112,104],t:88,lf:[118,184],lb:[68,148],af:[174,160],ab:[200,148]},{hip:[112,104],t:88,lf:[118,184],lb:[68,148],af:[146,110],ab:[200,148]}],dyn:[["hh","af"]],hl:"dos",move:["af"],ph:["Tire le coude vers la hanche","Redescends en contrôle"]});
+var RI_B=P(anCorps([40,184],5.1),{lf:[40,184],lb:[36,184],af:[200,112],ab:[196,112]});RI_B.sh=[196,170];
+var RI_H=P(anCorps([40,184],21.1),{lf:[40,184],lb:[36,184],af:[200,112],ab:[196,112]});RI_H.sh=[190,126];
+S("cali_rowing_inverse",{eq:[["barre",170,246,112],["poteau",240,104]],K:[RI_B,RI_H],s:{af:-1,ab:-1},hl:"corps",pied:[2,-6],ph:["Tire la poitrine à la barre","Redescends corps gainé"]});
+var RIP_B=P(anCorps([50,146],-9),{lf:[50,146],lb:[46,146],af:[206,112],ab:[202,112]}),RIP_H=P(anCorps([50,146],6),{lf:[50,146],lb:[46,146],af:[206,112],ab:[202,112]});
+S("cali_rowing_inverse_pieds",{eq:[["barre",170,246,112],["poteau",240,104],["banc",14,76,150]],K:[RIP_B,RIP_H],s:{af:-1,ab:-1},hl:"corps",pied:[2,-6],ph:["Tire la poitrine à la barre","Redescends"]});
+/* ----- Développés ----- */
+S("dc",{eq:[["banc",44,200,146]],K:[P(AN_BANC,{af:[94,122],ab:[90,122]}),P(AN_BANC,{af:[82,80],ab:[78,80]})],s:{af:1,ab:1},dyn:[["disque","mains",8]],ph:["Pousse la barre","Redescends au milieu des pecs"]});
+S("dincl",{eq:[["incline",72,96,150,150],["banc",120,176,150]],K:[{hip:[130,144],sh:[86,104],lf:[176,184],lb:[172,184],af:[104,98],ab:[100,98]},{hip:[130,144],sh:[86,104],lf:[176,184],lb:[172,184],af:[94,46],ab:[90,46]}],s:{af:-1,ab:-1},dyn:[["hh","af"]],ph:["Pousse les haltères","Redescends en contrôle"]});
+S("ecarte",{eq:[["banc",44,200,146]],K:[P(AN_BANC,{af:[78,80],ab:[74,80]}),P(AN_BANC,{af:[56,140],ab:[52,140]})],s:{af:1,ab:1},dyn:[["hh","af"]],ph:["Ouvre les bras, coudes souples","Referme en serrant les pecs"]});
+S("dm",{eq:[["banc",90,170,140]],K:[{hip:[124,132],t:0,lf:[172,184],lb:[168,184],af:[140,64],ab:[136,66]},{hip:[124,132],t:0,lf:[172,184],lb:[168,184],af:[128,14],ab:[124,16]}],s:{af:1,ab:1},dyn:[["hh","af"]],hl:"vertical",ph:["Pousse au-dessus de la tête","Redescends aux oreilles"]});
+/* ----- Épaules et bras ----- */
+S("elevlat",{v:"front",K:[P(AN_FR,{af:[152,98],ab:[108,98]}),P(AN_FR,{af:[208,40],ab:[52,40]})],dyn:[["hv","af"],["hv","ab"]],ph:["Monte jusqu’aux épaules","Redescends lentement"]});
+S("oiseau",{v:"front",K:[P(AN_FR,{sh:[130,64],hd:[0,-4],af:[148,126],ab:[112,126]}),P(AN_FR,{sh:[130,64],hd:[0,-4],af:[206,62],ab:[54,62]})],dyn:[["hv","af"],["hv","ab"]],ph:["Buste penché, ouvre les bras","Redescends"]});
+S("shrugs",{v:"front",K:[P(AN_FR,{hd:[0,-18],af:[150,100],ab:[110,100]}),P(AN_FR,{sh:[130,26],hd:[0,-10],af:[150,92],ab:[110,92]})],dyn:[["hv","af"],["hv","ab"]],ph:["Monte les épaules","Relâche"]});
+S("curlez",{eq:[["pupitre",142,92,190,128],["banc",86,146,150]],K:[{hip:[116,144],t:12,lf:[160,184],lb:[156,184],af:[204,140],ab:[200,142]},{hip:[116,144],t:12,lf:[160,184],lb:[156,184],af:[170,62],ab:[166,64]}],s:{af:1,ab:1},dyn:[["disque","mains",7]],ph:["Monte la barre","Redescends en contrôle"]});
+var CU_D=P(AN_ST,{af:[133,160],ab:[128,160]});
+S("curlalt",{K:[CU_D,P(CU_D,{af:[152,48]}),CU_D,P(CU_D,{ab:[148,50]})],dyn:[["hv","af"],["hv","ab"]],ph:["Monte un haltère","Redescends","L’autre bras","Redescends"]});
+S("marteau",{K:[CU_D,P(CU_D,{af:[152,48],ab:[148,50]})],dyn:[["hv","af"],["hv","ab"]],ph:["Monte les haltères, prise neutre","Redescends"]});
+S("extez",{eq:[["banc",44,200,146]],K:[P(AN_BANC,{af:[52,112],ab:[48,112]}),P(AN_BANC,{af:[80,78],ab:[76,78]})],s:{af:1,ab:1},dyn:[["disque","mains",7]],ph:["Tends les bras","Redescends vers le front"]});
+S("ext1",{K:[P(AN_ST,{af:[118,24],ab:[128,160]}),P(AN_ST,{af:[132,-28],ab:[128,160]})],s:{af:1},dyn:[["hv","af"]],move:["af"],ph:["Tends le bras au-dessus de la tête","Redescends derrière la tête"]});
+S("dips",{eq:[["barre",138,180,104],["poteau",176,104]],K:[{hip:[152,106],sh:[156,46],lf:[118,140],lb:[114,142],af:[160,104],ab:[156,104]},{hip:[150,134],sh:[160,76],lf:[116,168],lb:[112,170],af:[160,104],ab:[156,104]}],pied:0,ph:["Descends, buste légèrement penché","Repousse"]});
+S("cali_support_barres",{eq:[["barre",138,180,104],["poteau",176,104]],K:[{hip:[152,106],sh:[156,46],lf:[118,140],lb:[114,142],af:[160,104],ab:[156,104]}],pied:0,ph:["Tiens, épaules basses"]});
+S("mollets",{K:[P(AN_ST,{tf:[148,190],tb:[142,190],lf:[136,184],lb:[130,184]}),P(AN_ST,{hip:[130,80],tf:[148,190],tb:[142,190],lf:[138,172],lb:[132,172]})],m:0.8,ph:["Monte sur la pointe","Redescends lentement"]});
+S("hiit_mollets_debout",AN_SPECS.mollets);
+/* ----- Cardio ----- */
+var GH={hip:[130,92],t:0},GN=P(GH,{lf:[176,138],lb:[126,184],af:[112,94],ab:[160,70]}),GN2=P(GH,{lb:[172,138],lf:[130,184],ab:[112,94],af:[160,70]});
+S("hiit_montees_de_genoux_sans_saut",{K:[GN,GN2],m:0.45,h:0.05,ph:["Genou haut","Change"]});
+var TF1=P(GH,{lb:[98,108],lf:[134,184],af:[156,70],ab:[112,94]}),TF2=P(GH,{lf:[100,108],lb:[128,184],ab:[156,70],af:[112,94]});
+S("hiit_talons_fesses_sans_saut",{K:[TF1,TF2],m:0.45,h:0.05,ph:["Talon vers les fesses","Change"]});
+var CS1=P(GH,{hip:[130,88],lf:[160,150],lb:[118,178],af:[112,92],ab:[158,74]}),CS2=P(GH,{hip:[130,88],lb:[158,150],lf:[120,178],ab:[112,92],af:[158,74]});
+S("hiit_course_sur_place",{K:[CS1,CS2],m:0.35,h:0.03,ph:["Cours sur place","…"]});
+S("hiit_sprint_sur_place",{K:[CS1,CS2],m:0.22,h:0.02,ph:["À fond","…"]});
+S("hiit_montees_de_genoux_sautees",{K:[P(GN,{hip:[130,86],lb:[126,178]}),P(GN2,{hip:[130,86],lf:[130,178]})],m:0.35,h:0.03,ph:["Genou haut, rebondis","Change"]});
+S("hiit_talons_fesses_courus",{K:[P(TF1,{hip:[130,86],lf:[134,178]}),P(TF2,{hip:[130,86],lb:[128,178]})],m:0.32,h:0.03,ph:["Talons-fesses, rebondis","Change"]});
+var JJ_F=P(AN_FR,{af:[150,98],ab:[110,98]}),JJ_O=P(AN_FR,{hip:[130,90],sh:[130,30],lf:[166,180],lb:[94,180],af:[180,-22],ab:[80,-22]});
+S("hiit_jumping_jacks",{v:"front",K:[JJ_F,JJ_O],m:0.4,h:0.05,ph:["Saute, écarte bras et jambes","Referme"]});
+S("hiit_step_jacks",{v:"front",K:[JJ_F,P(JJ_F,{lf:[174,184],af:[180,-22],ab:[80,-22]}),JJ_F,P(JJ_F,{lb:[86,184],af:[180,-22],ab:[80,-22]})],m:0.5,h:0.08,ph:["Pas de côté, bras en l’air","Reviens","De l’autre côté","Reviens"]});
+S("hiit_skaters_pas_du_patineur",{v:"front",K:[{hip:[168,104],sh:[158,46],lf:[178,184],lb:[194,170],af:[112,104],ab:[96,92]},{hip:[92,104],sh:[102,46],lb:[82,184],lf:[66,170],ab:[148,104],af:[164,92]}],s:{lb:-1,lf:1},m:0.55,h:0.12,ph:["Bond sur le côté","Bond de l’autre côté"]});
+S("hiit_corde_a_sauter_sans_corde",{v:"front",K:[P(AN_FR,{af:[166,100],ab:[94,100]}),P(AN_FR,{hip:[130,86],sh:[130,26],lf:[138,176],lb:[122,176],af:[166,94],ab:[94,94]})],m:0.25,h:0.03,ph:["Petits sauts","…"]});
+var SB_G=P(AN_ST,{af:[150,24],ab:[146,28],lf:[150,184],lb:[116,184]});
+S("hiit_shadow_boxing",{K:[SB_G,P(SB_G,{af:[218,22]}),SB_G,P(SB_G,{ab:[214,26]})],m:0.3,h:0.08,move:["af","ab"],ph:["Direct","Garde","Direct de l’autre bras","Garde"]});
+S("hiit_pas_chasses_lents",{v:"front",K:[P(AN_FR,{hip:[110,94],sh:[110,34],lf:[118,184],lb:[102,184],af:[128,150],ab:[92,150]}),P(AN_FR,{hip:[130,96],sh:[130,36],lf:[160,184],lb:[100,184],af:[150,150],ab:[110,150]}),P(AN_FR,{hip:[150,94],sh:[150,34],lf:[158,184],lb:[142,184],af:[168,150],ab:[132,150]}),P(AN_FR,{hip:[130,96],sh:[130,36],lf:[160,184],lb:[100,184],af:[150,150],ab:[110,150]})],m:0.6,h:0.1,ph:["Pas chassé","…","Retour","…"]});
+
+/* Gestion des schémas affichés : une seule boucle d'animation pour tous */
+var anActifs=[],anRaf=null;
+function anCle(item){
+  if(!item)return null;
+  if(item.k&&AN_SPECS[item.k])return item.k;
+  var k=typeof cleExercice==="function"?cleExercice(item.n):null;
+  return k&&AN_SPECS[k]?k:null;
+}
+function anMonter(box,item,opt){
+  if(!box)return null;
+  opt=opt||{};
+  var k=anCle(item);
+  box.innerHTML="";box._k=k;
+  if(!k||!document.createElementNS){box.style.display="none";return null;}
+  box.style.display="";
+  var sp=AN_SPECS[k],svg=document.createElementNS(AN_NS,"svg");
+  svg.setAttribute("viewBox","-10 -36 280 230");
+  svg.setAttribute("role","img");svg.setAttribute("aria-label","Schéma animé : "+(item.n||""));
+  box.appendChild(svg);
+  var lab=null;if(opt.label){lab=document.createElement("div");lab.className="an-ph";box.appendChild(lab);}
+  var g=anBuild(svg,sp),e=anEtat(sp,0);anDraw(g,sp,e.q);if(lab)lab.textContent=e.lab;
+  anActifs.push({svg:svg,g:g,sp:sp,lab:lab});
+  if(!anRaf&&typeof requestAnimationFrame==="function")anRaf=requestAnimationFrame(anBoucle);
+  return k;
+}
+// ne remonte le schéma que si l'exercice change (lecteur HIIT, chrono)
+function anAfficher(box,item){
+  if(!box)return;
+  var k=anCle(item);
+  if(k&&box._k===k&&box.firstChild){box.style.display="";return;}
+  anMonter(box,item,{});
+}
+function anCacher(box){if(box){box.innerHTML="";box._k=null;box.style.display="none";}}
+function anBoucle(now){
+  anActifs=anActifs.filter(function(i){return document.body.contains?document.body.contains(i.svg):true;});
+  if(!anActifs.length){anRaf=null;return;}
+  var t=now/1000;
+  anActifs.forEach(function(i){
+    var r=i.svg.getBoundingClientRect?i.svg.getBoundingClientRect():{width:1};
+    if(!r.width)return;   // caché : on ne dessine pas
+    var e=anEtat(i.sp,t);anDraw(i.g,i.sp,e.q);
+    if(i.lab&&i.lab.textContent!==e.lab)i.lab.textContent=e.lab;
+  });
+  anRaf=requestAnimationFrame(anBoucle);
+}
 /* ---------- Séance libre mixte : muscu + HIIT ----------
    Les exercices HIIT sont convertis en blocs chronométrés compatibles avec
    les cartes de séance (séries × durée, chrono plein écran, pas de charge). */
@@ -3571,6 +3932,7 @@ function renderLib(){
         var d=el("div","lib-desc");
         var type=it.hiit?"⚡ HIIT · chronométré":it.cali?"🤸 Callisthénie · poids du corps":(it.chrono?"Gainage · chronométré":"Musculation");
         d.appendChild(el("div","ld-tag",type+" · "+esc(it.s)));
+        var anB=el("div","anim ld-anim");d.appendChild(anB);anMonter(anB,it,{label:true});
         if(it.v)d.appendChild(el("div","ld-v",esc(it.v)));
         if(it.g)d.appendChild(el("div","ld-g",esc(it.g)));
         if(it.w)d.appendChild(el("div","warnbox","⚠ <b>À savoir :</b> "+esc(it.w)));
