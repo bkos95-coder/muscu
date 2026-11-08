@@ -252,7 +252,18 @@
   .lib-ex.added{border-color:var(--ink);background:#faf9f6}
   .lib-ex .n{font-weight:600;font-size:14px}
   .lib-ex .s{font-size:12px;color:var(--grey)}
-  .lib-ex .add{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:20px;color:var(--red);width:30px;text-align:center;flex:0 0 auto}
+  .lib-ex .add{background:none;border:none;padding:0;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:22px;color:var(--red);width:40px;height:40px;text-align:center;flex:0 0 auto;cursor:pointer;border-radius:8px}
+  .lib-ex .add:active{background:#fdecec}
+  .lib-info{flex:1;min-width:0}
+  .ld-more{color:#b0aaa0;white-space:nowrap}
+  .lib-card.open .lib-ex{border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom:none}
+  .lib-desc{background:#fff;border:1.5px solid var(--line);border-top:1px dashed var(--line);border-radius:0 0 10px 10px;padding:10px 13px 13px;font-size:13.5px;line-height:1.45;color:var(--ink-2)}
+  .lib-card.added .lib-desc{border-color:var(--ink);background:#faf9f6;border-radius:0;border-bottom:none}
+  .ld-tag{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--grey);margin-bottom:6px}
+  .ld-v{font-weight:600;margin-bottom:6px;color:var(--ink)}
+  .ld-g{margin-bottom:4px}
+  .lib-desc .warnbox{margin-top:8px}
+  .ld-btn{margin-top:10px}
   .lib-card{margin:8px 0}
   .lib-card .lib-ex{margin:0}
   .lib-card.added .lib-ex{border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom:none}
@@ -644,7 +655,7 @@
   <!-- ============ VUE LIBRE ============ -->
   <div class="view" id="view-libre">
     <h2>Composer ma séance</h2>
-    <p class="muted">Choisis tes groupes, coche les exercices que tu veux, lance ta séance (en circuit si tu veux) ou enregistre-la comme modèle réutilisable.</p>
+    <p class="muted">Choisis tes groupes, touche un exercice pour voir comment le faire (ou <b>+</b> pour l’ajouter directement), lance ta séance (en circuit si tu veux) ou enregistre-la comme modèle réutilisable.</p>
     <div id="tplWrap" style="display:none">
       <div class="lab" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin:0 0 8px">Mes modèles</div>
       <div id="tplList"></div>
@@ -1039,8 +1050,12 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.26.0";
+var APP_VERSION="1.27.0";
 var CHANGELOG=[
+ {v:"1.27.0",d:"2026-11-08",n:[
+   "Libre : toucher un exercice ouvre sa fiche (type, consigne, comment faire, ⚠) avec un bouton pour l’ajouter ; « + » reste l’ajout direct",
+   "Guides d’exercice : 108 apostrophes rétablies (« c’est », « jusqu’à », « l’avant-pied »…)"
+ ]},
  {v:"1.26.0",d:"2026-11-08",n:[
    "Calories dépensées (estimation indicative) : sur chaque séance et activité, en fin de séance, dans le récap de la semaine et les statistiques",
    "Cartes d’activité : « dimanche » au lieu de « dim 2026 »"
@@ -1267,52 +1282,52 @@ var PLANCHE={k:"planche",n:"Gainage — planche",s:"5 × 50 s",v:"Finisher · do
 
 var DOS_LIB=[
   {k:"curlup",n:"Curl-up McGill",s:"3 × 8 × 10s",v:"Le « crunch » spécial dos fragile · les lombaires ne bougent jamais",sets:3,noCharge:true,dos:true,g:"Allongé, une jambe pliée, une tendue, mains glissées sous le creux lombaire. Décolle seulement tête et épaules de quelques centimètres, tiens 8-10s en respirant, repose. Le bas du dos reste plaqué sur tes mains tout du long. Change de jambe à mi-série."},
-  {k:"birddog",n:"Bird-dog",s:"3 × 10 / côté",v:"À 4 pattes, bras + jambe opposés tendus, 2s de pause",sets:3,noCharge:true,dos:true,g:"À quatre pattes, dos neutre. Tends bras droit + jambe gauche à l horizontale, 2s de pause SANS bouger le bassin, reviens, alterne. Imagine un verre d eau posé sur tes lombaires."},
-  {k:"superman",n:"Superman",s:"3 × 12",v:"Allongé ventre, décolle bras et jambes en contrôle",sets:3,noCharge:true,dos:true,g:"Allongé sur le ventre, bras devant. Décolle simultanément bras et jambes de quelques centimètres, pause 2s, repose. Petit mouvement contrôlé, pas d à-coups."},
+  {k:"birddog",n:"Bird-dog",s:"3 × 10 / côté",v:"À 4 pattes, bras + jambe opposés tendus, 2s de pause",sets:3,noCharge:true,dos:true,g:"À quatre pattes, dos neutre. Tends bras droit + jambe gauche à l’horizontale, 2s de pause SANS bouger le bassin, reviens, alterne. Imagine un verre d’eau posé sur tes lombaires."},
+  {k:"superman",n:"Superman",s:"3 × 12",v:"Allongé ventre, décolle bras et jambes en contrôle",sets:3,noCharge:true,dos:true,g:"Allongé sur le ventre, bras devant. Décolle simultanément bras et jambes de quelques centimètres, pause 2s, repose. Petit mouvement contrôlé, pas d’à-coups."},
   {k:"glat",n:"Gainage latéral",s:"2 × 30 s / côté",v:"Carré des lombes · corps aligné, hanche haute",sets:2,noCharge:true,dos:true,chrono:30,g:"Sur le côté, appui avant-bras, pieds empilés, hanches hautes et corps aligné tête-pieds. Cible le carré des lombes. Version facile : genou du bas au sol."},
   {k:"hipthrustd",n:"Hip thrust",s:"3 × 12",v:"Dos sur banc plat, barre ou haltère sur les hanches",sets:3,dos:true,g:"Version prévention : dos sur le banc, charge légère ou poids du corps, monte les hanches en serrant les fessiers 2s en haut. Qualité de contraction avant la charge."},
-  {k:"chatvache",n:"Chat-vache (mobilité)",s:"2 × 10 lent",v:"Arrondis puis creuse le dos en respirant, sans forcer",sets:2,noCharge:true,dos:true,g:"À quatre pattes. Inspire en creusant le dos tête haute (vache), expire en arrondissant tête rentrée (chat). Lent, fluide, sans forcer en fin d amplitude. C est de la mobilité, pas du renfo."}
+  {k:"chatvache",n:"Chat-vache (mobilité)",s:"2 × 10 lent",v:"Arrondis puis creuse le dos en respirant, sans forcer",sets:2,noCharge:true,dos:true,g:"À quatre pattes. Inspire en creusant le dos tête haute (vache), expire en arrondissant tête rentrée (chat). Lent, fluide, sans forcer en fin d’amplitude. C’est de la mobilité, pas du renfo."}
 ];
 
 var LIB={
  "Pectoraux":[
-  {k:"dc",n:"Développé couché",s:S513,v:"Barre olympique · Haltères : + d'amplitude",sets:5,g:"Allongé, pieds ancrés au sol, omoplates serrées, léger cambré naturel. Descends la barre en contrôle jusqu au milieu des pecs, remonte en soufflant. Erreur classique : rebondir sur la poitrine."},
-  {k:"dincl",n:"Développé incliné haltères",s:S513,v:"Banc calé incliné",sets:5,g:"Banc incliné ~30-45°. Haltères au niveau des épaules, pousse vers le haut en rapprochant légèrement les haltères au sommet. Descends jusqu à sentir l étirement des pecs. Ne claque pas les haltères en haut."},
-  {k:"ecarte",n:"Écarté couché",s:S513,v:"Haltères · isolation, coudes souples",sets:5,g:"Allongé, haltères au-dessus de la poitrine, coudes légèrement fléchis et FIXES. Ouvre les bras en arc de cercle jusqu à l étirement, referme comme pour enlacer un arbre. Léger, c est un exo d étirement-contraction."},
-  {k:"pompes",n:"Pompes lestées",s:"5 × max",v:"Disque sur le dos si besoin",sets:5,noCharge:true,g:"Mains largeur épaules +, corps gainé en planche. Descends poitrine près du sol, coudes à ~45° du buste. Erreur : hanches qui tombent ou fesses en l air."}],
+  {k:"dc",n:"Développé couché",s:S513,v:"Barre olympique · Haltères : + d'amplitude",sets:5,g:"Allongé, pieds ancrés au sol, omoplates serrées, léger cambré naturel. Descends la barre en contrôle jusqu’au milieu des pecs, remonte en soufflant. Erreur classique : rebondir sur la poitrine."},
+  {k:"dincl",n:"Développé incliné haltères",s:S513,v:"Banc calé incliné",sets:5,g:"Banc incliné ~30-45°. Haltères au niveau des épaules, pousse vers le haut en rapprochant légèrement les haltères au sommet. Descends jusqu’à sentir l’étirement des pecs. Ne claque pas les haltères en haut."},
+  {k:"ecarte",n:"Écarté couché",s:S513,v:"Haltères · isolation, coudes souples",sets:5,g:"Allongé, haltères au-dessus de la poitrine, coudes légèrement fléchis et FIXES. Ouvre les bras en arc de cercle jusqu’à l’étirement, referme comme pour enlacer un arbre. Léger, c’est un exo d’étirement-contraction."},
+  {k:"pompes",n:"Pompes lestées",s:"5 × max",v:"Disque sur le dos si besoin",sets:5,noCharge:true,g:"Mains largeur épaules +, corps gainé en planche. Descends poitrine près du sol, coudes à ~45° du buste. Erreur : hanches qui tombent ou fesses en l’air."}],
  "Dos":[
-  {k:"tractions",n:"Tractions pronation",s:"5 × max",v:"Paumes vers l'avant · dos · leste ou aide-toi selon ton niveau",sets:5,g:"Prise pronation (paumes vers l avant) un peu plus large que les épaules. Pars bras tendus, tire les coudes vers le bas jusqu au menton au-dessus de la barre, redescends en contrôle. C est la plus dure : si tu n en fais pas encore, utilise un élastique passé sous les pieds pour t alléger, ou fais des négatives (saute en haut, descends le plus lentement possible en 5s). Progresse vers la version lestée."},
-  {k:"chinups",n:"Tractions supination (chin-ups)",s:"5 × max",v:"Paumes vers toi · plus facile · dos + biceps",sets:5,g:"Prise supination (paumes vers TOI), mains largeur épaules. Tire jusqu à passer le menton au-dessus de la barre, redescends en contrôle complet. Les biceps aident beaucoup : c est ta meilleure option quand la pronation est trop dure. Garde les épaules basses et le buste gainé, sans donner d élan de jambes. Vu tes cervicales, ne force pas la tête vers la barre : c est la poitrine qui monte."},
+  {k:"tractions",n:"Tractions pronation",s:"5 × max",v:"Paumes vers l'avant · dos · leste ou aide-toi selon ton niveau",sets:5,g:"Prise pronation (paumes vers l’avant) un peu plus large que les épaules. Pars bras tendus, tire les coudes vers le bas jusqu’au menton au-dessus de la barre, redescends en contrôle. C’est la plus dure : si tu n’en fais pas encore, utilise un élastique passé sous les pieds pour t’alléger, ou fais des négatives (saute en haut, descends le plus lentement possible en 5s). Progresse vers la version lestée."},
+  {k:"chinups",n:"Tractions supination (chin-ups)",s:"5 × max",v:"Paumes vers toi · plus facile · dos + biceps",sets:5,g:"Prise supination (paumes vers TOI), mains largeur épaules. Tire jusqu’à passer le menton au-dessus de la barre, redescends en contrôle complet. Les biceps aident beaucoup : c’est ta meilleure option quand la pronation est trop dure. Garde les épaules basses et le buste gainé, sans donner d’élan de jambes. Vu tes cervicales, ne force pas la tête vers la barre : c’est la poitrine qui monte."},
   {k:"rowbar",n:"Rowing barre",s:S513,v:"⚠ Préfère le rowing 1 bras appuyé au banc · position penchée chargée déconseillée pour ton dos",sets:5,g:"Buste penché ~45°, dos plat, genoux fléchis. Tire la barre vers le nombril en serrant les omoplates, redescends lentement. Erreur : arrondir le dos ou tricher avec les jambes."},
-  {k:"row1",n:"Rowing 1 bras",s:"5 × 12 / côté",v:"Haltère, appui sur banc · corrige les asymétries",sets:5,g:"Un genou et une main sur le banc, dos plat parallèle au sol. Tire l haltère vers la hanche, coude le long du corps, pause 1s en haut. Ne tourne pas le buste."},
-  {k:"sdt",n:"Soulevé de terre",s:S513,v:"⚠ En pause tant que ton kiné ne l a pas validé · si feu vert un jour : léger, dos neutre absolu",sets:5,g:"Pieds sous la barre, dos plat, poitrine sortie. Pousse le sol avec les jambes, la barre glisse le long des tibias, termine debout hanches verrouillées. JAMAIS le dos rond. En 5×12 : charge modérée, technique irréprochable jusqu à la dernière rep."}],
+  {k:"row1",n:"Rowing 1 bras",s:"5 × 12 / côté",v:"Haltère, appui sur banc · corrige les asymétries",sets:5,g:"Un genou et une main sur le banc, dos plat parallèle au sol. Tire l’haltère vers la hanche, coude le long du corps, pause 1s en haut. Ne tourne pas le buste."},
+  {k:"sdt",n:"Soulevé de terre",s:S513,v:"⚠ En pause tant que ton kiné ne l’a pas validé · si feu vert un jour : léger, dos neutre absolu",sets:5,g:"Pieds sous la barre, dos plat, poitrine sortie. Pousse le sol avec les jambes, la barre glisse le long des tibias, termine debout hanches verrouillées. JAMAIS le dos rond. En 5×12 : charge modérée, technique irréprochable jusqu’à la dernière rep."}],
  "Épaules":[
   {k:"dm",n:"Développé haltères assis",s:S513,v:"Assis sur le banc, buste vertical et gainé · charge modérée",sets:5,g:"Assis sur le banc plat, pieds bien ancrés, buste vertical, abdos serrés. Pousse les haltères au-dessus de la tête SANS cambrer les lombaires, redescends aux épaules. Si le bas du dos se cambre, la charge est trop lourde."},
-  {k:"elevlat",n:"Élévations latérales",s:S513,v:"Haltères légers, mouvement propre",sets:5,g:"Debout, haltères le long du corps, coudes très légèrement fléchis. Monte les bras sur les côtés jusqu à l horizontale, comme si tu versais une carafe. Léger et propre, sans élan du buste."},
-  {k:"oiseau",n:"Oiseau (arrière d'épaule)",s:S513,v:"Assis, buste posé sur les cuisses (dos soutenu) · très léger",sets:5,g:"Assis en bout de banc, penche le buste jusqu à le poser sur les cuisses : le dos est ainsi soutenu. Haltères sous les mollets, ouvre les bras sur les côtés en serrant les omoplates. Très léger : ce muscle est petit."},
+  {k:"elevlat",n:"Élévations latérales",s:S513,v:"Haltères légers, mouvement propre",sets:5,g:"Debout, haltères le long du corps, coudes très légèrement fléchis. Monte les bras sur les côtés jusqu’à l’horizontale, comme si tu versais une carafe. Léger et propre, sans élan du buste."},
+  {k:"oiseau",n:"Oiseau (arrière d'épaule)",s:S513,v:"Assis, buste posé sur les cuisses (dos soutenu) · très léger",sets:5,g:"Assis en bout de banc, penche le buste jusqu’à le poser sur les cuisses : le dos est ainsi soutenu. Haltères sous les mollets, ouvre les bras sur les côtés en serrant les omoplates. Très léger : ce muscle est petit."},
   {k:"shrugs",n:"Shrugs",s:S513,v:"Léger · vu tes cervicales (C5-C6) : pas de charges lourdes, mouvement vertical strict",sets:5,g:"Debout, charges dans les mains, bras tendus. Hausse les épaules vers les oreilles, pause 1s, redescends. Pas de rotation des épaules, juste haut-bas."}],
  "Biceps":[
-  {k:"curlez",n:"Curl pupitre barre EZ",s:S513,v:"Banc Larry Scott",sets:5,g:"Bras posés sur le pupitre, aisselles calées en haut du support. Fléchis jusqu en haut, redescends LENTEMENT sans tendre complètement les coudes en bas. La descente lente fait tout le boulot."},
-  {k:"curlalt",n:"Curl haltères alterné",s:S513,v:"Debout, sans balancier",sets:5,g:"Debout, un bras après l autre. Coude collé au flanc, monte l haltère en tournant la paume vers toi. Erreur : balancer le buste ou avancer le coude."},
+  {k:"curlez",n:"Curl pupitre barre EZ",s:S513,v:"Banc Larry Scott",sets:5,g:"Bras posés sur le pupitre, aisselles calées en haut du support. Fléchis jusqu’en haut, redescends LENTEMENT sans tendre complètement les coudes en bas. La descente lente fait tout le boulot."},
+  {k:"curlalt",n:"Curl haltères alterné",s:S513,v:"Debout, sans balancier",sets:5,g:"Debout, un bras après l’autre. Coude collé au flanc, monte l’haltère en tournant la paume vers toi. Erreur : balancer le buste ou avancer le coude."},
   {k:"marteau",n:"Curl marteau",s:S513,v:"Prise neutre · avant-bras + brachial",sets:5,g:"Comme le curl classique mais paumes face à face (prise marteau) tout du long. Coudes fixes contre le corps."}],
  "Triceps":[
-  {k:"extez",n:"Extensions barre EZ",s:S513,v:"Couché uniquement · pas de version debout derrière la nuque",sets:5,g:"Allongé, barre EZ au-dessus du front, coudes fixes pointés au plafond. Seuls les avant-bras bougent : descends vers le front, remonte. Coudes qui s écartent = triche."},
+  {k:"extez",n:"Extensions barre EZ",s:S513,v:"Couché uniquement · pas de version debout derrière la nuque",sets:5,g:"Allongé, barre EZ au-dessus du front, coudes fixes pointés au plafond. Seuls les avant-bras bougent : descends vers le front, remonte. Coudes qui s’écartent = triche."},
   {k:"ext1",n:"Extension 1 bras",s:"5 × 12 / côté",v:"Assis, buste gainé · haltère au-dessus de la tête",sets:5,g:"Assis ou debout, haltère tenu à une main derrière la tête, coude au ciel. Tends le bras vers le haut, redescends derrière la nuque en contrôle. Garde le coude près de la tête."},
-  {k:"dips",n:"Dips entre supports",s:"5 × max",v:"Ou banc, pieds surélevés",sets:5,noCharge:true,g:"Mains sur deux supports stables, corps entre les deux. Descends jusqu à ~90° de flexion des coudes, buste légèrement penché en avant, remonte. Ne descends pas plus bas si les épaules tirent."}],
+  {k:"dips",n:"Dips entre supports",s:"5 × max",v:"Ou banc, pieds surélevés",sets:5,noCharge:true,g:"Mains sur deux supports stables, corps entre les deux. Descends jusqu’à ~90° de flexion des coudes, buste légèrement penché en avant, remonte. Ne descends pas plus bas si les épaules tirent."}],
  "Jambes":[
-  {k:"gobelet",n:"Goblet squat",s:S513,v:"Haltère contre la poitrine · ta version squat par défaut, dos-friendly",sets:5,g:"Haltère tenu verticalement contre la poitrine, coudes sous le poids. Descends entre tes jambes, buste le plus droit possible, talons au sol. La charge devant t oblige à rester gainé : version la plus sûre pour ton dos."},
-  {k:"squat",n:"Squat barre",s:S513,v:"⚠ Charge modérée uniquement · le goblet squat est ta version par défaut",sets:5,g:"Barre sur les trapèzes (pas la nuque), pieds largeur épaules, pointes légèrement ouvertes. Descends comme pour t asseoir, genoux dans l axe des pieds, cuisses au moins parallèles. Pousse dans les talons, dos gainé."},
-  {k:"bulg",n:"Fentes bulgares",s:"5 × 12 / jambe",v:"Pied arrière sur banc, haltères en main",sets:5,g:"Pied arrière posé sur le banc, pied avant bien devant. Descends verticalement, genou avant au-dessus de la cheville. Le buste reste droit. Brûlure garantie, c est normal."},
-  {k:"fentesm",n:"Fentes marchées",s:"5 × 12 / jambe",v:"Haltères en main",sets:5,g:"Grand pas en avant, descends le genou arrière vers le sol, remonte en poussant sur le talon avant et enchaîne avec l autre jambe. Buste droit, regard loin devant."},
+  {k:"gobelet",n:"Goblet squat",s:S513,v:"Haltère contre la poitrine · ta version squat par défaut, dos-friendly",sets:5,g:"Haltère tenu verticalement contre la poitrine, coudes sous le poids. Descends entre tes jambes, buste le plus droit possible, talons au sol. La charge devant t’oblige à rester gainé : version la plus sûre pour ton dos."},
+  {k:"squat",n:"Squat barre",s:S513,v:"⚠ Charge modérée uniquement · le goblet squat est ta version par défaut",sets:5,g:"Barre sur les trapèzes (pas la nuque), pieds largeur épaules, pointes légèrement ouvertes. Descends comme pour t’asseoir, genoux dans l’axe des pieds, cuisses au moins parallèles. Pousse dans les talons, dos gainé."},
+  {k:"bulg",n:"Fentes bulgares",s:"5 × 12 / jambe",v:"Pied arrière sur banc, haltères en main",sets:5,g:"Pied arrière posé sur le banc, pied avant bien devant. Descends verticalement, genou avant au-dessus de la cheville. Le buste reste droit. Brûlure garantie, c’est normal."},
+  {k:"fentesm",n:"Fentes marchées",s:"5 × 12 / jambe",v:"Haltères en main",sets:5,g:"Grand pas en avant, descends le genou arrière vers le sol, remonte en poussant sur le talon avant et enchaîne avec l’autre jambe. Buste droit, regard loin devant."},
   {k:"mollets",n:"Mollets debout",s:"5 × 15-20",v:"Haltères en main, sur une marche",sets:5,g:"Avant-pieds sur une marche, talons dans le vide. Monte le plus haut possible sur les pointes, pause 1s, descends sous le niveau de la marche pour étirer. Amplitude complète."}],
  "Fessiers":[
-  {k:"hipthrust",n:"Hip thrust",s:S513,v:"Dos sur banc plat, barre sur les hanches",sets:5,g:"Haut du dos sur le banc plat, barre sur les hanches (mets une serviette), pieds à plat. Pousse les hanches vers le plafond jusqu à l alignement épaules-genoux, serre fort les fessiers 1s en haut. Menton rentré."},
-  {k:"pont1j",n:"Pont fessier 1 jambe",s:"3 × 10 / côté",v:"Fessiers puissants, zéro charge sur la colonne",sets:3,noCharge:true,g:"Allongé sur le dos, un pied au sol près des fesses, l autre jambe tendue. Monte les hanches en serrant la fesse d appui, aligne épaules-genou, 1s en haut, redescends. Zéro compression, gros bénéfice."},
-  {k:"sdtjt",n:"SDT jambes tendues",s:S513,v:"⚠ En pause · flexion lombaire chargée, à valider avec ton kiné avant de reprendre",sets:5,g:"Debout, jambes quasi tendues, barre ou haltères contre les cuisses. Pousse les fesses en ARRIÈRE, la charge descend le long des jambes, dos plat, jusqu à l étirement des ischios. Remonte avec les fessiers."}],
+  {k:"hipthrust",n:"Hip thrust",s:S513,v:"Dos sur banc plat, barre sur les hanches",sets:5,g:"Haut du dos sur le banc plat, barre sur les hanches (mets une serviette), pieds à plat. Pousse les hanches vers le plafond jusqu’à l’alignement épaules-genoux, serre fort les fessiers 1s en haut. Menton rentré."},
+  {k:"pont1j",n:"Pont fessier 1 jambe",s:"3 × 10 / côté",v:"Fessiers puissants, zéro charge sur la colonne",sets:3,noCharge:true,g:"Allongé sur le dos, un pied au sol près des fesses, l’autre jambe tendue. Monte les hanches en serrant la fesse d’appui, aligne épaules-genou, 1s en haut, redescends. Zéro compression, gros bénéfice."},
+  {k:"sdtjt",n:"SDT jambes tendues",s:S513,v:"⚠ En pause · flexion lombaire chargée, à valider avec ton kiné avant de reprendre",sets:5,g:"Debout, jambes quasi tendues, barre ou haltères contre les cuisses. Pousse les fesses en ARRIÈRE, la charge descend le long des jambes, dos plat, jusqu’à l’étirement des ischios. Remonte avec les fessiers."}],
  "Abdos":[
-  {k:"releves",n:"Relevés inclinés PA300",s:"5 × 12-15",v:"⚠ Préfère le curl-up McGill · la flexion lombaire répétée n est pas ton amie",sets:5,noCharge:true,g:"Sur le banc incliné PA300, pieds calés. Remonte le buste en enroulant les abdos, redescends en contrôle SANS te laisser tomber. Ne tire pas sur la nuque."},
+  {k:"releves",n:"Relevés inclinés PA300",s:"5 × 12-15",v:"⚠ Préfère le curl-up McGill · la flexion lombaire répétée n’est pas ton amie",sets:5,noCharge:true,g:"Sur le banc incliné PA300, pieds calés. Remonte le buste en enroulant les abdos, redescends en contrôle SANS te laisser tomber. Ne tire pas sur la nuque."},
   {k:"planchex",n:"Planche",s:"3 × 50 s",v:"Version renforcée du finisher",sets:3,noCharge:true,chrono:50,g:"Comme le finisher mais en 3 séries : avant-bras au sol, corps aligné tête-talons, abdos et fessiers serrés, respiration continue. Si les hanches tombent, arrête la série."},
-  {k:"glatx",n:"Gainage latéral",s:"2 × 30 s / côté",v:"Obliques + carré des lombes",sets:2,noCharge:true,chrono:30,g:"Sur le côté, appui sur un avant-bras, pieds empilés. Hanches hautes, corps aligné. Si c est trop dur : genou du bas posé au sol."}],
+  {k:"glatx",n:"Gainage latéral",s:"2 × 30 s / côté",v:"Obliques + carré des lombes",sets:2,noCharge:true,chrono:30,g:"Sur le côté, appui sur un avant-bras, pieds empilés. Hanches hautes, corps aligné. Si c’est trop dur : genou du bas posé au sol."}],
  "Dos santé":DOS_LIB
 };
 
@@ -2057,30 +2072,30 @@ $("#ovPlus").addEventListener("click",function(){chronoAdj(10);});
 /* ---------- HIIT 7 minutes (adapté pied droit + dos) ---------- */
 var HIIT_CIRCUITS=[
  {name:"Full-body sans impact",ex:[
-  {n:"Squat poids de corps",t:"Talons bien ancrés, descends contrôlé, remonte tonique",g:"Pieds largeur épaules, poids sur les talons (le gros orteil ne pousse pas). Descends comme pour t asseoir, genoux dans l axe, cuisses parallèles si possible. Remonte en poussant dans les talons, buste fier."},
-  {n:"Pompes classiques",t:"Corps gainé, coudes à 45°",g:"Position planche sur les mains, mains un peu plus larges que les épaules. Descends la poitrine près du sol, coudes à environ 45° du buste (pas en croix), remonte en soufflant. Le corps reste une planche : ni hanches qui tombent, ni fesses en l air."},
+  {n:"Squat poids de corps",t:"Talons bien ancrés, descends contrôlé, remonte tonique",g:"Pieds largeur épaules, poids sur les talons (le gros orteil ne pousse pas). Descends comme pour t’asseoir, genoux dans l’axe, cuisses parallèles si possible. Remonte en poussant dans les talons, buste fier."},
+  {n:"Pompes classiques",t:"Corps gainé, coudes à 45°",g:"Position planche sur les mains, mains un peu plus larges que les épaules. Descends la poitrine près du sol, coudes à environ 45° du buste (pas en croix), remonte en soufflant. Le corps reste une planche : ni hanches qui tombent, ni fesses en l’air."},
   {n:"Montées de genoux sans saut",t:"Marche dynamique genoux hauts, pied à plat, bras actifs",g:"Marche dynamique sur place : monte les genoux à hauteur de hanche, un pied toujours au sol, pose le pied À PLAT. Les bras pompent comme en course. Rapide mais zéro rebond."},
-  {n:"Pont fessier",t:"Serre fort les fessiers 1s en haut, sans hyperextension",g:"Allongé sur le dos, pieds à plat près des fesses. Monte les hanches en serrant fort les fessiers, aligne épaules-genoux, 1s en haut, redescends. Ne cambre pas au-delà de l alignement."},
-  {n:"Chaise au mur",t:"Dos au mur, cuisses parallèles, appui talons",g:"Dos plaqué au mur, descends jusqu à cuisses parallèles, genoux à 90°, poids dans les talons. Tiens la position en respirant. Ça brûle, c est le but."},
+  {n:"Pont fessier",t:"Serre fort les fessiers 1s en haut, sans hyperextension",g:"Allongé sur le dos, pieds à plat près des fesses. Monte les hanches en serrant fort les fessiers, aligne épaules-genoux, 1s en haut, redescends. Ne cambre pas au-delà de l’alignement."},
+  {n:"Chaise au mur",t:"Dos au mur, cuisses parallèles, appui talons",g:"Dos plaqué au mur, descends jusqu’à cuisses parallèles, genoux à 90°, poids dans les talons. Tiens la position en respirant. Ça brûle, c’est le but."},
   {n:"Shadow boxing",t:"Frappes rapides dans le vide, pieds à plat, gaine le tronc",g:"Debout, garde de boxe, pieds à plat largeur épaules. Enchaîne directs et crochets dans le vide, gaine le ventre, tourne légèrement le buste avec les coups. Cardio garanti sans bouger les pieds."},
   {n:"Dead bug",t:"Dos plaqué au sol, bras+jambe opposés, lent et contrôlé",g:"Sur le dos, bras vers le plafond, genoux à 90°. Descends bras droit + jambe gauche vers le sol SANS décoller les lombaires, reviens, alterne. Le meilleur exo abdos pour ton dos."},
   {n:"Talons-fesses sans saut",t:"Marche rapide talon vers la fesse, sans rebondir",g:"Marche rapide sur place en ramenant le talon vers la fesse, pose du pied à plat, sans rebondir. Bras actifs, buste droit."},
   {n:"Planche",t:"Corps aligné, fessiers serrés, respire",g:"Avant-bras au sol sous les épaules, corps aligné tête-talons, fessiers et abdos serrés. Appui sur les avant-bras et le dessus des pieds si ça va, sinon sur les genoux. Respire."},
-  {n:"Fentes alternées",t:"Pied arrière sur le cou-de-pied côté droit, buste droit",g:"Grand pas en avant, descends le genou arrière vers le sol, remonte, alterne. Adaptation hallux : quand le pied droit est derrière, pose-le sur le cou-de-pied (dessus du pied à plat) ou garde la fente courte sans dérouler l orteil. Pied droit devant : aucune contrainte."},
-  {n:"Superman doux",t:"Petit décollé bras+jambes, 2s de pause, sans à-coups",g:"Allongé sur le ventre, décolle légèrement bras et jambes, 2s de pause, repose en contrôle. Petit mouvement, pas d à-coups — c est du renfo lombaire, pas de la gym artistique."},
+  {n:"Fentes alternées",t:"Pied arrière sur le cou-de-pied côté droit, buste droit",g:"Grand pas en avant, descends le genou arrière vers le sol, remonte, alterne. Adaptation hallux : quand le pied droit est derrière, pose-le sur le cou-de-pied (dessus du pied à plat) ou garde la fente courte sans dérouler l’orteil. Pied droit devant : aucune contrainte."},
+  {n:"Superman doux",t:"Petit décollé bras+jambes, 2s de pause, sans à-coups",g:"Allongé sur le ventre, décolle légèrement bras et jambes, 2s de pause, repose en contrôle. Petit mouvement, pas d’à-coups — c’est du renfo lombaire, pas de la gym artistique."},
   {n:"Gainage latéral",t:"15s par côté, hanche haute, change à mi-temps",g:"Sur le côté, appui avant-bras, hanches hautes, corps aligné. 15 secondes par côté — change à mi-temps quand le bip des 3 dernières secondes approche. Genou au sol si besoin."}]},
  {name:"Cardio & gainage",ex:[
   {n:"Shadow boxing",t:"Rythme rapide, pieds à plat, rotation du buste légère",g:"Debout, garde de boxe, pieds à plat largeur épaules. Enchaîne directs et crochets dans le vide, gaine le ventre, tourne légèrement le buste avec les coups. Cardio garanti sans bouger les pieds."},
   {n:"Montées de genoux sans saut",t:"Le plus vite possible SANS décoller, bras actifs",g:"Marche dynamique sur place : monte les genoux à hauteur de hanche, un pied toujours au sol, pose le pied À PLAT. Les bras pompent comme en course. Rapide mais zéro rebond."},
   {n:"Squat pulse",t:"Petits rebonds en bas du squat, talons ancrés",g:"En position basse de squat (talons ancrés), fais de petits rebonds de 10-15 cm sans jamais remonter complètement. Brûlure express des cuisses."},
-  {n:"Planche épaule-touches",t:"En planche genoux si besoin, touche l'épaule opposée",g:"En planche (sur genoux si besoin), touche l épaule opposée avec une main, repose, alterne. Le défi : le bassin ne bouge PAS. Lent et stable vaut mieux que rapide et bancal."},
-  {n:"Jumping jacks",t:"Réception amortie · repli : step jacks si le pied proteste",g:"Sauts écart-serré classiques, bras au-dessus de la tête, réception AMORTIE genoux souples. Si ton pied droit proteste, bascule en step jacks : même mouvement de bras mais un pied s écarte à la fois, sans saut. Règle des 24h : raideur de l orteil le lendemain = version step la fois suivante."},
-  {n:"Pont fessier marché",t:"En pont, tends une jambe puis l'autre",g:"En position de pont fessier tenue, tends une jambe à l horizontale, repose, alterne. Les hanches restent hautes et stables tout du long."},
+  {n:"Planche épaule-touches",t:"En planche genoux si besoin, touche l'épaule opposée",g:"En planche (sur genoux si besoin), touche l’épaule opposée avec une main, repose, alterne. Le défi : le bassin ne bouge PAS. Lent et stable vaut mieux que rapide et bancal."},
+  {n:"Jumping jacks",t:"Réception amortie · repli : step jacks si le pied proteste",g:"Sauts écart-serré classiques, bras au-dessus de la tête, réception AMORTIE genoux souples. Si ton pied droit proteste, bascule en step jacks : même mouvement de bras mais un pied s’écarte à la fois, sans saut. Règle des 24h : raideur de l’orteil le lendemain = version step la fois suivante."},
+  {n:"Pont fessier marché",t:"En pont, tends une jambe puis l'autre",g:"En position de pont fessier tenue, tends une jambe à l’horizontale, repose, alterne. Les hanches restent hautes et stables tout du long."},
   {n:"Pas chassés lents",t:"2 pas à droite, 2 à gauche, pieds à plat, en squat léger",g:"En squat léger, 2 pas chassés à droite puis 2 à gauche, pieds posés À PLAT, sans rebond. Reste bas tout du long : les cuisses travaillent en continu."},
-  {n:"Dead bug rapide",t:"Rythme soutenu mais dos toujours plaqué",g:"Même exercice que le dead bug, tempo plus soutenu — mais la règle d or reste absolue : les lombaires ne décollent jamais du sol. Si ça décolle, ralentis."},
-  {n:"Pompes classiques",t:"Tempo rapide, amplitude complète",g:"Position planche sur les mains. Descends la poitrine près du sol, remonte en poussant fort. Sur 30 s, cherche le rythme sans sacrifier l amplitude : mieux vaut 12 pompes complètes que 20 à moitié."},
+  {n:"Dead bug rapide",t:"Rythme soutenu mais dos toujours plaqué",g:"Même exercice que le dead bug, tempo plus soutenu — mais la règle d’or reste absolue : les lombaires ne décollent jamais du sol. Si ça décolle, ralentis."},
+  {n:"Pompes classiques",t:"Tempo rapide, amplitude complète",g:"Position planche sur les mains. Descends la poitrine près du sol, remonte en poussant fort. Sur 30 s, cherche le rythme sans sacrifier l’amplitude : mieux vaut 12 pompes complètes que 20 à moitié."},
   {n:"Chaise au mur + bras",t:"En chaise, monte et descends les bras tendus",g:"Position chaise au mur, et pendant ce temps monte et descends les bras tendus devant toi. Double peine : cuisses + épaules."},
-  {n:"Bird-dog rythmé",t:"Alterne vite mais bassin stable",g:"À quatre pattes, alterne bras droit + jambe gauche puis l inverse, à un rythme fluide. Le bassin reste une table stable — imagine ton verre d eau posé dessus."},
+  {n:"Bird-dog rythmé",t:"Alterne vite mais bassin stable",g:"À quatre pattes, alterne bras droit + jambe gauche puis l’inverse, à un rythme fluide. Le bassin reste une table stable — imagine ton verre d’eau posé dessus."},
   {n:"Planche",t:"Finis fort, corps aligné, respire",g:"Avant-bras au sol sous les épaules, corps aligné tête-talons, fessiers et abdos serrés. Appui sur les avant-bras et le dessus des pieds si ça va, sinon sur les genoux. Respire."}]}
 ];
 var HIIT_WORK=30,HIIT_REST=10;
@@ -2090,70 +2105,70 @@ var hiitSel={circ:0,tours:2};
 var HIIT_LIB={
  "Pompes & haut":[
   {n:"Pompes classiques",t:"La base · coudes à 45°",g:"Position planche sur les mains, mains un peu plus larges que les épaules. Descends la poitrine près du sol, coudes à environ 45° du buste, remonte en soufflant. Corps gainé du talon à la tête."},
-  {n:"Pompes larges",t:"Mains écartées · pectoraux",g:"Mains bien plus larges que les épaules, coudes qui s ouvrent davantage. Amplitude un peu plus courte, accent sur les pectoraux. Ne force pas si les épaules tirent."},
-  {n:"Pompes serrées",t:"Mains sous les épaules · triceps",g:"Mains à largeur d épaules ou un peu moins, coudes qui frôlent le buste en descendant. Triceps et pectoraux internes. Plus dur que les classiques."},
-  {n:"Pompes diamant",t:"Mains jointes · triceps en feu",g:"Mains jointes sous la poitrine, pouces et index formant un diamant. Coudes le long du corps. Le plus dur pour les triceps — réduis l amplitude si besoin plutôt que de casser la position."},
+  {n:"Pompes larges",t:"Mains écartées · pectoraux",g:"Mains bien plus larges que les épaules, coudes qui s’ouvrent davantage. Amplitude un peu plus courte, accent sur les pectoraux. Ne force pas si les épaules tirent."},
+  {n:"Pompes serrées",t:"Mains sous les épaules · triceps",g:"Mains à largeur d’épaules ou un peu moins, coudes qui frôlent le buste en descendant. Triceps et pectoraux internes. Plus dur que les classiques."},
+  {n:"Pompes diamant",t:"Mains jointes · triceps en feu",g:"Mains jointes sous la poitrine, pouces et index formant un diamant. Coudes le long du corps. Le plus dur pour les triceps — réduis l’amplitude si besoin plutôt que de casser la position."},
   {n:"Pompes déclinées",t:"Pieds surélevés · haut des pecs",g:"Pieds posés sur une marche, un banc ou le canapé, mains au sol. Plus de poids sur les bras et accent sur le haut des pectoraux et les épaules. Monte la hauteur progressivement."},
-  {n:"Pompes inclinées",t:"Mains surélevées · version allégée",g:"Mains sur un banc, une marche ou le rack. Plus la surface est haute, plus c est facile. Idéal pour finir un circuit quand les bras ne suivent plus, sans passer aux genoux."},
+  {n:"Pompes inclinées",t:"Mains surélevées · version allégée",g:"Mains sur un banc, une marche ou le rack. Plus la surface est haute, plus c’est facile. Idéal pour finir un circuit quand les bras ne suivent plus, sans passer aux genoux."},
   {n:"Pompes tempo",t:"3 s pour descendre · contrôle total",g:"Descente lente comptée 3 secondes, 1 seconde en bas, remontée tonique. Moins de répétitions mais beaucoup plus de tension : excellent pour la force et la technique."},
   {n:"Pompes spiderman",t:"Genou vers le coude en descendant",g:"En descendant, ramène un genou vers le coude du même côté, repose en remontant, alterne. Travaille les obliques en plus du haut du corps. Mouvement fluide, bassin stable."},
   {n:"Pompes avec rotation",t:"Bras tendu vers le plafond",g:"Après chaque pompe, pivote le buste et tends un bras vers le plafond en position de T, reviens, alterne. Ouvre la poitrine et mobilise le haut du dos — agréable quand on est raide."},
-  {n:"Pompes archer",t:"Avancé · un bras travaille",g:"Mains très larges. Descends en pliant un seul bras, l autre reste tendu et glisse sur le côté. Alterne. Étape vers la pompe à un bras : ne force pas, c est exigeant pour l épaule."},
-  {n:"Pompes sur poings",t:"Poignets neutres",g:"Mêmes pompes classiques mais sur les poings (serrés, poignets dans l axe de l avant-bras). Soulage les poignets si l extension te gêne. Sur un tapis, pas sur du carrelage nu."},
+  {n:"Pompes archer",t:"Avancé · un bras travaille",g:"Mains très larges. Descends en pliant un seul bras, l’autre reste tendu et glisse sur le côté. Alterne. Étape vers la pompe à un bras : ne force pas, c’est exigeant pour l’épaule."},
+  {n:"Pompes sur poings",t:"Poignets neutres",g:"Mêmes pompes classiques mais sur les poings (serrés, poignets dans l’axe de l’avant-bras). Soulage les poignets si l’extension te gêne. Sur un tapis, pas sur du carrelage nu."},
   {n:"Pompes pike",t:"Fesses hautes · épaules",g:"En V inversé fesses au plafond, mains au sol. Fléchis les coudes pour amener la tête vers le sol entre les mains, remonte. Cible les épaules — la version la plus proche du développé militaire."},
   {n:"Pompes sur genoux",t:"Version allégée si les bras lâchent",g:"Genoux au sol, corps aligné genoux-tête. Utile en fin de circuit pour continuer proprement quand les pompes classiques ne passent plus."},
-  {n:"Dips sur banc",t:"Talons au sol · triceps",g:"Mains au bord du banc derrière toi, jambes tendues devant, talons au sol. Descends en fléchissant les coudes vers l arrière, remonte. Ne descends pas si les épaules tirent."}],
+  {n:"Dips sur banc",t:"Talons au sol · triceps",g:"Mains au bord du banc derrière toi, jambes tendues devant, talons au sol. Descends en fléchissant les coudes vers l’arrière, remonte. Ne descends pas si les épaules tirent."}],
  "Jambes & fessiers":[
-  {n:"Squat poids de corps",t:"Talons ancrés",g:"Pieds largeur épaules, poids sur les talons. Descends comme pour t asseoir, cuisses parallèles, remonte en poussant dans les talons."},
+  {n:"Squat poids de corps",t:"Talons ancrés",g:"Pieds largeur épaules, poids sur les talons. Descends comme pour t’asseoir, cuisses parallèles, remonte en poussant dans les talons."},
   {n:"Squat sumo",t:"Pieds larges, pointes ouvertes",g:"Pieds bien plus larges que les épaules, pointes à 45°. Descends entre tes jambes, talons ancrés. Intérieur des cuisses."},
   {n:"Squat pulse",t:"Petits rebonds en position basse",g:"En bas du squat, petits rebonds de 10-15 cm sans remonter complètement, talons ancrés. Brûlure express."},
   {n:"Fentes alternées",t:"Pied droit derrière : sur le cou-de-pied",g:"Grand pas en avant, genou arrière vers le sol, remonte, alterne. Hallux : pied droit derrière posé sur le cou-de-pied ou fente courte. Pied droit devant : libre."},
-  {n:"Fentes latérales",t:"Pas sur le côté, pied à plat",g:"Grand pas sur le côté, fesses en arrière, jambe opposée tendue, pied à plat. Alterne. Ne déroule pas l orteil."},
+  {n:"Fentes latérales",t:"Pas sur le côté, pied à plat",g:"Grand pas sur le côté, fesses en arrière, jambe opposée tendue, pied à plat. Alterne. Ne déroule pas l’orteil."},
   {n:"Chaise au mur",t:"Cuisses parallèles, appui talons",g:"Dos au mur, cuisses parallèles, genoux 90°, poids dans les talons. Tiens en respirant."},
   {n:"Chaise au mur + bras",t:"Chaise + élévations bras",g:"En chaise au mur, monte et descends les bras tendus devant toi. Cuisses + épaules en même temps."},
   {n:"Pont fessier",t:"Serre fort en haut",g:"Sur le dos, pieds à plat près des fesses. Monte les hanches, serre 1s, redescends. Sans hyperextension."},
-  {n:"Pont fessier marché",t:"En pont, tends une jambe puis l'autre",g:"Position de pont tenue, tends une jambe à l horizontale, repose, alterne. Hanches hautes et stables."},
-  {n:"Pont fessier 1 jambe",t:"Une jambe tendue, l'autre pousse",g:"Sur le dos, un pied au sol, l autre jambe tendue. Monte les hanches sur une jambe, 1 s en haut. Costaud pour les fessiers, zéro colonne."},
-  {n:"Fentes marchées",t:"Avancer en fentes",g:"Enchaîne des fentes en avançant, genou arrière vers le sol. Pied droit derrière sur le cou-de-pied si l orteil tire."},
-  {n:"Fentes bulgares",t:"Pied arrière surélevé",w:"Appui prolongé sur le dessus du pied arrière ou sur les orteils.",g:"Pied arrière posé sur un banc, descends sur la jambe avant, remonte. Très efficace mais exigeant pour l équilibre."},
-  {n:"Good morning poids de corps",t:"Charnière de hanche",w:"Flexion de hanche dos tendu : à proscrire si le dos est sensible ce jour-là.",g:"Debout, mains derrière la tête, bascule le buste vers l avant en gardant le dos parfaitement plat, genoux légèrement fléchis, puis redresse par les fessiers."},
-  {n:"Mollets debout",t:"Montées sur la pointe des pieds",w:"Met l avant-pied en extension complète.",g:"Debout, monte lentement sur la pointe des pieds, 1 s en haut, redescends en contrôle. Appuie-toi à un mur pour l équilibre."},],
+  {n:"Pont fessier marché",t:"En pont, tends une jambe puis l'autre",g:"Position de pont tenue, tends une jambe à l’horizontale, repose, alterne. Hanches hautes et stables."},
+  {n:"Pont fessier 1 jambe",t:"Une jambe tendue, l'autre pousse",g:"Sur le dos, un pied au sol, l’autre jambe tendue. Monte les hanches sur une jambe, 1 s en haut. Costaud pour les fessiers, zéro colonne."},
+  {n:"Fentes marchées",t:"Avancer en fentes",g:"Enchaîne des fentes en avançant, genou arrière vers le sol. Pied droit derrière sur le cou-de-pied si l’orteil tire."},
+  {n:"Fentes bulgares",t:"Pied arrière surélevé",w:"Appui prolongé sur le dessus du pied arrière ou sur les orteils.",g:"Pied arrière posé sur un banc, descends sur la jambe avant, remonte. Très efficace mais exigeant pour l’équilibre."},
+  {n:"Good morning poids de corps",t:"Charnière de hanche",w:"Flexion de hanche dos tendu : à proscrire si le dos est sensible ce jour-là.",g:"Debout, mains derrière la tête, bascule le buste vers l’avant en gardant le dos parfaitement plat, genoux légèrement fléchis, puis redresse par les fessiers."},
+  {n:"Mollets debout",t:"Montées sur la pointe des pieds",w:"Met l’avant-pied en extension complète.",g:"Debout, monte lentement sur la pointe des pieds, 1 s en haut, redescends en contrôle. Appuie-toi à un mur pour l’équilibre."},],
  "Cardio sans/low impact":[
   {n:"Montées de genoux sans saut",t:"Marche dynamique, pied à plat",g:"Genoux à hauteur de hanche, un pied toujours au sol, pose à plat, bras qui pompent. Rapide, zéro rebond."},
   {n:"Talons-fesses sans saut",t:"Talon vers la fesse, sans rebond",g:"Marche rapide talon vers la fesse, pose du pied à plat, bras actifs, buste droit."},
-  {n:"Jumping jacks",t:"Réception amortie · repli step jacks",g:"Sauts écart-serré, bras au-dessus de la tête, réception amortie genoux souples. Repli : step jacks (un pied à la fois, sans saut) si l orteil proteste. Règle des 24h."},
-  {n:"Course sur place",t:"Genoux hauts, rythme soutenu",w:"Impact répété sur l avant-pied (hallux) et petites compressions pour les lombaires.",g:"Cours sur place en montant les genoux, réception sur l avant-pied, amortie. Bras actifs."},
+  {n:"Jumping jacks",t:"Réception amortie · repli step jacks",g:"Sauts écart-serré, bras au-dessus de la tête, réception amortie genoux souples. Repli : step jacks (un pied à la fois, sans saut) si l’orteil proteste. Règle des 24h."},
+  {n:"Course sur place",t:"Genoux hauts, rythme soutenu",w:"Impact répété sur l’avant-pied (hallux) et petites compressions pour les lombaires.",g:"Cours sur place en montant les genoux, réception sur l’avant-pied, amortie. Bras actifs."},
   {n:"Montées de genoux sautées",t:"Version explosive",w:"Impact à chaque foulée : hallux opéré et disques lombaires encaissent.",g:"Comme les montées de genoux mais en alternant par petits bonds. Réception souple, buste droit, gainage serré."},
-  {n:"Talons-fesses courus",t:"Rapide, avec rebond",w:"Impact répété sur l avant-pied.",g:"Talon vers la fesse en courant sur place. Réception amortie, buste droit."},
-  {n:"Skaters (pas du patineur)",t:"Bonds latéraux",w:"Réception sur une jambe : impact + torsion, sollicite genou, cheville et lombaires.",g:"Bond latéral d un pied sur l autre, jambe libre qui passe derrière, bras qui accompagnent. Réception amortie, poitrine haute."},
-  {n:"Corde à sauter (sans corde)",t:"Petits bonds sur l'avant-pied",w:"Impact continu sur l avant-pied : le plus exigeant pour un hallux opéré.",g:"Petits bonds réguliers, chevilles souples, bras qui miment la corde. Reste bas : 2-3 cm suffisent."},
-  {n:"Sprint sur place",t:"Intensité maximale 30 s",w:"Impact élevé et rythme cardiaque très haut.",g:"Course sur place au maximum de la fréquence, genoux hauts, bras qui pompent. C est l exercice le plus cardio du lot."},
-  {n:"Burpees",t:"Le classique complet",w:"Flexion lombaire répétée sous fatigue + impact à la réception : l exercice le plus à risque pour un dos fragile.",g:"Debout, mains au sol, saut arrière en planche, pompe, saut avant, saut vertical. Garde le dos plat en descendant et ne t écroule pas au sol."},
+  {n:"Talons-fesses courus",t:"Rapide, avec rebond",w:"Impact répété sur l’avant-pied.",g:"Talon vers la fesse en courant sur place. Réception amortie, buste droit."},
+  {n:"Skaters (pas du patineur)",t:"Bonds latéraux",w:"Réception sur une jambe : impact + torsion, sollicite genou, cheville et lombaires.",g:"Bond latéral d’un pied sur l’autre, jambe libre qui passe derrière, bras qui accompagnent. Réception amortie, poitrine haute."},
+  {n:"Corde à sauter (sans corde)",t:"Petits bonds sur l'avant-pied",w:"Impact continu sur l’avant-pied : le plus exigeant pour un hallux opéré.",g:"Petits bonds réguliers, chevilles souples, bras qui miment la corde. Reste bas : 2-3 cm suffisent."},
+  {n:"Sprint sur place",t:"Intensité maximale 30 s",w:"Impact élevé et rythme cardiaque très haut.",g:"Course sur place au maximum de la fréquence, genoux hauts, bras qui pompent. C’est l’exercice le plus cardio du lot."},
+  {n:"Burpees",t:"Le classique complet",w:"Flexion lombaire répétée sous fatigue + impact à la réception : l’exercice le plus à risque pour un dos fragile.",g:"Debout, mains au sol, saut arrière en planche, pompe, saut avant, saut vertical. Garde le dos plat en descendant et ne t’écroule pas au sol."},
   {n:"Burpees sans saut ni pompe",t:"Version allégée",w:"Reste une flexion lombaire répétée, mais sans impact.",g:"Mains au sol, recule les pieds en marchant (sans sauter), reviens, redresse-toi sans saut final. Le cardio sans les chocs."},
-  {n:"Mountain climbers",t:"Genoux vers la poitrine, en planche",w:"Appui prolongé sur les orteils (hallux) ; bassin qui bouge = lombaires sollicitées.",g:"En planche mains, ramène alternativement un genou vers la poitrine, vite. Le bassin reste bas et stable, pas de fesses en l air."},
-  {n:"Fentes sautées",t:"Changement de jambe en l'air",w:"Impact fort + poussée de l avant-pied : cumule les deux contraintes.",g:"En fente, saute et change de jambe en l air, réception amortie en fente. Buste droit, genou arrière qui descend sans toucher."},
+  {n:"Mountain climbers",t:"Genoux vers la poitrine, en planche",w:"Appui prolongé sur les orteils (hallux) ; bassin qui bouge = lombaires sollicitées.",g:"En planche mains, ramène alternativement un genou vers la poitrine, vite. Le bassin reste bas et stable, pas de fesses en l’air."},
+  {n:"Fentes sautées",t:"Changement de jambe en l'air",w:"Impact fort + poussée de l’avant-pied : cumule les deux contraintes.",g:"En fente, saute et change de jambe en l’air, réception amortie en fente. Buste droit, genou arrière qui descend sans toucher."},
   {n:"Squats sautés",t:"Explosivité jambes",w:"Compression axiale répétée à la réception : le geste le moins indiqué pour une discopathie.",g:"Squat classique puis saut vertical, réception genoux souples et fesses en arrière pour amortir. Amorti maximal, dos gainé."},
-  {n:"Box step-up",t:"Montées sur marche",w:"Poussée de l avant-pied sur la jambe qui monte.",g:"Monte un pied sur une marche ou un banc bas, déroule, redescends en contrôle, alterne. Pousse dans le talon pour épargner l orteil."},
+  {n:"Box step-up",t:"Montées sur marche",w:"Poussée de l’avant-pied sur la jambe qui monte.",g:"Monte un pied sur une marche ou un banc bas, déroule, redescends en contrôle, alterne. Pousse dans le talon pour épargner l’orteil."},
   {n:"Pas chassés lents",t:"En squat léger, pieds à plat",g:"2 pas chassés à droite, 2 à gauche, posés à plat, en restant bas. Cuisses en continu."},
-  {n:"Step jacks",t:"Jumping jack sans saut",g:"Même mouvement de bras que le jumping jack, mais un pied s écarte à la fois, sans jamais sauter. Cardio propre, zéro impact."},
+  {n:"Step jacks",t:"Jumping jack sans saut",g:"Même mouvement de bras que le jumping jack, mais un pied s’écarte à la fois, sans jamais sauter. Cardio propre, zéro impact."},
   {n:"Shadow boxing",t:"Frappes rapides, pieds à plat",g:"Garde de boxe, enchaîne directs et crochets dans le vide, gaine le tronc, buste qui tourne légèrement."}],
  "Gainage & dos":[
   {n:"Planche",t:"Corps aligné, respire",g:"Avant-bras au sol, corps aligné tête-talons, fessiers serrés. Sur les genoux si besoin."},
-  {n:"Planche épaule-touches",t:"Bassin immobile",g:"En planche mains (genoux si besoin), touche l épaule opposée, alterne. Le bassin ne bouge pas."},
+  {n:"Planche épaule-touches",t:"Bassin immobile",g:"En planche mains (genoux si besoin), touche l’épaule opposée, alterne. Le bassin ne bouge pas."},
   {n:"Gainage latéral",t:"15s par côté",g:"Sur le côté, appui avant-bras, hanches hautes. Change de côté à mi-temps."},
   {n:"Dead bug",t:"Lombaires plaquées, lent",g:"Sur le dos, bras+jambe opposés descendent SANS décoller les lombaires. Le meilleur abdo pour ton dos."},
   {n:"Dead bug rapide",t:"Tempo soutenu, dos plaqué",g:"Même exercice, rythme plus rapide — mais si les lombaires décollent, ralentis."},
   {n:"Bird-dog rythmé",t:"Bassin stable",g:"À quatre pattes, alterne bras+jambe opposés à rythme fluide, bassin immobile comme une table."},
   {n:"Superman doux",t:"Petit décollé, 2s de pause",g:"Sur le ventre, petit décollé bras+jambes, pause 2s, repose en contrôle. Sans à-coups."},
   {n:"Hollow hold",t:"Bas du dos plaqué",g:"Sur le dos, bras et jambes tendus légèrement décollés, lombaires écrasées au sol. Si le bas du dos décolle, replie les genoux."},
-  {n:"Flutter kicks",t:"Battements de jambes",w:"Jambes tendues basses = forte traction sur les lombaires.",g:"Sur le dos, mains sous les fesses, petits battements de jambes tendues. Plus les jambes sont basses, plus c est dur pour le dos : monte-les si ça tire."},
-  {n:"Relevés de jambes",t:"Jambes tendues, montée contrôlée",w:"Bascule du bassin et traction lombaire à chaque descente.",g:"Sur le dos, jambes tendues, monte-les à la verticale puis redescends lentement sans toucher le sol. Garde les lombaires plaquées — c est ça qui protège."},
+  {n:"Flutter kicks",t:"Battements de jambes",w:"Jambes tendues basses = forte traction sur les lombaires.",g:"Sur le dos, mains sous les fesses, petits battements de jambes tendues. Plus les jambes sont basses, plus c’est dur pour le dos : monte-les si ça tire."},
+  {n:"Relevés de jambes",t:"Jambes tendues, montée contrôlée",w:"Bascule du bassin et traction lombaire à chaque descente.",g:"Sur le dos, jambes tendues, monte-les à la verticale puis redescends lentement sans toucher le sol. Garde les lombaires plaquées — c’est ça qui protège."},
   {n:"Crunchs",t:"Flexion courte du buste",w:"Flexion lombaire répétée : à éviter en cas de discopathie, surtout sur 30 s à rythme rapide.",g:"Sur le dos, genoux pliés, décolle les omoplates de quelques centimètres, souffle en montant. Ne tire pas sur la nuque."},
-  {n:"Sit-ups",t:"Buste complet",w:"La flexion complète du rachis sous charge est la plus contraignante pour les disques.",g:"Sur le dos, remonte le buste jusqu à l assise, redescends en contrôle. Mouvement complet et exigeant pour la colonne."},
-  {n:"Russian twists",t:"Rotation buste assis",w:"Rotation lombaire répétée en position fléchie : combinaison à risque pour les disques.",g:"Assis, buste incliné en arrière, pieds décollés ou non, tourne le buste d un côté puis de l autre. Tourne depuis les côtes, pas depuis le bas du dos."},
+  {n:"Sit-ups",t:"Buste complet",w:"La flexion complète du rachis sous charge est la plus contraignante pour les disques.",g:"Sur le dos, remonte le buste jusqu’à l’assise, redescends en contrôle. Mouvement complet et exigeant pour la colonne."},
+  {n:"Russian twists",t:"Rotation buste assis",w:"Rotation lombaire répétée en position fléchie : combinaison à risque pour les disques.",g:"Assis, buste incliné en arrière, pieds décollés ou non, tourne le buste d’un côté puis de l’autre. Tourne depuis les côtes, pas depuis le bas du dos."},
   {n:"V-ups",t:"Bras et jambes se rejoignent",w:"Flexion lombaire complète et dynamique.",g:"Allongé, monte simultanément buste et jambes tendues pour former un V, redescends en contrôle."},
   {n:"Planche dynamique (up-down)",t:"Avant-bras → mains → avant-bras",g:"En planche, passe des avant-bras aux mains puis reviens, en alternant le bras qui démarre. Le bassin ne tourne pas."},
-  {n:"Planche commando",t:"Gainage + haut du corps",g:"Même principe que l up-down, en enchaînant plus vite. Serre les fessiers pour bloquer le bassin."}]
+  {n:"Planche commando",t:"Gainage + haut du corps",g:"Même principe que l’up-down, en enchaînant plus vite. Serre les fessiers pour bloquer le bassin."}]
 };
 var hiit={seq:[],idx:0,phEnd:0,iv:null,paused:false,pauseLeft:0,startedAt:0,tours:1,circName:"",exCount:12,beeped:{}};
 
@@ -3520,6 +3535,7 @@ function renderPanier(){
     box.appendChild(row);
   });
 }
+var libOuvert=null;   // fiche d'exercice dépliée dans la liste du Libre
 function renderLib(){
   var list=$("#libList");list.innerHTML="";
   var sel=[];
@@ -3528,23 +3544,47 @@ function renderLib(){
     list.appendChild(el("h2",null,esc(g)));
     (allLib()[g]||[]).forEach(function(it){
       var added=!!basket[it.k];
-      var card=el("div","lib-card"+(added?" added":""));
+      var ouvert=libOuvert===it.k;
+      var card=el("div","lib-card"+(added?" added":"")+(ouvert?" open":""));
       var row=el("div","lib-ex"+(added?" added":""));
-      var left=el("div");
+      var left=el("div","lib-info");
       left.appendChild(el("div","n",esc(it.n)+(it.w?" <span class='warnbadge'>⚠</span>":"")));
-      left.appendChild(el("div","s",esc(added?basket[it.k].s:it.s)));
+      left.appendChild(el("div","s",esc(added?basket[it.k].s:it.s)+" <span class='ld-more'>"+(ouvert?"· masquer ▾":"· détails ▸")+"</span>"));
       row.appendChild(left);
-      row.appendChild(el("div","add",added?"✓":"+"));
-      row.addEventListener("click",function(){
+      var add=el("button","add",added?"✓":"+");
+      add.setAttribute("aria-label",added?"Retirer de ma sélection":"Ajouter à ma sélection");
+      function basculer(){
         if(basket[it.k])delete basket[it.k];
         else{
           var copy=Object.assign({},it);
           copy._reps=parseReps(it.s);
           basket[it.k]=copy;
         }
-        renderLib();
-      });
+      }
+      // « + » : ajout direct, sans ouvrir la fiche
+      add.addEventListener("click",function(e){e.stopPropagation();basculer();renderLib();});
+      // toucher l'exercice : ouvre ou referme sa fiche
+      row.addEventListener("click",function(){libOuvert=ouvert?null:it.k;renderLib();});
+      row.appendChild(add);
       card.appendChild(row);
+      if(ouvert){
+        var d=el("div","lib-desc");
+        var type=it.hiit?"⚡ HIIT · chronométré":it.cali?"🤸 Callisthénie · poids du corps":(it.chrono?"Gainage · chronométré":"Musculation");
+        d.appendChild(el("div","ld-tag",type+" · "+esc(it.s)));
+        if(it.v)d.appendChild(el("div","ld-v",esc(it.v)));
+        if(it.g)d.appendChild(el("div","ld-g",esc(it.g)));
+        if(it.w)d.appendChild(el("div","warnbox","⚠ <b>À savoir :</b> "+esc(it.w)));
+        var b=el("button","btn block ld-btn"+(added?" ghost":" red"),added?"✓ Dans ta sélection · retirer":"+ Ajouter à ma sélection");
+        b.addEventListener("click",function(e){
+          e.stopPropagation();
+          var ajoute=!basket[it.k];
+          basculer();
+          if(ajoute){libOuvert=null;toast("Ajouté : "+it.n);}
+          renderLib();
+        });
+        d.appendChild(b);
+        card.appendChild(d);
+      }
       // Réglages séries / reps (ou durée) quand l'exercice est sélectionné
       if(added)card.appendChild(reglagesPanier(basket[it.k]));
       list.appendChild(card);
