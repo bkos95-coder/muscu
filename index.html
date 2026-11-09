@@ -1131,8 +1131,12 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.29.1";
+var APP_VERSION="1.29.2";
 var CHANGELOG=[
+ {v:"1.29.2",d:"2026-11-09",n:[
+   "Historique : supprimer la dernière entrée d’un type pendant que son filtre était actif affichait une liste vide — retour automatique sur « Tout »",
+   "Audit complet : 139 boutons cliqués, parcours de bout en bout, nettoyage du code inutilisé"
+ ]},
  {v:"1.29.1",d:"2026-11-09",n:[
    "Date de la version 1.29.0 corrigée (9 novembre)"
  ]},
@@ -2226,7 +2230,6 @@ var HIIT_CIRCUITS=[
   {n:"Bird-dog rythmé",t:"Alterne vite mais bassin stable",g:"À quatre pattes, alterne bras droit + jambe gauche puis l’inverse, à un rythme fluide. Le bassin reste une table stable — imagine ton verre d’eau posé dessus."},
   {n:"Planche",t:"Finis fort, corps aligné, respire",g:"Avant-bras au sol sous les épaules, corps aligné tête-talons, fessiers et abdos serrés. Appui sur les avant-bras et le dessus des pieds si ça va, sinon sur les genoux. Respire."}]}
 ];
-var HIIT_WORK=30,HIIT_REST=10;
 var hiitSel={circ:0,tours:2};
 
 /* Bibliothèque HIIT par catégories — pour composer ses circuits */
@@ -3370,7 +3373,6 @@ function updateSchemeSets(w){
   var rest=m?m[1]:"12";
   w.scheme=w.sets.length+" × "+rest;
 }
-function _oldNoop(){}
 $("#backBtn").addEventListener("click",function(){
   if(confirm("Annuler cette séance sans l'enregistrer ?")){current=null;sessClockStop();timerIdle();show("plan");renderPlan();}
 });
@@ -3419,7 +3421,6 @@ $("#finishBtn").addEventListener("click",function(){
   state.lastSession={title:current.session.title,letter:current.session.letter,sub:current.session.sub,id:current.session.id,items:current.session.items};
   state.history.unshift(entry);
   save();
-  var wasNote=current.note;
   current=null;
   sessClockStop();
   timerIdle();
@@ -3503,7 +3504,6 @@ function anEl(p,tag,at){var e=document.createElementNS(AN_NS,tag);for(var k in a
 function anDecor(svg,sp){
   anEl(svg,"line",{x1:-10,y1:190,x2:270,y2:190,"class":"an-sol"});
   (sp.eq||[]).forEach(function(e){
-    var c={"class":"an-eq"};
     if(e[0]==="banc"){anEl(svg,"rect",{x:e[1],y:e[3],width:e[2]-e[1],height:8,rx:3,"class":"an-eq"});anEl(svg,"rect",{x:e[1]+8,y:e[3]+8,width:5,height:182-e[3],"class":"an-eq"});anEl(svg,"rect",{x:e[2]-13,y:e[3]+8,width:5,height:182-e[3],"class":"an-eq"});}
     else if(e[0]==="barre"){anEl(svg,"line",{x1:e[1],y1:e[3],x2:e[2],y2:e[3],"class":"an-barre"});}
     else if(e[0]==="mur"){anEl(svg,"rect",{x:e[1],y:10,width:7,height:180,"class":"an-eq"});}
@@ -3635,7 +3635,6 @@ S("cali_hip_thrust_banc",{eq:[["banc",20,78,150]],K:[P(HT_B,{lb:[184,126]}),P(HT
 var POMPE={K:[PU.haut,PU.bas],hl:"corps",pied:[-3,6],ph:["Poitrine vers le sol","Pousse, sans creuser"]};
 ["pompes","hiit_pompes_classiques","hiit_pompes_larges","hiit_pompes_serrees","hiit_pompes_diamant","hiit_pompes_sur_poings","hiit_pompes_archer"].forEach(function(k){S(k,POMPE);});
 S("hiit_pompes_tempo",P(POMPE,{mm:[2.4,1.0],ph:["Descends lentement (3 s)","Remonte"]}));
-var PG=anPompe({an:[100,184]});
 var GEN_H=P(anCorps([100,184],30,46),{lf:[64,160],lb:[60,160],af:[198,186],ab:[194,186]}),GEN_B=P(anCorps([100,184],9,46),{lf:[64,160],lb:[60,160],af:[198,186],ab:[194,186]});
 S("hiit_pompes_sur_genoux",{K:[GEN_H,GEN_B],hl:"dos",pied:[-4,4],ph:["Poitrine vers le sol","Pousse"]});
 var DEC=anPompe({an:[60,148],thH:8.3,thB:-7.6,mains:[208,186]});
@@ -5339,6 +5338,9 @@ function renderHisto(){
   renderWeight();
   renderVolume();
   renderProg();
+  // Filtre devenu caduc (barre masquée sous 5 entrées, ou plus aucune entrée de ce type,
+  // ex. après suppression du dernier trail) : on revient à « Tout » plutôt qu'une liste vide
+  if(histoFiltre!=="tout"&&(state.history.length<5||!state.history.some(function(h){return histoMatch(h,histoFiltre);})))histoFiltre="tout";
   var list=$("#histoList");list.innerHTML="";
   var wk=weekKey(new Date().toISOString());
   var wkSess=state.history.filter(function(h){return h.type!=="act"&&weekKey(h.date)===wk;}).length;
