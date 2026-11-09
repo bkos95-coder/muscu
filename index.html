@@ -412,7 +412,7 @@
   #chronoOverlay{justify-content:center}
   #hiitOverlay{justify-content:center}
   #hiitOverlay .ov-pause{display:block}
-  #hiitOverlay .h-exname{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:clamp(28px,8.5vw,42px);text-transform:uppercase;letter-spacing:.02em;line-height:1.05;color:#fff;text-align:center;max-width:92vw}
+  #hiitOverlay .h-exname{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:clamp(32px,10.5vw,52px);text-transform:uppercase;letter-spacing:.02em;line-height:1.05;color:#fff;text-align:center;max-width:92vw}
   #hiitOverlay.paused .ov-time{opacity:.45}
   #hiitOverlay.paused .ov-ensuite{animation:none}
   #hiitOverlay.course.rest .ov-time,#hiitOverlay.course.rest .h-phase{color:#4caf50}
@@ -436,13 +436,6 @@
   /* écrans plein écran : rien ne s'écrase, et ça défile si le téléphone est petit */
   #doOverlay,#hiitOverlay,#chronoOverlay{overflow-y:auto;justify-content:safe center}
   #doOverlay>*,#hiitOverlay>*,#chronoOverlay>*{flex-shrink:0}
-  @media (max-height:780px){
-    .overlay{gap:6px;padding:18px 20px}
-    .ov-time{font-size:clamp(96px,30vw,180px)}
-    #doOverlay .do-done{height:min(30vw,112px)}
-    .ov-anim{width:min(28vw,110px)}
-    .do-anim{width:min(40vw,150px)}
-  }
   .run-reps{display:flex;align-items:center;gap:14px}
   .run-reps b{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:26px;min-width:34px;text-align:center}
   .run-sum{margin-top:14px;font-size:14px;font-weight:600;color:var(--ink-2)}
@@ -464,10 +457,10 @@
   .ov-serie span{display:block;font-size:14px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#8a857d}
   .ov-serie b{display:block;font-size:clamp(46px,14vw,72px);font-weight:800;line-height:1;color:#fff}
   .ov-serie b em{font-style:normal;color:var(--red)}
-  #chronoOverlay .ov-label{font-size:clamp(26px,8vw,40px);color:#fff;letter-spacing:.03em;line-height:1.05;max-width:92vw}
+  #chronoOverlay .ov-label{font-size:clamp(32px,10.5vw,52px);color:#fff;letter-spacing:.03em;line-height:1.05;max-width:92vw}
   .overlay.rest #ovLabel{color:#4caf50}
-  .ov-ensuite{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:clamp(19px,5.6vw,25px);color:#c9c4bb;text-align:center;max-width:92vw;line-height:1.15;min-height:1px}
-  .ov-ensuite.imminent{font-size:clamp(26px,8vw,36px);color:var(--red);animation:ovClignote .55s ease-in-out infinite alternate}
+  .ov-ensuite{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:clamp(24px,7.2vw,34px);color:#c9c4bb;text-align:center;max-width:92vw;line-height:1.15;min-height:1px}
+  .ov-ensuite.imminent{font-size:clamp(30px,9.5vw,46px);color:var(--red);animation:ovClignote .55s ease-in-out infinite alternate}
   @keyframes ovClignote{from{opacity:1}to{opacity:.25}}
   .ov-bottom{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
   #chronoOverlay .ov-bottom .ov-close{margin-top:0}
@@ -564,6 +557,66 @@
   .overlay.ready .ov-start{display:block}
   .overlay.ready .ov-bar{visibility:hidden}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+  /* ===== Adaptation à l'écran (en fin de feuille : ces règles priment) ===== */
+  @media (orientation:portrait){
+    .overlay{gap:8px}
+    .ov-time{font-size:clamp(110px,34vw,220px)}
+    .ov-anim{width:min(30vw,120px)}
+    .do-anim{width:min(40vw,160px)}
+    #hiitOverlay .ov-time{font-size:clamp(96px,29vw,190px)}
+    #hiitOverlay .ov-anim{width:min(24vw,96px)}
+    #hiitOverlay{gap:6px}
+  }
+  @media (orientation:portrait) and (max-height:780px){
+    .overlay{gap:5px;padding:16px 18px}
+    .ov-time{font-size:clamp(92px,29vw,170px)}
+    #chronoOverlay .ov-label,#hiitOverlay .h-exname{font-size:clamp(28px,9vw,42px)}
+    .ov-ensuite{font-size:clamp(21px,6.4vw,28px)}
+    .ov-ensuite.imminent{font-size:clamp(26px,8vw,36px)}
+    #doOverlay .do-done{height:min(30vw,112px)}
+    .ov-anim{width:min(26vw,100px)}
+    .do-anim{width:min(36vw,140px)}
+    #hiitOverlay .h-tip{font-size:12.5px}
+    #hiitOverlay .ov-time{font-size:clamp(80px,25vw,150px)}
+    #hiitOverlay .ov-anim{width:min(22vw,84px)}
+  }
+  /* Paysage (téléphone tourné) : chrono à gauche, infos et boutons à droite */
+  @media (orientation:landscape) and (max-height:560px){
+    #chronoOverlay.open,#hiitOverlay.open{display:grid;grid-auto-flow:row dense;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);grid-auto-rows:min-content;align-content:center;column-gap:20px;row-gap:4px;padding:8px 20px}
+    #chronoOverlay>*,#hiitOverlay>*{grid-column:2;margin:0!important;justify-self:center;max-width:100%}
+    #chronoOverlay>.ov-total,#hiitOverlay>.ov-total,#doOverlay>.ov-total{grid-column:auto;grid-row:auto}
+    #chronoOverlay .ov-anim,#hiitOverlay .ov-anim{grid-column:1;grid-row:1;width:min(16vw,110px)}
+    #chronoOverlay .ov-time,#hiitOverlay .ov-time{grid-column:1;grid-row:2/span 10;align-self:center;font-size:min(42vh,24vw)}
+    #chronoOverlay .ov-bar,#hiitOverlay .ov-bar{grid-column:1;grid-row:12;width:90%}
+    .ov-serie{padding-top:0}
+    .ov-serie span{font-size:11px}
+    .ov-serie b{font-size:clamp(26px,9vh,40px)}
+    #chronoOverlay .ov-label,#hiitOverlay .h-exname{font-size:clamp(20px,7vh,32px);line-height:1.05}
+    #hiitOverlay .h-phase{font-size:14px}
+    .ov-ensuite{font-size:clamp(16px,5vh,22px)}
+    .ov-ensuite.imminent{font-size:clamp(19px,6.2vh,28px)}
+    #hiitOverlay .h-tip,#chronoOverlay .ov-hint{display:none}
+    #hiitOverlay .h-round{font-size:11px}
+    .ov-bottom{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:6px;padding-bottom:0}
+    .ov-bottom .ov-close,.ov-bottom .ov-pause{min-width:0;padding:8px 16px;font-size:15px}
+    #doOverlay.open{display:grid;grid-auto-flow:row dense;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-auto-rows:min-content;align-content:center;column-gap:22px;row-gap:4px;padding:8px 20px}
+    #doOverlay>*{grid-column:1;margin:0!important;justify-self:center;max-width:100%}
+    #doOverlay .do-charge,#doOverlay .do-done,#doOverlay .do-next,#doOverlay .do-row{grid-column:2}
+    #doOverlay .do-name{font-size:clamp(22px,8vh,34px)}
+    #doOverlay .do-tip{font-size:12.5px}
+    #doOverlay .do-done{height:min(30vh,110px);width:min(40vw,300px);font-size:clamp(22px,7vh,30px)}
+    #doOverlay .do-anim{width:min(15vw,100px)}
+    #doOverlay .do-row{flex-direction:row;gap:8px}
+    #doOverlay .do-row .ov-close{padding:8px 14px;margin:0}
+  }
+  @media (orientation:landscape) and (max-height:380px){
+    #doOverlay .do-anim{width:min(12vw,78px)}
+    #doOverlay .do-tip{display:none}
+    #doOverlay.open,#chronoOverlay.open,#hiitOverlay.open{row-gap:2px}
+    #doOverlay .do-name{font-size:clamp(20px,7vh,28px)}
+    #doOverlay .do-done{height:min(26vh,90px)}
+  }
 </style>
 </head>
 <body>
@@ -903,6 +956,7 @@
       </div>
       <p class="muted" id="volHint" style="font-size:11.5px;margin:2px 0 10px">100 % = niveau standard · au-delà, son renforcé</p>
       <p class="muted" id="sonState">Joue la séquence complète pour vérifier le réglage. Rien n'est enregistré.</p>
+      <label class="sheet-check duck-check"><input type="checkbox" id="duckOn"> 🎵 Baisser la musique pendant les bips, sifflets et annonces</label>
       <button class="btn ghost block" id="sonTest">▶ Tester les sons</button>
     </div>
 
@@ -1077,8 +1131,14 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.28.0";
+var APP_VERSION="1.29.0";
 var CHANGELOG=[
+ {v:"1.29.0",d:"2026-11-08",n:[
+   "Chrono et HIIT : nom de l’exercice et « Ensuite » en plus gros",
+   "HIIT : mountain climbers extérieurs et intérieurs (avec schémas animés)",
+   "La musique (Spotify…) baisse pendant les bips, sifflets et annonces, puis remonte (réglable)",
+   "Mode paysage pour le chrono, le lecteur HIIT et la page « À toi »"
+ ]},
  {v:"1.28.0",d:"2026-11-08",n:[
    "Schémas animés pour les 127 exercices : fiche du Libre, page « À toi », écran du chrono, lecteur HIIT et « Comment faire » des séances",
    "Ligne verte = ce qui reste droit (dos, alignement) · orange = le membre qui travaille · consigne du moment sous le schéma"
@@ -1258,7 +1318,7 @@ var CHANGELOG=[
    "Récap réel de la semaine, indépendant du programme choisi"
  ]}
 ];
-var state={freq:3,rest:90,dur:40,mode:"equilibre",keepAwake:false,volume:100,fatUnit:"%",height:185,flowOrder:"circuit",flowPause:null,flowPauseEx:10,flowSetup:5,hiitWork:30,hiitRest:10,hiitRound:60,hiitSetup:5,runWarm:5,runRun:60,runWalk:120,runReps:8,runCool:5,leadIn:1,voice:true,history:[],lastCharges:{},chronoDur:{},autoSave:false,lastSession:null,templates:[],hiitCustom:[],weights:[],lastExport:null};
+var state={freq:3,rest:90,dur:40,mode:"equilibre",keepAwake:false,volume:100,fatUnit:"%",height:185,duckAudio:true,flowOrder:"circuit",flowPause:null,flowPauseEx:10,flowSetup:5,hiitWork:30,hiitRest:10,hiitRound:60,hiitSetup:5,runWarm:5,runRun:60,runWalk:120,runReps:8,runCool:5,leadIn:1,voice:true,history:[],lastCharges:{},chronoDur:{},autoSave:false,lastSession:null,templates:[],hiitCustom:[],weights:[],lastExport:null};
 var canSave=true;
 try{
   var raw=localStorage.getItem(KEY);
@@ -1278,6 +1338,7 @@ try{
       state.leadIn=[1,3,5].indexOf(p.leadIn)>=0?p.leadIn:1;
       state.flowSetup=[0,3,5,10,15,20].indexOf(p.flowSetup)>=0?p.flowSetup:5;
       state.flowPauseEx=[0,5,10,15,20,30].indexOf(p.flowPauseEx)>=0?p.flowPauseEx:10;
+      state.duckAudio=p.duckAudio!==false;
       function choix(v,liste,def){return liste.indexOf(v)>=0?v:def;}
       state.hiitWork=choix(p.hiitWork,[20,30,40,45,60],30);
       state.hiitRest=choix(p.hiitRest,[0,5,10,15,20,30],10);
@@ -1805,8 +1866,38 @@ function initAudio(){
     if(AC)audioCtx=new AC();
   }catch(e){audioCtx=null;}
 }
+/* ---------- Baisser la musique des autres applis pendant nos sons ----------
+   Une appli web ne peut pas régler le volume de Spotify & co. Mais un son court
+   (< 5 s) joué par un élément <audio> demande à Android une « priorité audio
+   passagère avec atténuation » : le système baisse alors la musique, puis la remonte.
+   On joue donc un clip silencieux de 4,5 s, prolongé tant que bips, sifflets
+   et annonces s'enchaînent. */
+var duckEl=null,duckFin=0,duckTimer=null,duckUrl=null;
+function duckClip(){
+  var sr=8000,n=Math.floor(sr*4.5),buf=new ArrayBuffer(44+n),v=new DataView(buf);
+  function txt(o,t){for(var i=0;i<t.length;i++)v.setUint8(o+i,t.charCodeAt(i));}
+  txt(0,"RIFF");v.setUint32(4,36+n,true);txt(8,"WAVE");txt(12,"fmt ");
+  v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+  v.setUint32(24,sr,true);v.setUint32(28,sr,true);v.setUint16(32,1,true);v.setUint16(34,8,true);
+  txt(36,"data");v.setUint32(40,n,true);
+  for(var k=0;k<n;k++)v.setUint8(44+k,128);   // silence (8 bits non signés)
+  return URL.createObjectURL(new Blob([buf],{type:"audio/wav"}));
+}
+function baisserMusique(ms){
+  if(state.duckAudio===false||typeof Audio==="undefined")return;
+  try{
+    if(!duckEl){duckUrl=duckUrl||duckClip();duckEl=new Audio(duckUrl);duckEl.preload="auto";}
+    var now=Date.now();
+    if(duckEl.paused){duckEl.currentTime=0;var pr=duckEl.play();if(pr&&pr.catch)pr.catch(function(){});}
+    else if(duckEl.currentTime>3.2)duckEl.currentTime=0;   // on prolonge sans relâcher
+    duckFin=Math.max(duckFin,now+Math.min(ms||1000,4300));
+    clearTimeout(duckTimer);
+    duckTimer=setTimeout(function(){try{duckEl.pause();}catch(e){}duckFin=0;},Math.max(0,duckFin-now)+350);
+  }catch(e){}
+}
 function beep(freq,dur,vol,type){
   if(!audioCtx)return;
+  baisserMusique(900+(dur||0.15)*1000);
   try{
     if(audioCtx.state==="suspended")audioCtx.resume();
     var o=audioCtx.createOscillator(),g=audioCtx.createGain();
@@ -1831,6 +1922,7 @@ function beepShort(){
 function whistle(dur,delay){
   if(!audioCtx)return;
   var d=dur||0.45, start=delay||0;
+  baisserMusique((d+start)*1000+800);
   try{
     if(audioCtx.state==="suspended")audioCtx.resume();
     var t=audioCtx.currentTime+start;
@@ -2041,6 +2133,7 @@ function chronoTic(){
     // les 5 dernières secondes : la suite grossit et clignote
     var ens=$("#ovEnsuite");
     if(ens)ens.classList.toggle("imminent",remain<=5&&!!ens.textContent);
+    if(remain===6)baisserMusique(1500);
     if(remain<=5&&!chrono.beeped[remain]){
       chrono.beeped[remain]=true;
       beepShort();
@@ -2178,6 +2271,8 @@ var HIIT_LIB={
   {n:"Burpees",t:"Le classique complet",w:"Flexion lombaire répétée sous fatigue + impact à la réception : l’exercice le plus à risque pour un dos fragile.",g:"Debout, mains au sol, saut arrière en planche, pompe, saut avant, saut vertical. Garde le dos plat en descendant et ne t’écroule pas au sol."},
   {n:"Burpees sans saut ni pompe",t:"Version allégée",w:"Reste une flexion lombaire répétée, mais sans impact.",g:"Mains au sol, recule les pieds en marchant (sans sauter), reviens, redresse-toi sans saut final. Le cardio sans les chocs."},
   {n:"Mountain climbers",t:"Genoux vers la poitrine, en planche",w:"Appui prolongé sur les orteils (hallux) ; bassin qui bouge = lombaires sollicitées.",g:"En planche mains, ramène alternativement un genou vers la poitrine, vite. Le bassin reste bas et stable, pas de fesses en l’air."},
+  {n:"Mountain climbers extérieurs",t:"Genou vers le coude, côté extérieur",w:"Appui prolongé sur les orteils (hallux) ; bassin qui bouge = lombaires sollicitées.",g:"En planche mains, amène le genou par l’extérieur jusqu’au coude du même côté, reviens, puis change de jambe. Le bassin reste bas et stable. Travaille les obliques et la mobilité des hanches."},
+  {n:"Mountain climbers intérieurs",t:"Genou vers le coude opposé, sous le corps",w:"Petite rotation du bassin à chaque genou : reste contrôlé avec ta discopathie ; appui prolongé sur les orteils (hallux).",g:"En planche mains, amène le genou en diagonale sous le buste, vers le coude opposé, reviens, puis change de jambe. Les épaules restent au-dessus des mains. Travaille les obliques."},
   {n:"Fentes sautées",t:"Changement de jambe en l'air",w:"Impact fort + poussée de l’avant-pied : cumule les deux contraintes.",g:"En fente, saute et change de jambe en l’air, réception amortie en fente. Buste droit, genou arrière qui descend sans toucher."},
   {n:"Squats sautés",t:"Explosivité jambes",w:"Compression axiale répétée à la réception : le geste le moins indiqué pour une discopathie.",g:"Squat classique puis saut vertical, réception genoux souples et fesses en arrière pour amortir. Amorti maximal, dos gainé."},
   {n:"Box step-up",t:"Montées sur marche",w:"Poussée de l’avant-pied sur la jambe qui monte.",g:"Monte un pied sur une marche ou un banc bas, déroule, redescends en contrôle, alterne. Pousse dans le talon pour épargner l’orteil."},
@@ -2476,6 +2571,7 @@ function hiitTick(){
   $("#hTime").classList.toggle("warn",left<=5&&(p.type==="work"||p.type==="run"));
   var e=Math.floor((Date.now()-hiit.startedAt)/1000);
   $("#hTotalVal").textContent=Math.floor(e/60)+":"+(e%60<10?"0":"")+(e%60);
+  if(left===6)baisserMusique(1500);
   if(left<=5&&!hiit.beeped[left]){hiit.beeped[left]=true;beepShort();}
   if(hiit.lockOn)majVerrou();
 }
@@ -2942,7 +3038,10 @@ function parler(txt){
     ss.cancel();
     var u=new SpeechSynthesisUtterance(txt);
     u.lang="fr-FR";u.rate=1.05;u.volume=Math.min(1,volumeFactor());
+    baisserMusique(700+txt.length*70);
     ss.speak(u);
+    // annonce longue : on garde la musique basse jusqu'à la fin de la phrase
+    var garde=setInterval(function(){if(ss.speaking||ss.pending)baisserMusique(1200);else clearInterval(garde);},800);
   }catch(e){}
 }
 function annonceProchain(w){
@@ -3559,6 +3658,8 @@ S("hiit_planche_epaule_touches",{K:[PL_H,P(PL_H,{af:[198,132]}),PL_H,P(PL_H,{ab:
 S("hiit_planche_dynamique_up_down",{K:[PLANCHE_C,PL_H],m:0.8,hl:"corps",pied:[-3,6],ph:["Monte sur les mains","Redescends sur les avant-bras"]});
 S("hiit_planche_commando",AN_SPECS.hiit_planche_dynamique_up_down);
 S("hiit_mountain_climbers",{K:[P(PL_H,{lf:[140,176]}),P(PL_H,{lb:[136,176]})],m:0.35,h:0.05,move:["lf","lb"],pied:[-3,6],ph:["Genou vers la poitrine","Change"]});
+S("hiit_mountain_climbers_exterieurs",{K:[PL_H,P(PL_H,{lf:[178,166]}),PL_H,P(PL_H,{lb:[174,168]})],m:0.45,h:0.08,move:["lf","lb"],pied:[-3,6],ph:["Genou vers le coude, par l’extérieur","Reviens","L’autre genou","Reviens"]});
+S("hiit_mountain_climbers_interieurs",{K:[PL_H,P(PL_H,{lf:[156,186]}),PL_H,P(PL_H,{lb:[152,186]})],m:0.45,h:0.08,move:["lf","lb"],pied:[-3,6],ph:["Genou vers le coude opposé, sous le buste","Reviens","L’autre genou","Reviens"]});
 var GL=P(PLANCHE_C,{ab:[198,96]});
 ["glat","glatx","hiit_gainage_lateral"].forEach(function(k){S(k,{K:[GL],hl:"corps",pied:[-3,6],ph:["Tiens, hanches hautes"]});});
 var BU_D={hip:[130,92],t:0,lf:[134,184],lb:[128,184],af:[133,160],ab:[128,160]},BU_S={hip:[118,150],t:70,lf:[130,184],lb:[126,184],af:[178,186],ab:[174,186]};
@@ -5351,6 +5452,10 @@ renderHiitUI();
 timerIdle();
 if($("#srvConfig")){$("#srvConfig").addEventListener("click",configurerSauvegarde);renderSrvState();}
 if($("#sonTest"))$("#sonTest").addEventListener("click",testSons);
+if($("#duckOn")){
+  $("#duckOn").checked=state.duckAudio!==false;
+  $("#duckOn").addEventListener("change",function(){state.duckAudio=this.checked;save();toast(this.checked?"La musique baissera pendant les sons de l’appli":"La musique restera au même volume");});
+}
 if($("#weightListBtn"))$("#weightListBtn").addEventListener("click",function(){weightListOpen=!weightListOpen;renderWeight();});
 function renderSonVolume(){
   var v=typeof state.volume==="number"?state.volume:100;
