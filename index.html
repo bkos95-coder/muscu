@@ -436,6 +436,14 @@
   /* écrans plein écran : rien ne s'écrase, et ça défile si le téléphone est petit */
   #doOverlay,#hiitOverlay,#chronoOverlay{overflow-y:auto;justify-content:safe center}
   #doOverlay>*,#hiitOverlay>*,#chronoOverlay>*{flex-shrink:0}
+  .pc-ex{font-size:12.5px;color:var(--ink-2);margin-top:5px;line-height:1.35}
+  .flow-prep{margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+  .prep-chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}
+  .prep-chips span{background:#fff4e0;border:1.5px solid #f0c674;color:#6b4a00;border-radius:99px;padding:5px 11px;font-size:13.5px;font-weight:600}
+  .prep-list{margin:4px 0 0;padding-left:22px;font-size:14px;line-height:1.35}
+  .prep-list li{margin:0 0 7px}
+  .prep-sch{color:var(--grey);font-size:12.5px;margin-left:4px}
+  .prep-mat{display:block;color:#8a6a1f;font-size:12.5px;margin-top:1px}
   .run-reps{display:flex;align-items:center;gap:14px}
   .run-reps b{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:26px;min-width:34px;text-align:center}
   .run-sum{margin-top:14px;font-size:14px;font-weight:600;color:var(--ink-2)}
@@ -1004,6 +1012,7 @@
 <div class="sheet" id="flowSheet">
   <div class="sheet-card flow-card">
    <div class="sheet-body">
+    <div class="flow-prep" id="flowPrep"></div>
     <div class="sheet-title">Comment tu enchaînes&nbsp;?</div>
     <div class="sheet-lab">Ordre</div>
     <div class="seg" id="flowOrderOpts">
@@ -1131,8 +1140,12 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.29.2";
+var APP_VERSION="1.30.0";
 var CHANGELOG=[
+ {v:"1.30.0",d:"2026-11-10",n:[
+   "Avant de démarrer une séance : « 🧰 À préparer » liste le matériel à sortir, et « Au programme » les exercices dans l’ordre",
+   "Semaine : le nom des exercices s’affiche sur les cartes A, B, C"
+ ]},
  {v:"1.29.2",d:"2026-11-09",n:[
    "Historique : supprimer la dernière entrée d’un type pendant que son filtre était actif affichait une liste vide — retour automatique sur « Tout »",
    "Audit complet : 139 boutons cliqués, parcours de bout en bout, nettoyage du code inutilisé"
@@ -1752,6 +1765,7 @@ function renderPlan(){
     mid.appendChild(el("div","pc-title",title));
     var nForce=s.items.filter(function(it){return !it.dos&&!it.fin;}).length;
     mid.appendChild(el("div","pc-sub",esc(s.sub)+" · "+nForce+" exo"+(nForce>1?"s":"")+" + dos + planche · ~"+s.estMin+" min · repos "+restTxt+"s"));
+    mid.appendChild(el("div","pc-ex",s.items.filter(function(it){return !it.fin;}).map(function(it){return esc(it.n);}).join(" · ")));
     c.appendChild(mid);
     c.appendChild(done?el("div","pc-done","✓ faite cette sem."):(i===nextIdx?el("div","pc-next","À faire ›"):el("div","pc-go","›")));
     c.addEventListener("click",function(){openSession(s);});
@@ -3261,7 +3275,24 @@ function renderFlux(){
   state.rest=p>0?p:60;
   if(!timer.iv){timer.left=state.rest;timerRender();}
 }
-function ouvrirFlux(){renderFlux();$("#flowSheet").classList.add("open");}
+function renderPrep(){
+  var box=$("#flowPrep");if(!box)return;
+  box.innerHTML="";
+  if(!current||!current.work||!current.work.length){box.style.display="none";return;}
+  box.style.display="";
+  var items=current.work.map(function(w){return w.item;});
+  var mats=materielListe(items);
+  box.appendChild(el("div","sheet-title","🧰 À préparer"));
+  box.appendChild(el("div","prep-chips",mats.length?mats.map(function(m){return "<span>"+esc(m)+"</span>";}).join(""):"<span>Poids du corps, rien à sortir</span>"));
+  box.appendChild(el("div","sheet-lab","Au programme · "+current.work.length+" exercice"+(current.work.length>1?"s":"")));
+  var ol=el("ol","prep-list");
+  current.work.forEach(function(w){
+    var m=materielEx(w.item);
+    ol.appendChild(el("li",null,"<b>"+esc(w.item.n)+"</b> <span class='prep-sch'>"+esc(w.scheme||w.item.s||"")+"</span>"+(m.length?"<span class='prep-mat'>"+esc(m.join(" · "))+"</span>":"")));
+  });
+  box.appendChild(ol);
+}
+function ouvrirFlux(){renderFlux();renderPrep();$("#flowSheet").classList.add("open");var b=$("#flowSheet .sheet-body");if(b)b.scrollTop=0;}
 function fermerFlux(){$("#flowSheet").classList.remove("open");renderFlux();}
 function renderSessionCards(){
   var wrap=$("#sExercises");wrap.innerHTML="";
@@ -3792,6 +3823,51 @@ function anBoucle(now){
     if(i.lab&&i.lab.textContent!==e.lab)i.lab.textContent=e.lab;
   });
   anRaf=requestAnimationFrame(anBoucle);
+}
+
+/* ---------- Matériel à préparer ----------
+   Pour chaque exercice du programme : ce qu'il faut sortir (home gym : banc Corength,
+   Rack 500, barre olympique, barre EZ, haltères). Les autres exercices (Libre, callisthénie,
+   HIIT) sont déduits du matériel dessiné dans leur schéma animé. */
+var MAT={
+  dc:["Barre olympique + disques","Banc plat","Rack (sécurités)"],
+  dincl:["Haltères","Banc incliné"], dm:["Haltères","Banc"], elevlat:["Haltères légers"],
+  ext1:["Haltère","Banc"], extez:["Barre EZ","Banc plat"], curlez:["Barre EZ","Pupitre"],
+  curlalt:["Haltères"], marteau:["Haltères"], shrugs:["Haltères"], oiseau:["Haltères légers","Banc"],
+  chinups:["Barre de traction"], tractions:["Barre de traction"], dips:["Supports de dips"],
+  row1:["Haltère","Banc plat"], rowbar:["Barre olympique + disques"],
+  gobelet:["Haltère"], squat:["Barre olympique + disques","Rack"], bulg:["Haltères","Banc plat"], fentesm:["Haltères"],
+  hipthrust:["Barre olympique + disques","Banc plat","Mousse de barre"], hipthrustd:["Haltère ou barre","Banc plat"],
+  mollets:["Haltères","Marche"], sdt:["Barre olympique + disques"], sdtjt:["Barre olympique + disques"],
+  pont1j:["Tapis"], glat:["Tapis"], glatx:["Tapis"], birddog:["Tapis"], curlup:["Tapis"], superman:["Tapis"],
+  chatvache:["Tapis"], planche:["Tapis"], planchex:["Tapis"],
+  releves:["Station PA300"], pompes:["Tapis","Disque ou sac lesté"],
+  hiit_squat_sumo:["Haltère (facultatif)"], hiit_fentes_bulgares:["Banc"],
+  cali_nordic:["Tapis","Calage des pieds (sous le banc)"],
+  cali_pompes_hindoues:["Tapis"], hiit_pompes_pike:["Tapis"], hiit_burpees:["Tapis"], hiit_burpees_sans_saut_ni_pompe:["Tapis"]
+};
+function materielEx(item){
+  if(!item)return [];
+  if(MAT[item.k])return MAT[item.k];
+  var k=anCle(item),sp=k&&AN_SPECS[k],r=[];
+  if(!sp)return r;
+  (sp.eq||[]).forEach(function(e){
+    if(e[0]==="banc")r.push("Banc");
+    else if(e[0]==="incline")r.push("Banc incliné");
+    else if(e[0]==="barre")r.push(e[3]<=20?"Barre de traction":(e[2]-e[1]<=60?"Supports de dips":"Barre basse (rack)"));
+    else if(e[0]==="mur")r.push("Un mur");
+    else if(e[0]==="box")r.push(/l_sit/.test(k)?"Parallettes ou supports":"Box ou marche");
+    else if(e[0]==="pupitre")r.push("Pupitre");
+    else if(e[0]==="poteau"&&!(sp.eq||[]).some(function(x){return x[0]==="barre";}))r.push("Montant du rack (appui)");
+  });
+  (sp.dyn||[]).forEach(function(d){r.push(d[0]==="disque"?"Barre + disques":"Haltères");});
+  if(!r.length){var q=sp.K[0];if(q.hip&&q.hip[1]>=130&&!(sp.eq||[]).length)r.push("Tapis");}
+  return r.filter(function(x,i){return r.indexOf(x)===i&&!(x==="Supports de dips"&&r.indexOf("Barre de traction")>=0&&false);});
+}
+function materielListe(items){
+  var tous=[];
+  items.forEach(function(it){materielEx(it).forEach(function(m){if(tous.indexOf(m)<0)tous.push(m);});});
+  return tous;
 }
 /* ---------- Séance libre mixte : muscu + HIIT ----------
    Les exercices HIIT sont convertis en blocs chronométrés compatibles avec
