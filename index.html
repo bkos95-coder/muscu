@@ -691,8 +691,8 @@
       <button data-d="20"><span>express</span>20 min</button>
       <button data-d="25"><span>bref</span>25 min</button>
       <button data-d="30"><span>court</span>30 min</button>
-      <button data-d="35"><span>·</span>35 min</button>
-      <button data-d="40"><span>·</span>40 min</button>
+      <button data-d="35"><span>Moyen</span>35 min</button>
+      <button data-d="40"><span>Long</span>40 min</button>
       <button data-d="45"><span>complet</span>45 min</button>
     </div>
     <p class="muted" id="durHint" style="margin-top:6px"></p>
@@ -711,7 +711,7 @@
       <h3>Règles du jeu</h3>
       <ul>
         <li><b>Format :</b> 5 × 12 sur les exercices de force. Quand les 5 × 12 passent proprement, monte le poids.</li>
-        <li><b>Circuit :</b> active le mode circuit en séance — 1 série de chaque exo à la suite = 1 tour, repos chronométré entre les tours, 5 tours au total.</li>
+        <li><b>Enchaînement :</b> au lancement d’une séance, choisis <b>Circuit</b> (1 série de chaque exercice à la suite, puis un tour de plus), <b>Série par série</b> ou <b>Manuel</b>. Les repos et la mise en place se règlent au même endroit.</li>
         <li><b>Équilibre :</b> chaque séance travaille le haut ET le bas du corps.</li>
         <li><b>Dos (imagerie 12/2025) :</b> programme adapté à ta discopathie lombaire — pas de soulevé de terre ni de rowing penché chargé, pas de sit-ups, squat en version goblet, charges axiales modérées, gainage type McGill à chaque séance. Fais valider l'ensemble par ton kiné.</li>
         <li><b>Signal stop :</b> une douleur qui descend dans la fesse ou la jambe pendant un exercice = on arrête cet exercice immédiatement. Une courbature musculaire c'est normal ; une douleur qui irradie, non.</li>
@@ -810,14 +810,14 @@
         <li><b>Gainage latéral :</b> le carré des lombes, muscle clé anti-mal de dos.</li>
         <li><b>Hip thrust :</b> des fessiers forts soulagent directement les lombaires.</li>
         <li><b>Chat-vache :</b> mobilité de la colonne, lentement, en respirant.</li>
-        <li>Dans tes séances, le <b>soulevé de terre</b> et le <b>rowing</b> construisent aussi ce dos — technique avant charge.</li>
+        <li>Dans tes séances, le <b>rowing 1 bras appuyé</b>, le <b>pont fessier</b> et le <b>goblet squat</b> construisent aussi ce dos sans charger les disques — le soulevé de terre et le rowing barre penché restent exclus.</li>
       </ul>
     </div>
   </div>
 
   <!-- ============ VUE HIIT ============ -->
   <div class="view" id="view-hiit">
-    <h2>HIIT 7 minutes</h2>
+    <h2>HIIT & fractionné</h2>
     <p class="muted">Circuit poids de corps auto-enchaîné, avec les durées que tu règles plus bas. <b>Adapté à ton pied droit et ton dos</b> : appuis talons, pompes sur genoux, et pour les fentes et jumping jacks chaque fiche indique l'adaptation hallux (cou-de-pied, step jacks). Pas de squats sautés : trop de compression pour tes disques.</p>
 
     <p class="muted" style="font-size:12.5px;margin:10px 0 0"><span class="warnbadge">⚠</span> Les exercices marqués d'un ⚠ sont plus exigeants pour le dos ou le pied. Ils restent disponibles : la fiche explique le risque, à toi de juger selon la forme du jour.</p>
@@ -1172,15 +1172,15 @@
   </div>
   <button class="ov-start" id="ovStart">Démarrer</button>
   <button class="ov-next" id="ovNext">→ Exercice suivant</button>
-  <button class="ov-skip" id="ovSkip">⏭ Passer cet exercice</button>
-  <button class="ov-phase" id="ovGoNow">⏭ Démarrer maintenant</button>
-  <button class="ov-phase" id="ovRestEnd">⏭ Terminer la pause</button>
-  <button class="ov-phase" id="ovSkipEx">⏭ Passer l’exercice</button>
   <button class="ov-restart" id="ovRestart">↻ Série suivante</button>
   <div class="ov-bar"><i id="ovBar"></i></div>
   <div class="ov-ensuite" id="ovEnsuite"></div>
   <p class="ov-hint" id="ovHint">L'écran reste allumé pendant le chrono</p>
   <div class="ov-bottom">
+    <button class="ov-phase" id="ovGoNow">⏭ Démarrer maintenant</button>
+    <button class="ov-phase" id="ovRestEnd">⏭ Terminer la pause</button>
+    <button class="ov-phase" id="ovSkipEx">⏭ Passer l’exercice</button>
+    <button class="ov-skip" id="ovSkip">⇄ Sauter le prochain exercice</button>
     <button class="ov-pause" id="ovPause">⏸ Pause</button>
     <button class="ov-close" id="ovClose">Fermer</button>
   </div>
@@ -1194,8 +1194,14 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.32.0";
+var APP_VERSION="1.33.0";
 var CHANGELOG=[
+ {v:"1.33.0",d:"2026-11-10",n:[
+   "Annuler une séance ramène à l’écran d’où tu viens (Libre, Dos…) et rend ta sélection, au lieu de renvoyer sur la Semaine",
+   "Chrono : les boutons pour passer sont regroupés en bas ; « Voir la liste » remplace « Fermer » en séance",
+   "Textes corrigés : règles du jeu, Dos (plus de mention du soulevé de terre), libellés 35 et 40 min",
+   "Schémas animés plus légers (moins de batterie), revue complète de tous les modules"
+ ]},
  {v:"1.32.0",d:"2026-11-10",n:[
    "Enchaînement : fermer le chrono ou « À toi » le met en pause ; « ▶ Reprendre » relance là où tu en es ; cocher dans la liste ne relance plus rien tout seul",
    "Chrono : « Démarrer maintenant » (mise en place), « Terminer la pause » (récup), « Passer l’exercice » (effort)",
@@ -2155,6 +2161,7 @@ function chronoOpen(label,seconds,key,onDone){
   if($("#ovEnsuite")){$("#ovEnsuite").textContent="";$("#ovEnsuite").classList.remove("imminent");}
   if($("#ovSerie"))$("#ovSerie").classList.remove("on");
   ovx.classList.remove("en-seance");
+  $("#ovClose").textContent=(current&&current.lance)?"☰ Voir la liste":"Fermer";
   anCacher($("#ovAnim"));
   chrono.onDone=typeof onDone==="function"?onDone:null;
   if(chrono.key&&state.chronoDur&&state.chronoDur[chrono.key])seconds=state.chronoDur[chrono.key];
@@ -3391,18 +3398,26 @@ var vueAvantSeance="plan";
 // ✕ ou bouton retour sur la feuille de démarrage :
 // séance pas encore lancée → on annule et on revient d'où l'on vient (rien d'enregistré) ;
 // feuille rouverte en cours de séance pour un réglage → on la referme simplement
+// Séance annulée (avant ou après « C'est parti ») : on revient à l'écran d'où l'on venait,
+// et le Libre retrouve la sélection qui avait servi à lancer la séance
+function retourApresSeance(){
+  var v=vueAvantSeance||"plan";
+  fluxSuspendu=false;majReprise();
+  if(v==="libre"&&panierAvantLancement){
+    basket=panierAvantLancement.basket;
+    panierAvantLancement.groupes.forEach(function(b){b.classList.add("sel");});
+  }
+  panierAvantLancement=null;
+  show(v);
+  if(v==="plan")renderPlan();
+  if(v==="libre")renderLib();
+  if(v==="histo")renderHisto();
+}
 function annulerFlux(){
   if(current&&!current.lance){
     current=null;sessClockStop();timerIdle();
     if(typeof lockOff==="function")lockOff();
-    fermerFlux();show(vueAvantSeance||"plan");
-    if(vueAvantSeance==="plan")renderPlan();
-    if(vueAvantSeance==="libre"&&panierAvantLancement){
-      basket=panierAvantLancement.basket;
-      panierAvantLancement.groupes.forEach(function(b){b.classList.add("sel");});
-      panierAvantLancement=null;
-    }
-    if(vueAvantSeance==="libre")renderLib();
+    fermerFlux();retourApresSeance();
     return;
   }
   fermerFlux();
@@ -3521,7 +3536,12 @@ function updateSchemeSets(w){
   w.scheme=w.sets.length+" × "+rest;
 }
 $("#backBtn").addEventListener("click",function(){
-  if(confirm("Annuler cette séance sans l'enregistrer ?")){current=null;sessClockStop();timerIdle();show("plan");renderPlan();}
+  if(confirm("Annuler cette séance sans l'enregistrer ?")){
+    chronoStop();fermerDo();
+    current=null;sessClockStop();timerIdle();
+    if(typeof lockOff==="function")lockOff();
+    retourApresSeance();
+  }
 });
 $("#finishBtn").addEventListener("click",function(){
   if(!current)return;
@@ -3577,6 +3597,7 @@ $("#finishBtn").addEventListener("click",function(){
   else{toast("Séance enregistrée 💪");}
   if(state.autoSave)doExport(true);
   sauvegardeServeur(state);
+  panierAvantLancement=null;fluxSuspendu=false;majReprise();
   renderPlan();
   show("plan");
 });
@@ -3928,13 +3949,18 @@ function anAfficher(box,item){
   anMonter(box,item,{});
 }
 function anCacher(box){if(box){box.innerHTML="";box._k=null;box.style.display="none";}}
+var anDernier=0;
 function anBoucle(now){
+  // 30 images par seconde suffisent pour ces schémas : deux fois moins de calcul et de batterie
+  if(now-anDernier<32){anRaf=requestAnimationFrame(anBoucle);return;}
+  anDernier=now;
   anActifs=anActifs.filter(function(i){return document.body.contains?document.body.contains(i.svg):true;});
   if(!anActifs.length){anRaf=null;return;}
+  if(document.hidden){anRaf=requestAnimationFrame(anBoucle);return;}
   var t=now/1000;
   anActifs.forEach(function(i){
-    var r=i.svg.getBoundingClientRect?i.svg.getBoundingClientRect():{width:1};
-    if(!r.width)return;   // caché : on ne dessine pas
+    var bx=i.svg.parentNode;
+    if(bx&&bx.offsetParent===null&&!(bx.closest&&bx.closest(".overlay.open,.sheet.open")))return;   // caché : on ne dessine pas
     var e=anEtat(i.sp,t);anDraw(i.g,i.sp,e.q);
     if(i.lab&&i.lab.textContent!==e.lab)i.lab.textContent=e.lab;
   });
@@ -5888,7 +5914,7 @@ $("#resumeBtn").addEventListener("click",reprendreFlux);
 $("#flowGo").addEventListener("click",function(){
   initAudio();
   // la durée de la séance démarre ici, pas pendant la préparation du matériel
-  if(current&&!current.lance){current.lance=true;sessClockStart();panierAvantLancement=null;}
+  if(current&&!current.lance){current.lance=true;sessClockStart();}
   fluxSuspendu=false;majReprise();
   fermerFlux();
   if(state.flowOrder==="manuel"||!current)return;
