@@ -460,6 +460,22 @@
   .dl-v{font-weight:600;margin:4px 0 6px}
   .dl-g{color:var(--ink-2);margin-bottom:8px}
   .dl-mat{color:#8a6a1f;font-size:13px;margin-top:8px}
+  .ov-phase{display:none;background:#2a2a2a;border:1px solid #444;color:#fff;border-radius:10px;padding:10px 22px;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:.06em;cursor:pointer}
+  #chronoOverlay.lead #ovGoNow{display:block}
+  #chronoOverlay.rest.running #ovRestEnd,#chronoOverlay.rest.paused #ovRestEnd{display:block}
+  #chronoOverlay.en-seance.running:not(.rest):not(.lead) #ovSkipEx{display:block}
+  .resume-bar{position:sticky;top:6px;z-index:5;display:flex;align-items:center;gap:10px;background:var(--ink);color:#fff;border-radius:14px;padding:10px 12px 10px 16px;margin:0 0 12px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+  .resume-bar div{flex:1;min-width:0}
+  .resume-bar small{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#bbb}
+  .resume-bar b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .resume-bar button{background:var(--red);color:#fff;border:none;border-radius:10px;padding:11px 16px;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:17px;text-transform:uppercase;cursor:pointer;flex:0 0 auto}
+  #ficheSheet{z-index:260}
+  .fi-s{color:var(--grey);font-size:13.5px;margin:-2px 0 8px}
+  .fi-anim{max-width:250px;margin:0 auto 10px}
+  .tap-fiche{cursor:pointer;text-decoration:underline dotted rgba(0,0,0,.35);text-underline-offset:3px}
+  .pan-resume{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 10px;font-weight:700;font-size:15px}
+  .pan-diff{display:block;font-weight:600;font-size:12.5px;color:var(--grey);margin-top:2px}
+  .pan-diff.plus{color:#b8571b}.pan-diff.moins{color:#2e7d4f}
   .run-reps{display:flex;align-items:center;gap:14px}
   .run-reps b{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:26px;min-width:34px;text-align:center}
   .run-sum{margin-top:14px;font-size:14px;font-weight:600;color:var(--ink-2)}
@@ -733,6 +749,7 @@
       <label class="autorest"><input type="checkbox" id="keepAwake"> Garder l'écran allumé pendant toute la séance</label>
     </div>
 
+    <div class="resume-bar" id="resumeBar" style="display:none"><div><small>Enchaînement en pause · prochain</small><b id="resumeTxt"></b></div><button id="resumeBtn">▶ Reprendre</button></div>
     <div id="sExercises"></div>
     <div class="rpe-block">
       <div class="lab">🩹 Mal de dos avant la séance <span style="text-transform:none;letter-spacing:0;color:var(--grey)">(0 = rien)</span></div>
@@ -983,6 +1000,8 @@
       <p class="muted" id="sonState">Joue la séquence complète pour vérifier le réglage. Rien n'est enregistré.</p>
       <label class="sheet-check duck-check"><input type="checkbox" id="duckOn"> 🎵 Baisser la musique pendant les bips, sifflets et annonces</label>
       <button class="btn ghost block" id="sonTest">▶ Tester les sons</button>
+      <button class="btn ghost block" id="duckTest" style="margin-top:8px">🎵 Tester la baisse de la musique</button>
+      <div class="muted" style="font-size:12px;margin-top:4px">Lance ta musique (Spotify…), reviens ici et touche ce bouton : la musique doit baisser pendant 4 bips, puis remonter.</div>
     </div>
 
     <div class="verfoot">
@@ -1079,6 +1098,17 @@
   </div>
 </div>
 
+<div class="sheet" id="ficheSheet">
+  <div class="sheet-card flow-card">
+   <div class="sheet-body">
+    <div class="sheet-head">
+      <div class="sheet-title" id="ficheTitre">Exercice</div>
+      <button class="sheet-x" id="ficheClose" aria-label="Fermer">✕</button>
+    </div>
+    <div id="ficheCorps"></div>
+   </div>
+  </div>
+</div>
 <div class="sheet" id="panSheet">
   <div class="sheet-card flow-card">
    <div class="sheet-body">
@@ -1143,6 +1173,9 @@
   <button class="ov-start" id="ovStart">Démarrer</button>
   <button class="ov-next" id="ovNext">→ Exercice suivant</button>
   <button class="ov-skip" id="ovSkip">⏭ Passer cet exercice</button>
+  <button class="ov-phase" id="ovGoNow">⏭ Démarrer maintenant</button>
+  <button class="ov-phase" id="ovRestEnd">⏭ Terminer la pause</button>
+  <button class="ov-phase" id="ovSkipEx">⏭ Passer l’exercice</button>
   <button class="ov-restart" id="ovRestart">↻ Série suivante</button>
   <div class="ov-bar"><i id="ovBar"></i></div>
   <div class="ov-ensuite" id="ovEnsuite"></div>
@@ -1161,8 +1194,17 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.31.0";
+var APP_VERSION="1.32.0";
 var CHANGELOG=[
+ {v:"1.32.0",d:"2026-11-10",n:[
+   "Enchaînement : fermer le chrono ou « À toi » le met en pause ; « ▶ Reprendre » relance là où tu en es ; cocher dans la liste ne relance plus rien tout seul",
+   "Chrono : « Démarrer maintenant » (mise en place), « Terminer la pause » (récup), « Passer l’exercice » (effort)",
+   "Une mise à jour arrivée pendant une séance attend la fin de la séance pour s’installer",
+   "Toucher le nom d’un exercice ouvre sa fiche (schéma animé, consigne, ⚠, matériel) : avant lancement, Ma sélection, aperçu des modèles",
+   "Modification d’un modèle : durée estimée en direct et écart avec le modèle enregistré",
+   "⚠ ajoutés selon tes pathologies : SDT, rowing barre, relevés PA300, squat barre, shrugs, développé assis, hollow, mollets, fentes, jumping jacks",
+   "Baisse de la musique renforcée + bouton pour la tester"
+ ]},
  {v:"1.31.0",d:"2026-11-10",n:[
    "Feuille avant lancement : bouton ✕ (et retour Android) pour annuler et revenir d’où tu viens",
    "Bouton retour d’Android géré partout : il ferme ce qui est ouvert au lieu de quitter l’appli, et demande confirmation en séance ou en HIIT",
@@ -1924,13 +1966,15 @@ function initAudio(){
    et annonces s'enchaînent. */
 var duckEl=null,duckFin=0,duckTimer=null,duckUrl=null;
 function duckClip(){
-  var sr=8000,n=Math.floor(sr*4.5),buf=new ArrayBuffer(44+n),v=new DataView(buf);
+  var sr=8000,n=Math.floor(sr*4.5),buf=new ArrayBuffer(44+n*2),v=new DataView(buf);
   function txt(o,t){for(var i=0;i<t.length;i++)v.setUint8(o+i,t.charCodeAt(i));}
-  txt(0,"RIFF");v.setUint32(4,36+n,true);txt(8,"WAVE");txt(12,"fmt ");
+  txt(0,"RIFF");v.setUint32(4,36+n*2,true);txt(8,"WAVE");txt(12,"fmt ");
   v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
-  v.setUint32(24,sr,true);v.setUint32(28,sr,true);v.setUint16(32,1,true);v.setUint16(34,8,true);
-  txt(36,"data");v.setUint32(40,n,true);
-  for(var k=0;k<n;k++)v.setUint8(44+k,128);   // silence (8 bits non signés)
+  v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);
+  txt(36,"data");v.setUint32(40,n*2,true);
+  // souffle à ±1 sur 32 768 (≈ −90 dB) : inaudible, mais pas un silence parfait,
+  // que certains téléphones ignorent et qui ne déclencherait pas la baisse
+  for(var k=0;k<n;k++)v.setInt16(44+k*2,(k%2?1:-1),true);
   return URL.createObjectURL(new Blob([buf],{type:"audio/wav"}));
 }
 function baisserMusique(ms){
@@ -2110,6 +2154,7 @@ function chronoOpen(label,seconds,key,onDone){
   var ovx=$("#chronoOverlay");ovx.classList.remove("rest","has-next","lead","running","paused");
   if($("#ovEnsuite")){$("#ovEnsuite").textContent="";$("#ovEnsuite").classList.remove("imminent");}
   if($("#ovSerie"))$("#ovSerie").classList.remove("on");
+  ovx.classList.remove("en-seance");
   anCacher($("#ovAnim"));
   chrono.onDone=typeof onDone==="function"?onDone:null;
   if(chrono.key&&state.chronoDur&&state.chronoDur[chrono.key])seconds=state.chronoDur[chrono.key];
@@ -2221,7 +2266,7 @@ function chronoAdj(d){
   chrono.left=chrono.total;
   chronoRender();
 }
-$("#ovClose").addEventListener("click",chronoStop);
+$("#ovClose").addEventListener("click",function(){chronoStop();suspendreFlux();});
 $("#ovPause").addEventListener("click",function(){
   if($("#chronoOverlay").classList.contains("paused"))chronoReprendre();else chronoPause();
 });
@@ -2237,6 +2282,17 @@ $("#ovSkip").addEventListener("click",function(){
   parler("Prochain : "+annonceProchain(nx));
 });
 $("#ovStart").addEventListener("click",function(){demarrerAvecMiseEnPlace(false);});
+// Mise en place : on démarre l'effort tout de suite
+$("#ovGoNow").addEventListener("click",function(){if(chrono.leadIv)chrono.leadEnd=Date.now();});
+// Récup ou pause : on la termine et l'exercice suivant démarre (avec sa mise en place)
+$("#ovRestEnd").addEventListener("click",function(){if(chrono.iv)chrono.endAt=Date.now();});
+// Effort chronométré : on passe à l'exercice suivant sans compter la série
+$("#ovSkipEx").addEventListener("click",function(){
+  var w=chrono.from;if(!w||!current)return;
+  var nx=passer(w);if(!nx)return;
+  clearInterval(chrono.iv);chrono.iv=null;
+  enchainerVers(nx,w);
+});
 $("#ovRestart").addEventListener("click",function(){
   $("#chronoOverlay").classList.remove("finished");
   demarrerAvecMiseEnPlace(false);
@@ -3024,6 +3080,7 @@ function openSession(s){
   if(state.keepAwake)lockOn();
   updateSessProgress();
   renderSessionCards();
+  fluxSuspendu=false;majReprise();
   var va=document.querySelector(".view.active");
   vueAvantSeance=va?va.id.replace("view-",""):"plan";
   if(vueAvantSeance==="session")vueAvantSeance="plan";
@@ -3179,6 +3236,7 @@ function lancerChrono(w,auto,miseEnPlace){
     }else serieFaite(w);
   });
   chrono.from=w;
+  $("#chronoOverlay").classList.add("en-seance");
   majSerie();
   anAfficher($("#ovAnim"),w.item);
   if(auto){
@@ -3321,7 +3379,9 @@ function renderPrep(){
   var ol=el("ol","prep-list");
   current.work.forEach(function(w){
     var m=materielEx(w.item);
-    ol.appendChild(el("li",null,"<b>"+esc(w.item.n)+"</b> <span class='prep-sch'>"+esc(w.scheme||w.item.s||"")+"</span>"+(m.length?"<span class='prep-mat'>"+esc(m.join(" · "))+"</span>":"")));
+    var li=el("li",null,"<b class='tap-fiche'>"+esc(w.item.n)+"</b>"+(w.item.w?" <span class='warnbadge'>⚠</span>":"")+" <span class='prep-sch'>"+esc(w.scheme||w.item.s||"")+"</span>"+(m.length?"<span class='prep-mat'>"+esc(m.join(" · "))+"</span>":""));
+    li.querySelector("b").addEventListener("click",function(){ouvrirFiche(w.item);});
+    ol.appendChild(li);
   });
   box.appendChild(ol);
 }
@@ -3392,8 +3452,11 @@ function renderSessionCards(){
             // mode manuel : repos dans le panneau, comme avant
             if(!it.chrono&&pauseFlux()>0&&!timer.iv)timerStart();
             if(toutFait())finSeance();
+          }else if(fluxSuspendu){
+            // enchaînement en pause : on coche seulement, rien ne se relance tout seul
+            if(toutFait())finSeance();else majReprise();
           }else serieFaite(w);
-        }
+        }else majReprise();
       }
       b.addEventListener("click",tg);
       b.addEventListener("keydown",function(e){if(e.key===" "||e.key==="Enter"){e.preventDefault();tg();}});
@@ -3879,12 +3942,48 @@ function anBoucle(now){
 }
 
 
+
+/* ---------- Enchaînement en pause / reprise ----------
+   Fermer le chrono ou la page « À toi » met l'enchaînement en pause : on revient à la
+   liste, on peut cocher librement, et « ▶ Reprendre » relance là où on en est. */
+var fluxSuspendu=false;
+function seanceEnCours(){
+  return !!(current&&current.lance)||coucheOuverte("hiitOverlay")||coucheOuverte("endOverlay")||coucheOuverte("chronoOverlay")||coucheOuverte("doOverlay");
+}
+// utilisés par le script d'installation des mises à jour (bloc séparé)
+window.seanceEnCours=seanceEnCours;window.toastAppli=function(t){toast(t);};
+function fluxActif(){return !!(current&&current.lance&&state.flowOrder!=="manuel");}
+function suspendreFlux(){if(fluxActif()&&!toutFait()){fluxSuspendu=true;}majReprise();}
+function prochaineAReprendre(){
+  if(!current)return null;
+  var ws=current.work.filter(function(x){return x.sets.indexOf(false)>=0;});
+  if(!ws.length)return null;
+  if(state.flowOrder==="circuit"){
+    var min=Math.min.apply(null,ws.map(function(x){return x.sets.filter(Boolean).length;}));
+    return ws.filter(function(x){return x.sets.filter(Boolean).length===min;})[0];
+  }
+  return ws[0];
+}
+function majReprise(){
+  var bar=$("#resumeBar");if(!bar)return;
+  var w=fluxSuspendu&&fluxActif()?prochaineAReprendre():null;
+  if(!w){bar.style.display="none";return;}
+  bar.style.display="";
+  $("#resumeTxt").textContent=w.item.n+" · série "+(w.sets.filter(Boolean).length+1)+"/"+w.sets.length;
+}
+function reprendreFlux(){
+  var w=prochaineAReprendre();
+  fluxSuspendu=false;majReprise();
+  if(!w){if(toutFait())finSeance();return;}
+  initAudio();
+  lancerExercice(w,true);
+}
 /* ---------- Bouton « retour » d'Android ----------
    Sans gestion, il fermait l'appli, même en pleine séance. Désormais il ferme ce qui
    est ouvert (feuille, panneau, chrono…), demande confirmation pour quitter une séance
    ou un HIIT, et ne fait rien sous le verrou du fractionné. Principe : tant qu'un
    écran « couche » est ouvert, une entrée d'historique sert de garde. */
-var COUCHES=["lockScreen","endOverlay","flowSheet","tplView","panSheet","chronoOverlay","doOverlay","hiitOverlay","view-session"];
+var COUCHES=["lockScreen","ficheSheet","endOverlay","flowSheet","tplView","panSheet","chronoOverlay","doOverlay","hiitOverlay","view-session"];
 function coucheOuverte(id){var e=document.getElementById(id);return !!e&&e.classList.contains(id==="view-session"?"active":"open");}
 function coucheDuDessus(){for(var i=0;i<COUCHES.length;i++)if(coucheOuverte(COUCHES[i]))return COUCHES[i];return null;}
 var gardeArmee=false,retourInterne=false;
@@ -3905,6 +4004,7 @@ function surRetour(){
   function clic(sel){var b=document.querySelector(sel);if(b)b.click();}
   if(id==="lockScreen")toast("Écran verrouillé : appui long 2 s pour déverrouiller");
   else if(id==="endOverlay")toast("Enregistre ta séance ou touche « Pas encore »");
+  else if(id==="ficheSheet")fermerFiche();
   else if(id==="flowSheet")annulerFlux();
   else if(id==="tplView")clic("#tvClose");
   else if(id==="panSheet")clic("#panClose");
@@ -3920,6 +4020,49 @@ if(typeof MutationObserver!=="undefined"){
   var obsCouches=new MutationObserver(function(){if(coucheDuDessus())armerGarde();else desarmerSiInutile();});
   COUCHES.forEach(function(id){var e=document.getElementById(id);if(e)obsCouches.observe(e,{attributes:true,attributeFilter:["class"]});});
 }
+
+/* ---------- Fiche d'un exercice (schéma animé, consigne, guide, ⚠, matériel) ----------
+   Ouverte d'un toucher sur le nom d'un exercice, où qu'il soit. */
+function ouvrirFiche(item){
+  if(!item)return;
+  var lib=null;
+  try{Object.values(allLib()).forEach(function(g){g.forEach(function(e){if(!lib&&(e.k===item.k||e.n===item.n))lib=e;});});}catch(e){}
+  var it=Object.assign({},lib||{},item);
+  $("#ficheTitre").textContent=it.n;
+  var c=$("#ficheCorps");c.innerHTML="";
+  if(it.s)c.appendChild(el("div","fi-s",esc(it.s)));
+  var a=el("div","anim ld-anim fi-anim");c.appendChild(a);anMonter(a,it,{label:true});
+  var cons=it.v||it.t;if(cons)c.appendChild(el("div","dl-v",esc(cons)));
+  if(it.g)c.appendChild(el("div","dl-g",esc(it.g)));
+  if(it.w)c.appendChild(el("div","warnbox","⚠ <b>À savoir :</b> "+esc(it.w)));
+  var m=materielEx(it);
+  c.appendChild(el("div","dl-mat","🧰 "+(m.length?esc(m.join(" · ")):"Rien à préparer")));
+  $("#ficheSheet").classList.add("open");
+  var b=$("#ficheSheet .sheet-body");if(b)b.scrollTop=0;
+}
+function fermerFiche(){$("#ficheSheet").classList.remove("open");}
+
+/* ---------- ⚠ complémentaires selon tes pathologies ----------
+   Discopathie L4-L5/L5-S1 · pincement C5-C6 · hallux rigidus opéré (pied droit).
+   Appliqués aux exercices qui n'avaient pas encore d'avertissement. */
+var W_AJOUT={
+  sdt:"Exclu de ton programme (discopathie L4-L5/L5-S1) : forte charge sur les disques en flexion. Préfère goblet squat, pont fessier ou hip thrust.",
+  sdtjt:"Exclu de ton programme (discopathie L4-L5/L5-S1) : le dos encaisse la charge en flexion. Préfère pont fessier 1 jambe ou hip thrust.",
+  rowbar:"Exclu de ton programme (discopathie L4-L5/L5-S1) : buste penché sans appui, lombaires en charge. Préfère le rowing 1 bras appuyé sur banc.",
+  releves:"Exclu de ton programme : les fléchisseurs de hanche tirent sur les lombaires. Préfère le curl-up McGill.",
+  squat:"Charge axiale sur les disques L4-L5/L5-S1 : préfère le goblet squat. Si barre : charge modérée, dos neutre, sans aller chercher la profondeur.",
+  shrugs:"Cervicales C5-C6 : charge légère, mouvement vertical strict, aucune rotation de la tête.",
+  dm:"Charge au-dessus de la tête : cervicales C5-C6 et lombaires sollicitées. Charge modérée, buste gainé, sans cambrer.",
+  cali_hollow_rocks:"Lombaires : le bas du dos doit rester plaqué au sol. S’il décolle, plie les genoux ou réduis l’amplitude.",
+  hiit_hollow_hold:"Lombaires : le bas du dos doit rester plaqué au sol. S’il décolle, plie les genoux.",
+  mollets:"Hallux rigidus (pied droit) : la montée sur pointe plie fort le gros orteil. Amplitude réduite, appui plutôt sur le bord externe ; stop si douleur.",
+  hiit_mollets_debout:"Hallux rigidus (pied droit) : la montée sur pointe plie fort le gros orteil. Amplitude réduite ; stop si douleur.",
+  fentesm:"Hallux rigidus : le pied arrière roule sur les orteils. Si le gros orteil droit tire, fais des pas plus courts.",
+  hiit_fentes_marchees:"Hallux rigidus : le pied arrière roule sur les orteils. Si le gros orteil droit tire, fais des pas plus courts.",
+  hiit_fentes_alternees:"Hallux rigidus : le pied arrière roule sur les orteils. Si le gros orteil droit tire, réduis l’amplitude.",
+  hiit_jumping_jacks:"Hallux rigidus : réceptions sur l’avant-pied. Si le pied droit tire, préfère les step jacks (sans saut)."
+};
+function appliquerAvertissements(liste){(liste||[]).forEach(function(e){if(e&&!e.w&&W_AJOUT[e.k])e.w=W_AJOUT[e.k];});}
 /* ---------- Matériel à préparer ----------
    Pour chaque exercice du programme : ce qu'il faut sortir (home gym : banc Corength,
    Rack 500, barre olympique, barre EZ, haltères). Les autres exercices (Libre, callisthénie,
@@ -3959,6 +4102,8 @@ function materielEx(item){
   if(!r.length){var q=sp.K[0];if(q.hip&&q.hip[1]>=130&&!(sp.eq||[]).length)r.push("Tapis");}
   return r.filter(function(x,i){return r.indexOf(x)===i&&!(x==="Supports de dips"&&r.indexOf("Barre de traction")>=0&&false);});
 }
+function allLib(){var L=allLibBrut();Object.keys(L).forEach(function(g){appliquerAvertissements(L[g]);});return L;}
+try{appliquerAvertissements(DOS_SESSION.items);Object.keys(PLANS).forEach(function(f){PLANS[f].sessions.forEach(function(se){appliquerAvertissements(se.items);});});allLib();}catch(e){}
 function materielListe(items){
   var tous=[];
   items.forEach(function(it){materielEx(it).forEach(function(m){if(tous.indexOf(m)<0)tous.push(m);});});
@@ -3982,7 +4127,7 @@ function libHiit(){
   LIB_HIIT_CACHE=out;
   return out;
 }
-function allLib(){
+function allLibBrut(){
   var o={};
   Object.keys(LIB).forEach(function(k){o[k]=LIB[k];});
   Object.keys(CALI_LIB).forEach(function(k){o[k]=CALI_LIB[k];});
@@ -4148,6 +4293,16 @@ function renderPanier(){
   box.innerHTML="";
   var keys=Object.keys(basket);
   if(!keys.length)return;
+  // effet direct de chaque réglage : durée estimée (et écart avec le modèle d'origine)
+  var itemsAct=keys.map(function(k){var o=Object.assign({},basket[k]);delete o._reps;return o;});
+  var dAct=dureeEstimee(itemsAct),nS=itemsAct.reduce(function(t,it){return t+(it.sets||0);},0);
+  var txt="≈ "+dAct+" min · "+itemsAct.length+" exercice"+(itemsAct.length>1?"s":"")+" · "+nS+" séries";
+  if(typeof tplEdit!=="undefined"&&tplEdit&&tplEdit.mode==="edit"&&tplEdit.ref&&tplEdit.ref.items){
+    var dAv=dureeEstimee(tplEdit.ref.items.map(function(it){return Object.assign({},it);}));
+    var diff=dAct-dAv;
+    txt+=diff?" <span class='pan-diff "+(diff>0?"plus":"moins")+"'>"+(diff>0?"+":"−")+Math.abs(diff)+" min vs modèle enregistré ("+dAv+" min)</span>":" <span class='pan-diff'>= modèle enregistré</span>";
+  }
+  box.appendChild(el("div","pan-resume",txt));
   if(keys.length>1)box.appendChild(reglagesGlobaux());
   box.appendChild(el("div","pan-title",keys.length+" exercice"+(keys.length>1?"s":"")+" · dans l'ordre de la séance"));
   keys.forEach(function(k,i){
@@ -4155,7 +4310,8 @@ function renderPanier(){
     var row=el("div","pan-row");
     var top=el("div","pan-top");
     top.appendChild(el("span","pan-num",String(i+1)));
-    var nm=el("div","pan-name",(b.hiit?"<span class='hiittag'>⚡</span> ":"")+esc(b.n)+(b.w?" <span class='warnbadge'>⚠</span>":"")+"<small>"+esc(b.s)+"</small>");
+    var nm=el("div","pan-name",(b.hiit?"<span class='hiittag'>⚡</span> ":"")+"<span class='tap-fiche'>"+esc(b.n)+"</span>"+(b.w?" <span class='warnbadge'>⚠</span>":"")+"<small>"+esc(b.s)+"</small>");
+    (function(bb){var t=nm.querySelector(".tap-fiche");if(t)t.addEventListener("click",function(e){e.stopPropagation();ouvrirFiche(bb);});})(b);
     top.appendChild(nm);
     var up=el("button","pan-btn","↑"),dn=el("button","pan-btn","↓"),x=el("button","pan-btn","✕");
     up.setAttribute("aria-label","Monter");dn.setAttribute("aria-label","Descendre");x.setAttribute("aria-label","Retirer");
@@ -4394,7 +4550,8 @@ function ouvrirApercu(t){
   d.items.forEach(function(it,i){
     var row=el("div","tv-row"+(it.fin?" auto":""));
     row.appendChild(el("span","pan-num",String(i+1)));
-    row.appendChild(el("div","tv-name",(it.hiit?"<span class='hiittag'>⚡</span> ":"")+esc(it.n)+(it.w?" <span class='warnbadge'>⚠</span>":"")+"<small>"+esc(it.s||"")+(it.fin?" · ajoutée automatiquement":"")+"</small>"));
+    row.appendChild(el("div","tv-name",(it.hiit?"<span class='hiittag'>⚡</span> ":"")+"<span class='tap-fiche'>"+esc(it.n)+"</span>"+(it.w?" <span class='warnbadge'>⚠</span>":"")+"<small>"+esc(it.s||"")+(it.fin?" · ajoutée automatiquement":"")+"</small>"));
+    (function(ii,r){var t=r.querySelector(".tv-name .tap-fiche");if(t)t.addEventListener("click",function(e){e.stopPropagation();ouvrirFiche(ii);});})(it,row);
     box.appendChild(row);
   });
   $("#tvNote").textContent="Durée estimée avec tes réglages : "+resumeFlux()+".";
@@ -5656,6 +5813,12 @@ renderHiitUI();
 timerIdle();
 if($("#srvConfig")){$("#srvConfig").addEventListener("click",configurerSauvegarde);renderSrvState();}
 if($("#sonTest"))$("#sonTest").addEventListener("click",testSons);
+$("#duckTest").addEventListener("click",function(){
+  initAudio();
+  if(state.duckAudio===false){toast("Coche d’abord « Baisser la musique… »");return;}
+  baisserMusique(4300);
+  [600,1600,2600,3600].forEach(function(t,i){setTimeout(function(){if(i<3)beepShort();else beepEnd();},t);});
+});
 if($("#duckOn")){
   $("#duckOn").checked=state.duckAudio!==false;
   $("#duckOn").addEventListener("change",function(){state.duckAudio=this.checked;save();toast(this.checked?"La musique baissera pendant les sons de l’appli":"La musique restera au même volume");});
@@ -5719,10 +5882,14 @@ $("#voiceOn").addEventListener("change",function(){
   if(this.checked)parler("Annonce vocale activée");
 });
 $("#flowClose").addEventListener("click",annulerFlux);
+$("#ficheClose").addEventListener("click",fermerFiche);
+$("#ficheSheet").addEventListener("click",function(e){if(e.target===this)fermerFiche();});
+$("#resumeBtn").addEventListener("click",reprendreFlux);
 $("#flowGo").addEventListener("click",function(){
   initAudio();
   // la durée de la séance démarre ici, pas pendant la préparation du matériel
   if(current&&!current.lance){current.lance=true;sessClockStart();panierAvantLancement=null;}
+  fluxSuspendu=false;majReprise();
   fermerFlux();
   if(state.flowOrder==="manuel"||!current)return;
   // seulement au tout début de la séance : si on rouvre le panneau en cours
@@ -5751,7 +5918,7 @@ $("#doSkip").addEventListener("click",function(){
   var nx=passer(w);if(!nx)return;
   fermerDo();lancerExercice(nx,true);
 });
-$("#doList").addEventListener("click",fermerDo);
+$("#doList").addEventListener("click",function(){fermerDo();suspendreFlux();});
 $("#endSave").addEventListener("click",function(){fermerFin();$("#finishBtn").click();});
 $("#endFeel").addEventListener("click",function(){
   fermerFin();
@@ -5798,6 +5965,14 @@ if("serviceWorker" in navigator){
     navigator.serviceWorker.addEventListener("controllerchange",function(){
       if(recharge)return;
       recharge=true;
+      // Séance, HIIT ou fractionné en cours : on ne recharge surtout pas maintenant
+      // (la séance serait perdue). La nouvelle version s'installe dès la fin.
+      var occupe=function(){return typeof window.seanceEnCours==="function"&&window.seanceEnCours();};
+      if(occupe()){
+        if(window.toastAppli)window.toastAppli("Mise à jour prête : elle s’installera à la fin de ta séance");
+        var att=setInterval(function(){if(!occupe()){clearInterval(att);location.reload();}},4000);
+        return;
+      }
       location.reload();
     });
   });
