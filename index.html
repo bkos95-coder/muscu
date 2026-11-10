@@ -444,6 +444,22 @@
   .prep-list li{margin:0 0 7px}
   .prep-sch{color:var(--grey);font-size:12.5px;margin-left:4px}
   .prep-mat{display:block;color:#8a6a1f;font-size:12.5px;margin-top:1px}
+  .redo-ex{display:block;font-family:inherit;font-weight:500;font-size:12.5px;text-transform:none;letter-spacing:0;color:var(--grey);margin-top:4px;line-height:1.35}
+  .dos-liste{margin:0 0 16px}
+  .dl-titre{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin:4px 0 8px}
+  .dl-ex{background:#fff;border:1.5px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden}
+  .dl-head{width:100%;display:flex;align-items:center;gap:8px;background:none;border:none;padding:12px 14px;text-align:left;cursor:pointer;font:inherit;color:var(--ink)}
+  .dl-head b{flex:1;font-size:15px}
+  .dl-head span{font-size:12.5px;color:var(--grey)}
+  .dl-head i{font-style:normal;color:var(--grey);transition:transform .2s}
+  .dl-ex.open .dl-head i{transform:rotate(90deg)}
+  .dl-body{display:none;padding:0 14px 14px;font-size:14px;line-height:1.45}
+  .dl-ex.open .dl-body{display:block}
+  .dl-body .anim{max-width:230px;margin:0 auto 8px}
+  .dl-head i{display:inline-block}
+  .dl-v{font-weight:600;margin:4px 0 6px}
+  .dl-g{color:var(--ink-2);margin-bottom:8px}
+  .dl-mat{color:#8a6a1f;font-size:13px;margin-top:8px}
   .run-reps{display:flex;align-items:center;gap:14px}
   .run-reps b{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:26px;min-width:34px;text-align:center}
   .run-sum{margin-top:14px;font-size:14px;font-weight:600;color:var(--ink-2)}
@@ -759,6 +775,7 @@
     <h2>Dos solide</h2>
     <p class="muted">Vu ton imagerie (discopathie étagée L4-L5/L5-S1, pincement C5-C6), cette routine type McGill est ta base : elle renforce le corset lombaire sans charger les disques. Idéale quotidiennement, même les jours off. Montre-la à ton kiné pour la personnaliser — et si une douleur irradie dans la jambe, on suspend l'exercice et on consulte.</p>
     <button class="btn red block" id="startDos" style="margin:6px 0 14px">Lancer la routine Dos express</button>
+    <div class="dos-liste" id="dosListe"></div>
     <div class="prog" id="painWrap" style="display:none;margin-bottom:14px">
       <div class="lab" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin-bottom:8px">🩹 Évolution de ton mal de dos</div>
       <canvas id="painCanvas"></canvas>
@@ -1012,6 +1029,10 @@
 <div class="sheet" id="flowSheet">
   <div class="sheet-card flow-card">
    <div class="sheet-body">
+    <div class="sheet-head">
+      <div class="sheet-title" id="flowHead">Avant de commencer</div>
+      <button class="sheet-x" id="flowClose" aria-label="Fermer">✕</button>
+    </div>
     <div class="flow-prep" id="flowPrep"></div>
     <div class="sheet-title">Comment tu enchaînes&nbsp;?</div>
     <div class="sheet-lab">Ordre</div>
@@ -1140,8 +1161,15 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.30.0";
+var APP_VERSION="1.31.0";
 var CHANGELOG=[
+ {v:"1.31.0",d:"2026-11-10",n:[
+   "Feuille avant lancement : bouton ✕ (et retour Android) pour annuler et revenir d’où tu viens",
+   "Bouton retour d’Android géré partout : il ferme ce qui est ouvert au lieu de quitter l’appli, et demande confirmation en séance ou en HIIT",
+   "La durée de séance démarre à « C’est parti », plus pendant la préparation du matériel",
+   "Dos : la routine en détail, chaque exercice se déplie (schéma animé, consigne, ⚠, matériel)",
+   "« Refaire » affiche aussi les exercices de la séance"
+ ]},
  {v:"1.30.0",d:"2026-11-10",n:[
    "Avant de démarrer une séance : « 🧰 À préparer » liste le matériel à sortir, et « Au programme » les exercices dans l’ordre",
    "Semaine : le nom des exercices s’affiche sur les cartes A, B, C"
@@ -1775,7 +1803,8 @@ function renderPlan(){
   var rb=$("#redoBtn");
   if(state.lastSession){
     rb.style.display="block";
-    rb.textContent="↻ Refaire : "+state.lastSession.letter+" · "+state.lastSession.title;
+    var exR=(state.lastSession.items||[]).filter(function(it){return !it.fin;}).map(function(it){return esc(it.n);});
+    rb.innerHTML=esc("↻ Refaire : "+state.lastSession.letter+" · "+state.lastSession.title)+(exR.length?"<span class='redo-ex'>"+exR.slice(0,8).join(" · ")+(exR.length>8?" …":"")+"</span>":"");
   }else{rb.style.display="none";}
 }
 document.querySelectorAll("#freqSel button").forEach(function(b){
@@ -2990,11 +3019,14 @@ function openSession(s){
   renderMood();
   renderPain("before");
   renderPain("after");
-  sessClockStart();
+  sessClockStop();
   timerIdle();
   if(state.keepAwake)lockOn();
   updateSessProgress();
   renderSessionCards();
+  var va=document.querySelector(".view.active");
+  vueAvantSeance=va?va.id.replace("view-",""):"plan";
+  if(vueAvantSeance==="session")vueAvantSeance="plan";
   show("session");
   ouvrirFlux();
 }
@@ -3278,6 +3310,7 @@ function renderFlux(){
 function renderPrep(){
   var box=$("#flowPrep");if(!box)return;
   box.innerHTML="";
+  if($("#flowHead"))$("#flowHead").textContent=current&&current.session?((current.session.letter?current.session.letter+" · ":"")+current.session.title):"Réglages";
   if(!current||!current.work||!current.work.length){box.style.display="none";return;}
   box.style.display="";
   var items=current.work.map(function(w){return w.item;});
@@ -3294,6 +3327,26 @@ function renderPrep(){
 }
 function ouvrirFlux(){renderFlux();renderPrep();$("#flowSheet").classList.add("open");var b=$("#flowSheet .sheet-body");if(b)b.scrollTop=0;}
 function fermerFlux(){$("#flowSheet").classList.remove("open");renderFlux();}
+var vueAvantSeance="plan";
+// ✕ ou bouton retour sur la feuille de démarrage :
+// séance pas encore lancée → on annule et on revient d'où l'on vient (rien d'enregistré) ;
+// feuille rouverte en cours de séance pour un réglage → on la referme simplement
+function annulerFlux(){
+  if(current&&!current.lance){
+    current=null;sessClockStop();timerIdle();
+    if(typeof lockOff==="function")lockOff();
+    fermerFlux();show(vueAvantSeance||"plan");
+    if(vueAvantSeance==="plan")renderPlan();
+    if(vueAvantSeance==="libre"&&panierAvantLancement){
+      basket=panierAvantLancement.basket;
+      panierAvantLancement.groupes.forEach(function(b){b.classList.add("sel");});
+      panierAvantLancement=null;
+    }
+    if(vueAvantSeance==="libre")renderLib();
+    return;
+  }
+  fermerFlux();
+}
 function renderSessionCards(){
   var wrap=$("#sExercises");wrap.innerHTML="";
   current.work.forEach(function(w){
@@ -3825,6 +3878,48 @@ function anBoucle(now){
   anRaf=requestAnimationFrame(anBoucle);
 }
 
+
+/* ---------- Bouton « retour » d'Android ----------
+   Sans gestion, il fermait l'appli, même en pleine séance. Désormais il ferme ce qui
+   est ouvert (feuille, panneau, chrono…), demande confirmation pour quitter une séance
+   ou un HIIT, et ne fait rien sous le verrou du fractionné. Principe : tant qu'un
+   écran « couche » est ouvert, une entrée d'historique sert de garde. */
+var COUCHES=["lockScreen","endOverlay","flowSheet","tplView","panSheet","chronoOverlay","doOverlay","hiitOverlay","view-session"];
+function coucheOuverte(id){var e=document.getElementById(id);return !!e&&e.classList.contains(id==="view-session"?"active":"open");}
+function coucheDuDessus(){for(var i=0;i<COUCHES.length;i++)if(coucheOuverte(COUCHES[i]))return COUCHES[i];return null;}
+var gardeArmee=false,retourInterne=false;
+function armerGarde(){
+  if(gardeArmee||!coucheDuDessus())return;
+  try{history.pushState({garde:1},"");gardeArmee=true;}catch(e){}
+}
+function desarmerSiInutile(){
+  setTimeout(function(){
+    if(gardeArmee&&!coucheDuDessus()){gardeArmee=false;retourInterne=true;try{history.back();}catch(e){retourInterne=false;}}
+  },150);
+}
+function surRetour(){
+  if(retourInterne){retourInterne=false;return;}
+  gardeArmee=false;
+  var id=coucheDuDessus();
+  if(!id)return;
+  function clic(sel){var b=document.querySelector(sel);if(b)b.click();}
+  if(id==="lockScreen")toast("Écran verrouillé : appui long 2 s pour déverrouiller");
+  else if(id==="endOverlay")toast("Enregistre ta séance ou touche « Pas encore »");
+  else if(id==="flowSheet")annulerFlux();
+  else if(id==="tplView")clic("#tvClose");
+  else if(id==="panSheet")clic("#panClose");
+  else if(id==="chronoOverlay")clic("#ovClose");
+  else if(id==="doOverlay")clic("#doList");
+  else if(id==="hiitOverlay")clic("#hQuit");
+  else if(id==="view-session")clic("#backBtn");
+  // s'il reste quelque chose d'ouvert (confirmation refusée, verrou…), on réarme la garde
+  setTimeout(armerGarde,0);
+}
+if(typeof window.addEventListener==="function")window.addEventListener("popstate",surRetour);
+if(typeof MutationObserver!=="undefined"){
+  var obsCouches=new MutationObserver(function(){if(coucheDuDessus())armerGarde();else desarmerSiInutile();});
+  COUCHES.forEach(function(id){var e=document.getElementById(id);if(e)obsCouches.observe(e,{attributes:true,attributeFilter:["class"]});});
+}
 /* ---------- Matériel à préparer ----------
    Pour chaque exercice du programme : ce qu'il faut sortir (home gym : banc Corength,
    Rack 500, barre olympique, barre EZ, haltères). Les autres exercices (Libre, callisthénie,
@@ -4211,11 +4306,14 @@ $("#startLibre").addEventListener("click",function(){
   openSession({id:"LIBRE",letter:nH?"⚡":"L",title:titre,sub:sub,items:items});
   // pendant la modification d'un modèle, on garde le composeur pour pouvoir enregistrer après l'essai
   if(!tplEdit){
+    // mis de côté : si la séance est annulée avant « C'est parti », on rend la sélection
+    panierAvantLancement={basket:basket,groupes:[].map.call(document.querySelectorAll(".gbtn.sel"),function(b){return b;})};
     basket={};
     document.querySelectorAll(".gbtn.sel").forEach(function(b){b.classList.remove("sel");});
   }
   renderLib();
 });
+var panierAvantLancement=null;
 $("#saveTpl").addEventListener("click",function(){
   var keys=Object.keys(basket);
   if(!keys.length){toast("Choisis d'abord des exercices");return;}
@@ -4352,6 +4450,31 @@ function renderTemplates(){
 
 /* ---------- Vue Dos ---------- */
 $("#startDos").addEventListener("click",function(){openSession(DOS_SESSION);});
+/* Routine Dos : chaque exercice se déplie (schéma animé, consigne, guide, ⚠, matériel) */
+function renderDosListe(){
+  var box=$("#dosListe");if(!box)return;
+  box.innerHTML="";
+  box.appendChild(el("div","dl-titre","La routine en détail · touche un exercice"));
+  DOS_SESSION.items.forEach(function(it){
+    var c=el("div","dl-ex");
+    var h=el("button","dl-head","<b>"+esc(it.n)+"</b><span>"+esc(it.s||"")+(it.w?" · ⚠":"")+"</span><i>›</i>");
+    var body=el("div","dl-body");
+    h.addEventListener("click",function(){
+      c.classList.toggle("open");
+      if(c.classList.contains("open")&&!body._fait){
+        body._fait=true;
+        var a=el("div","anim ld-anim");body.appendChild(a);anMonter(a,it,{label:true});
+        if(it.v)body.appendChild(el("div","dl-v",esc(it.v)));
+        if(it.g)body.appendChild(el("div","dl-g",esc(it.g)));
+        if(it.w)body.appendChild(el("div","warnbox","⚠ <b>À savoir :</b> "+esc(it.w)));
+        var m=materielEx(it);
+        body.appendChild(el("div","dl-mat","🧰 "+(m.length?esc(m.join(" · ")):"Rien à préparer")));
+      }
+    });
+    c.appendChild(h);c.appendChild(body);box.appendChild(c);
+  });
+}
+renderDosListe();
 
 /* ---------- Courbe douleur dos ---------- */
 function renderPainChart(){
@@ -5595,8 +5718,12 @@ $("#voiceOn").addEventListener("change",function(){
   state.voice=this.checked;save();
   if(this.checked)parler("Annonce vocale activée");
 });
+$("#flowClose").addEventListener("click",annulerFlux);
 $("#flowGo").addEventListener("click",function(){
-  initAudio();fermerFlux();
+  initAudio();
+  // la durée de la séance démarre ici, pas pendant la préparation du matériel
+  if(current&&!current.lance){current.lance=true;sessClockStart();panierAvantLancement=null;}
+  fermerFlux();
   if(state.flowOrder==="manuel"||!current)return;
   // seulement au tout début de la séance : si on rouvre le panneau en cours
   // de route pour changer un réglage, on ne relance pas tout
