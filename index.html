@@ -476,6 +476,8 @@
   .pan-resume{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 10px;font-weight:700;font-size:15px}
   .pan-diff{display:block;font-weight:600;font-size:12.5px;color:var(--grey);margin-top:2px}
   .pan-diff.plus{color:#b8571b}.pan-diff.moins{color:#2e7d4f}
+  .tpl-io{display:flex;gap:8px;margin:0 0 14px}
+  .tpl-io .btn{flex:1;font-size:13px;padding:10px 8px}
   .run-reps{display:flex;align-items:center;gap:14px}
   .run-reps b{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:26px;min-width:34px;text-align:center}
   .run-sum{margin-top:14px;font-size:14px;font-weight:600;color:var(--ink-2)}
@@ -777,6 +779,11 @@
     <div id="tplWrap" style="display:none">
       <div class="lab" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin:0 0 8px">Mes modèles</div>
       <div id="tplList"></div>
+    </div>
+    <div class="tpl-io">
+      <button class="btn ghost" id="tplImpBtn">⬆ Importer des modèles</button>
+      <button class="btn ghost" id="tplExpBtn">⬇ Exporter mes modèles</button>
+      <input type="file" id="tplImpFile" accept=".json,application/json" style="display:none">
     </div>
     <p class="muted" style="font-size:12.5px;margin:0 0 10px">Les groupes <b style="color:#2f7a72">🤸 Callisthénie</b> ajoutent du renforcement au poids du corps, les groupes <b style="color:#b8860b">⚡ HIIT</b> des blocs chronométrés (3 × 30 s par défaut, réglables) : mélange-les librement avec tes exercices de muscu.</p>
     <div class="groups" id="groupBtns"></div>
@@ -1194,8 +1201,12 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.33.0";
+var APP_VERSION="1.34.0";
 var CHANGELOG=[
+ {v:"1.34.0",d:"2026-11-14",n:[
+   "Libre : « Importer des modèles » depuis un fichier préparé avec Claude — ils arrivent dans Mes modèles, prêts à lancer",
+   "« Exporter mes modèles » pour les faire retravailler, et exercices personnalisés possibles dans un fichier"
+ ]},
  {v:"1.33.0",d:"2026-11-10",n:[
    "Annuler une séance ramène à l’écran d’où tu viens (Libre, Dos…) et rend ta sélection, au lieu de renvoyer sur la Semaine",
    "Chrono : les boutons pour passer sont regroupés en bas ; « Voir la liste » remplace « Fermer » en séance",
@@ -3920,6 +3931,7 @@ S("hiit_pas_chasses_lents",{v:"front",K:[P(AN_FR,{hip:[110,94],sh:[110,34],lf:[1
 var anActifs=[],anRaf=null;
 function anCle(item){
   if(!item)return null;
+  if(item.an&&AN_SPECS[item.an])return item.an;
   if(item.k&&AN_SPECS[item.k])return item.k;
   var k=typeof cleExercice==="function"?cleExercice(item.n):null;
   return k&&AN_SPECS[k]?k:null;
@@ -4112,6 +4124,7 @@ var MAT={
 };
 function materielEx(item){
   if(!item)return [];
+  if(Array.isArray(item.mat))return item.mat;
   if(MAT[item.k])return MAT[item.k];
   var k=anCle(item),sp=k&&AN_SPECS[k],r=[];
   if(!sp)return r;
@@ -4321,10 +4334,10 @@ function renderPanier(){
   if(!keys.length)return;
   // effet direct de chaque réglage : durée estimée (et écart avec le modèle d'origine)
   var itemsAct=keys.map(function(k){var o=Object.assign({},basket[k]);delete o._reps;return o;});
-  var dAct=dureeEstimee(itemsAct),nS=itemsAct.reduce(function(t,it){return t+(it.sets||0);},0);
+  var dAct=dureeEstimee(itemsAct).min,nS=itemsAct.reduce(function(t,it){return t+(it.sets||0);},0);
   var txt="≈ "+dAct+" min · "+itemsAct.length+" exercice"+(itemsAct.length>1?"s":"")+" · "+nS+" séries";
   if(typeof tplEdit!=="undefined"&&tplEdit&&tplEdit.mode==="edit"&&tplEdit.ref&&tplEdit.ref.items){
-    var dAv=dureeEstimee(tplEdit.ref.items.map(function(it){return Object.assign({},it);}));
+    var dAv=dureeEstimee(tplEdit.ref.items.map(function(it){return Object.assign({},it);})).min;
     var diff=dAct-dAv;
     txt+=diff?" <span class='pan-diff "+(diff>0?"plus":"moins")+"'>"+(diff>0?"+":"−")+Math.abs(diff)+" min vs modèle enregistré ("+dAv+" min)</span>":" <span class='pan-diff'>= modèle enregistré</span>";
   }
@@ -4496,6 +4509,128 @@ $("#startLibre").addEventListener("click",function(){
   renderLib();
 });
 var panierAvantLancement=null;
+
+/* ---------- Modèles : import / export par fichier ----------
+   Format lisible, préparé hors de l'appli puis importé dans le Libre :
+   {"type":"muscu-modeles","modeles":[{"nom":"…","exercices":[
+      {"exercice":"Squat poids de corps","series":4,"duree":40},
+      {"exercice":"Développé couché","series":5,"reps":12}]}]}
+   Un exercice absent de la bibliothèque est accepté s'il est décrit
+   ("consigne", "guide", "attention", "materiel", "schema"). */
+function normNom(x){return String(x||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g," ").trim();}
+function trouverExercice(ref){
+  if(!ref)return null;
+  var L=allLib(),gs=Object.keys(L),i,j,n=normNom(ref);
+  for(i=0;i<gs.length;i++)for(j=0;j<L[gs[i]].length;j++)if(L[gs[i]][j].k===ref)return L[gs[i]][j];
+  for(i=0;i<gs.length;i++)for(j=0;j<L[gs[i]].length;j++)if(normNom(L[gs[i]][j].n)===n)return L[gs[i]][j];
+  return null;
+}
+function borner(v,a,b){return Math.max(a,Math.min(b,v));}
+function itemDepuisFichier(e,notes){
+  if(typeof e==="string")e={exercice:e};
+  if(!e||typeof e!=="object")return null;
+  var nom=String(e.exercice||e.nom||"").trim();
+  var base=trouverExercice(e.cle)||trouverExercice(nom);
+  var nS=parseInt(e.series,10),d=parseInt(e.duree,10),r=e.reps==="max"?null:parseInt(e.reps,10);
+  var it;
+  if(base){
+    it=Object.assign({},base);
+    it.sets=borner(nS||base.sets||parseInt(base.s,10)||3,1,10);
+    if(it.chrono){
+      if(d)it.chrono=borner(d,5,600);
+      else if(e.reps!==undefined)notes.push("« "+it.n+" » est chronométré : répétitions ignorées");
+      it.s=it.sets+" × "+it.chrono+" s";
+    }else{
+      if(d)notes.push("« "+it.n+" » se compte en répétitions : durée ignorée");
+      var rr=(e.reps==="max")?null:(r>0?borner(r,1,50):parseReps(base.s));
+      it.s=buildScheme(it.sets,rr,base.s);
+    }
+    return it;
+  }
+  if(!nom)return null;
+  if(!e.consigne&&!e.guide){notes.push("« "+nom+" » : inconnu de la bibliothèque, ignoré");return null;}
+  // exercice personnalisé, décrit dans le fichier
+  it={k:"perso_"+normNom(nom).replace(/ /g,"_"),n:nom,v:String(e.consigne||""),g:String(e.guide||""),perso:true,noCharge:e.charge!==true};
+  it.sets=borner(nS||3,1,10);
+  if(e.attention)it.w=String(e.attention);
+  if(Array.isArray(e.materiel))it.mat=e.materiel.map(String).slice(0,6);
+  if(e.schema){var sc=trouverExercice(e.schema);if(sc)it.an=sc.k;}
+  if(d){it.chrono=borner(d,5,600);it.hiit=true;it.s=it.sets+" × "+it.chrono+" s";}
+  else it.s=it.sets+" × "+(e.reps==="max"?"max":(r>0?borner(r,1,50):12));
+  return it;
+}
+function lireModeles(p){
+  var notes=[],out=[];
+  var liste=Array.isArray(p)?p:(p&&Array.isArray(p.modeles)?p.modeles:null);
+  if(!liste)return null;
+  liste.forEach(function(m,i){
+    if(!m||!Array.isArray(m.exercices))return;
+    var items=[],vus={};
+    m.exercices.forEach(function(e){
+      var it=itemDepuisFichier(e,notes);
+      if(!it)return;
+      if(vus[it.k]){notes.push("« "+it.n+" » en double dans « "+(m.nom||"")+" » : gardé une fois");return;}
+      vus[it.k]=1;items.push(it);
+    });
+    if(items.length)out.push({name:String(m.nom||("Modèle importé "+(i+1))).slice(0,60),items:items});
+    else notes.push("Modèle « "+(m.nom||i+1)+" » : aucun exercice reconnu, ignoré");
+  });
+  return {modeles:out,notes:notes};
+}
+function importerModeles(p){
+  var res=lireModeles(p);
+  if(!res){toast("Ce fichier ne contient pas de modèles");return false;}
+  if(!res.modeles.length){alert("Aucun modèle importable.\n\n"+res.notes.join("\n"));return false;}
+  if(!state.templates)state.templates=[];
+  var existants=res.modeles.filter(function(m){return state.templates.some(function(t){return t.name===m.name;});});
+  var msg="Importer "+res.modeles.length+" modèle"+(res.modeles.length>1?"s":"")+" ?\n\n"+res.modeles.map(function(m){return "• "+m.name+" ("+m.items.length+" exercices, ≈ "+dureeEstimee(m.items).min+" min)";}).join("\n");
+  if(existants.length)msg+="\n\nDéjà présent"+(existants.length>1?"s":"")+", sera remplacé : "+existants.map(function(m){return m.name;}).join(", ");
+  if(res.notes.length)msg+="\n\nÀ noter :\n"+res.notes.join("\n");
+  if(!confirm(msg))return false;
+  res.modeles.forEach(function(m){
+    var i=-1;state.templates.forEach(function(t,k){if(t.name===m.name)i=k;});
+    if(i>=0)state.templates[i]=m;else state.templates.push(m);
+  });
+  save();sauvegardeServeur(state);
+  renderTemplates();
+  toast(res.modeles.length+" modèle"+(res.modeles.length>1?"s importés":" importé")+" : Libre ▸ Mes modèles");
+  return true;
+}
+function exporterModeles(){
+  var tpls=state.templates||[];
+  if(!tpls.length){toast("Aucun modèle à exporter");return;}
+  var data={type:"muscu-modeles",version:1,modeles:tpls.map(function(t){
+    return {nom:t.name,exercices:t.items.map(function(it){
+      var e={exercice:it.n,series:it.sets||parseInt(it.s,10)||3};
+      if(!it.perso)e.cle=it.k;   // plusieurs exercices portent le même nom (ex. « Gainage latéral »)
+      if(it.chrono)e.duree=it.chrono;else{var r=parseReps(it.s);e.reps=r===null?"max":r;}
+      if(it.perso){e.consigne=it.v||"";e.guide=it.g||"";if(it.w)e.attention=it.w;if(it.mat)e.materiel=it.mat;if(it.an)e.schema=it.an;if(it.noCharge===false)e.charge=true;}
+      return e;
+    })};
+  })};
+  try{
+    var a=document.createElement("a"),d=new Date();
+    a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,1)],{type:"application/json"}));
+    a.download="muscu-modeles-"+d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0")+".json";
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
+    toast(tpls.length+" modèle"+(tpls.length>1?"s exportés":" exporté"));
+  }catch(e){toast("Export impossible");}
+}
+$("#tplImpBtn").addEventListener("click",function(){$("#tplImpFile").click();});
+$("#tplExpBtn").addEventListener("click",exporterModeles);
+$("#tplImpFile").addEventListener("change",function(){
+  var f=this.files[0],champ=this;if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){
+    var p=null;try{p=JSON.parse(r.result);}catch(e){}
+    if(p&&Array.isArray(p.history)&&!p.modeles)alert("Ce fichier est une sauvegarde complète : importe-le depuis Historique ▸ Importer.");
+    else if(!p)alert("Fichier illisible : ce n’est pas un fichier de modèles valide.");
+    else importerModeles(p);
+    champ.value="";
+  };
+  r.readAsText(f);
+});
 $("#saveTpl").addEventListener("click",function(){
   var keys=Object.keys(basket);
   if(!keys.length){toast("Choisis d'abord des exercices");return;}
@@ -5091,6 +5226,7 @@ $("#impFile").addEventListener("change",function(){
   r.onload=function(){
     try{
       var p=JSON.parse(r.result);
+      if(p&&typeof p==="object"&&!Array.isArray(p.history)&&(p.type==="muscu-modeles"||Array.isArray(p.modeles))){importerModeles(p);return;}
       if(!p||typeof p!=="object"||!Array.isArray(p.history))throw new Error("format");
       if(!confirm("Importer cette sauvegarde ("+p.history.length+" entrées) ? Elle remplacera les données actuelles."))return;
       state.freq=p.freq||3;
