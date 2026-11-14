@@ -603,8 +603,30 @@
   /* ===== Adaptation à l'écran (en fin de feuille : ces règles priment) ===== */
   @media (orientation:portrait){
     .overlay{gap:8px}
-    .ov-time{font-size:clamp(110px,34vw,220px)}
-    .ov-anim{width:min(30vw,120px)}
+    .ov-total span{font-size:13px}
+    .ov-total b{font-size:32px}
+    .ov-serie span{font-size:17px}
+    .ov-serie b{font-size:clamp(52px,15vw,80px)}
+    #chronoOverlay .ov-label,#hiitOverlay .h-exname{font-size:clamp(34px,10.4vw,58px);overflow-wrap:anywhere;hyphens:auto}
+    .ov-ensuite{font-size:clamp(28px,8.4vw,40px)}
+    .ov-ensuite.imminent{font-size:clamp(34px,10.5vw,52px)}
+    #hiitOverlay .h-phase{font-size:22px}
+    #hiitOverlay .h-tip{font-size:17px}
+    #hiitOverlay .h-round{font-size:16px}
+    .ov-hint{font-size:16px}
+    .ov-bottom{gap:8px}
+    .ov-bottom .ov-pause{font-size:25px;padding:13px 30px}
+    .ov-bottom .ov-close,.ov-bottom .ov-phase,.ov-bottom .ov-skip{font-size:19px;padding:11px 24px;margin:0}
+    #doOverlay .do-done{height:min(30vw,120px)}
+    #doOverlay .do-anim{width:min(30vw,124px)}
+    #doOverlay .do-meta,#doOverlay .do-tip{font-size:17px}
+    #doOverlay{gap:6px}
+    #doOverlay .do-name{font-size:clamp(34px,10.4vw,58px);overflow-wrap:anywhere;hyphens:auto}
+
+    #doOverlay .do-next{font-size:19px}
+    #doOverlay .do-row .ov-close{font-size:19px}
+    .ov-time{font-size:clamp(100px,30vw,210px)}
+    .ov-anim{width:min(26vw,110px)}
     .do-anim{width:min(40vw,160px)}
     #hiitOverlay .ov-time{font-size:clamp(96px,29vw,190px)}
     #hiitOverlay .ov-anim{width:min(24vw,96px)}
@@ -614,8 +636,16 @@
     .overlay{gap:5px;padding:16px 18px}
     .ov-time{font-size:clamp(92px,29vw,170px)}
     #chronoOverlay .ov-label,#hiitOverlay .h-exname{font-size:clamp(28px,9vw,42px)}
-    .ov-ensuite{font-size:clamp(21px,6.4vw,28px)}
-    .ov-ensuite.imminent{font-size:clamp(26px,8vw,36px)}
+    .ov-ensuite{font-size:clamp(22px,6.6vw,30px)}
+    .ov-time{font-size:clamp(84px,26vw,150px)}
+    .ov-serie b{font-size:clamp(44px,12vw,60px)}
+    #doOverlay .do-name{font-size:clamp(28px,9vw,42px)}
+    #doOverlay .do-done{height:min(24vw,92px)}
+    #doOverlay .do-anim{width:min(24vw,92px)}
+    #doOverlay .do-meta,#doOverlay .do-tip{font-size:15px}
+    .ov-ensuite.imminent{font-size:clamp(28px,8.6vw,40px)}
+    .ov-bottom .ov-pause{font-size:22px;padding:11px 24px}
+    .ov-bottom .ov-close,.ov-bottom .ov-phase,.ov-bottom .ov-skip{font-size:17px;padding:10px 20px}
     #doOverlay .do-done{height:min(30vw,112px)}
     .ov-anim{width:min(26vw,100px)}
     .do-anim{width:min(36vw,140px)}
@@ -632,23 +662,26 @@
     #chronoOverlay .ov-time,#hiitOverlay .ov-time{grid-column:1;grid-row:2/span 10;align-self:center;font-size:min(42vh,24vw)}
     #chronoOverlay .ov-bar,#hiitOverlay .ov-bar{grid-column:1;grid-row:12;width:90%}
     .ov-serie{padding-top:0}
-    .ov-serie span{font-size:11px}
-    .ov-serie b{font-size:clamp(26px,9vh,40px)}
-    #chronoOverlay .ov-label,#hiitOverlay .h-exname{font-size:clamp(20px,7vh,32px);line-height:1.05}
-    #hiitOverlay .h-phase{font-size:14px}
-    .ov-ensuite{font-size:clamp(16px,5vh,22px)}
-    .ov-ensuite.imminent{font-size:clamp(19px,6.2vh,28px)}
+    .ov-serie span{font-size:14px}
+    .ov-serie b{font-size:clamp(30px,10vh,48px)}
+    #chronoOverlay .ov-label,#hiitOverlay .h-exname{font-size:clamp(24px,8.6vh,42px);line-height:1.02;overflow-wrap:anywhere}
+    #hiitOverlay .h-phase{font-size:19px}
+    .ov-ensuite{font-size:clamp(18px,6.2vh,30px)}
+    .ov-ensuite.imminent{font-size:clamp(21px,7.4vh,36px)}
     #hiitOverlay .h-tip,#chronoOverlay .ov-hint{display:none}
     #hiitOverlay .h-round{font-size:11px}
     .ov-bottom{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:6px;padding-bottom:0}
-    .ov-bottom .ov-close,.ov-bottom .ov-pause{min-width:0;padding:8px 16px;font-size:15px}
+    .ov-bottom .ov-close,.ov-bottom .ov-pause,.ov-bottom .ov-phase,.ov-bottom .ov-skip{min-width:0;padding:8px 16px;font-size:clamp(15px,4.8vh,22px);margin:0}
+    #hiitOverlay .h-round{font-size:15px}
     #doOverlay.open{display:grid;grid-auto-flow:row dense;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-auto-rows:min-content;align-content:center;column-gap:22px;row-gap:4px;padding:8px 20px}
     #doOverlay>*{grid-column:1;margin:0!important;justify-self:center;max-width:100%}
     #doOverlay .do-charge,#doOverlay .do-done,#doOverlay .do-next,#doOverlay .do-row{grid-column:2}
-    #doOverlay .do-name{font-size:clamp(22px,8vh,34px)}
-    #doOverlay .do-tip{font-size:12.5px}
+    #doOverlay .do-name{font-size:clamp(24px,8.6vh,40px);overflow-wrap:anywhere}
+    #doOverlay .do-next{font-size:clamp(15px,5vh,20px)}
+    #doOverlay .do-row .ov-close{font-size:clamp(15px,5vh,20px)}
+    #doOverlay .do-tip{display:none!important}
     #doOverlay .do-done{height:min(30vh,110px);width:min(40vw,300px);font-size:clamp(22px,7vh,30px)}
-    #doOverlay .do-anim{width:min(15vw,100px)}
+    #doOverlay .do-anim{width:min(13vw,86px)}
     #doOverlay .do-row{flex-direction:row;gap:8px}
     #doOverlay .do-row .ov-close{padding:8px 14px;margin:0}
   }
@@ -1201,8 +1234,15 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.34.0";
+var APP_VERSION="1.35.0";
 var CHANGELOG=[
+ {v:"1.35.0",d:"2026-11-14",n:[
+   "HIIT : sauts pieds joints latéraux, sauts pieds joints avant-arrière, sauts sur un pied gauche-droite (avec schémas et ⚠)",
+   "Encouragements vocaux à mi-parcours de chaque effort de 30 s ou plus, variés",
+   "Textes plus gros en portrait, et dans la colonne de droite en paysage, pour lire de loin",
+   "Plus de portrait à l’envers : seul le paysage fait tourner l’écran",
+   "Biceps : curl concentré, bras droit puis bras gauche"
+ ]},
  {v:"1.34.0",d:"2026-11-14",n:[
    "Libre : « Importer des modèles » depuis un fichier préparé avec Claude — ils arrivent dans Mes modèles, prêts à lancer",
    "« Exporter mes modèles » pour les faire retravailler, et exercices personnalisés possibles dans un fichier"
@@ -1508,7 +1548,8 @@ var LIB={
  "Biceps":[
   {k:"curlez",n:"Curl pupitre barre EZ",s:S513,v:"Banc Larry Scott",sets:5,g:"Bras posés sur le pupitre, aisselles calées en haut du support. Fléchis jusqu’en haut, redescends LENTEMENT sans tendre complètement les coudes en bas. La descente lente fait tout le boulot."},
   {k:"curlalt",n:"Curl haltères alterné",s:S513,v:"Debout, sans balancier",sets:5,g:"Debout, un bras après l’autre. Coude collé au flanc, monte l’haltère en tournant la paume vers toi. Erreur : balancer le buste ou avancer le coude."},
-  {k:"marteau",n:"Curl marteau",s:S513,v:"Prise neutre · avant-bras + brachial",sets:5,g:"Comme le curl classique mais paumes face à face (prise marteau) tout du long. Coudes fixes contre le corps."}],
+  {k:"marteau",n:"Curl marteau",s:S513,v:"Prise neutre · avant-bras + brachial",sets:5,g:"Comme le curl classique mais paumes face à face (prise marteau) tout du long. Coudes fixes contre le corps."},
+  {k:"curlconc",n:"Curl concentré",s:"4 × 10 / bras",v:"Assis, coude calé à l’intérieur de la cuisse · alterne bras droit puis bras gauche",sets:4,w:"Buste penché en avant : garde le dos plat et appuie l’autre main sur le genou pour soulager les lombaires.",g:"Assis au bout du banc, jambes écartées. Cale l’arrière du coude contre l’intérieur de la cuisse, bras tendu vers le sol. Monte l’haltère vers l’épaule sans bouger le coude, serre le biceps une seconde, redescends lentement jusqu’au bras tendu. Fais tes 10 répétitions bras droit, puis 10 bras gauche : c’est une série. L’autre main reste posée sur le genou, dos plat."}],
  "Triceps":[
   {k:"extez",n:"Extensions barre EZ",s:S513,v:"Couché uniquement · pas de version debout derrière la nuque",sets:5,g:"Allongé, barre EZ au-dessus du front, coudes fixes pointés au plafond. Seuls les avant-bras bougent : descends vers le front, remonte. Coudes qui s’écartent = triche."},
   {k:"ext1",n:"Extension 1 bras",s:"5 × 12 / côté",v:"Assis, buste gainé · haltère au-dessus de la tête",sets:5,g:"Assis ou debout, haltère tenu à une main derrière la tête, coude au ciel. Tends le bras vers le haut, redescends derrière la nuque en contrôle. Garde le coude près de la tête."},
@@ -2212,7 +2253,7 @@ function chronoGo(){
   }
   chrono.left=chrono.total;
   chrono.endAt=Date.now()+chrono.total*1000;
-  chrono.beeped={};
+  chrono.beeped={};chrono.encourage=false;
   chrono.fired=false;
   chrono.annonce=false;
   // pendant l'effort, on affiche ce qui vient après (déroulé automatique uniquement)
@@ -2246,6 +2287,9 @@ function chronoTic(){
     // les 5 dernières secondes : la suite grossit et clignote
     var ens=$("#ovEnsuite");
     if(ens)ens.classList.toggle("imminent",remain<=5&&!!ens.textContent);
+    if(chrono.total>=30&&remain===Math.floor(chrono.total/2)&&!chrono.encourage&&!$("#chronoOverlay").classList.contains("rest")){
+      chrono.encourage=true;encourager();
+    }
     if(remain===6)baisserMusique(1500);
     if(remain<=5&&!chrono.beeped[remain]){
       chrono.beeped[remain]=true;
@@ -2400,6 +2444,9 @@ var HIIT_LIB={
   {n:"Squats sautés",t:"Explosivité jambes",w:"Compression axiale répétée à la réception : le geste le moins indiqué pour une discopathie.",g:"Squat classique puis saut vertical, réception genoux souples et fesses en arrière pour amortir. Amorti maximal, dos gainé."},
   {n:"Box step-up",t:"Montées sur marche",w:"Poussée de l’avant-pied sur la jambe qui monte.",g:"Monte un pied sur une marche ou un banc bas, déroule, redescends en contrôle, alterne. Pousse dans le talon pour épargner l’orteil."},
   {n:"Pas chassés lents",t:"En squat léger, pieds à plat",g:"2 pas chassés à droite, 2 à gauche, posés à plat, en restant bas. Cuisses en continu."},
+  {n:"Sauts pieds joints latéraux",t:"Pieds serrés, gauche-droite",w:"Impact répété sur l’avant-pied (hallux droit) et petites compressions pour les lombaires : petits sauts, réception souple, arrête si le pied ou le dos tire.",g:"Pieds serrés, genoux légèrement fléchis, saute à gauche puis à droite par-dessus une ligne imaginaire. Petits sauts rapides, réception sur l’avant-pied puis le talon, genoux souples. Le buste reste droit et gainé."},
+  {n:"Sauts pieds joints avant-arrière",t:"Pieds serrés, devant-derrière",w:"Impact répété sur l’avant-pied (hallux droit) et petites compressions pour les lombaires : petits sauts, réception souple, arrête si le pied ou le dos tire.",g:"Pieds serrés, saute en avant puis en arrière par-dessus une ligne imaginaire. Sauts bas et rapides, réception amortie genoux souples, buste gainé sans se pencher."},
+  {n:"Sauts sur un pied gauche-droite",t:"À cloche-pied, change de pied",w:"Le plus exigeant pour le pied droit opéré (poussée et réception sur l’avant-pied) et pour le dos : sauts très bas, peu de répétitions sur le pied droit, stop au moindre tiraillement.",g:"Sautille sur le pied gauche, puis sur le droit, en alternant toutes les 4 à 6 réceptions. Petits sauts sur place, genou de la jambe d’appui souple, l’autre pied décollé derrière. Garde l’équilibre en regardant devant toi."},
   {n:"Step jacks",t:"Jumping jack sans saut",g:"Même mouvement de bras que le jumping jack, mais un pied s’écarte à la fois, sans jamais sauter. Cardio propre, zéro impact."},
   {n:"Shadow boxing",t:"Frappes rapides, pieds à plat",g:"Garde de boxe, enchaîne directs et crochets dans le vide, gaine le tronc, buste qui tourne légèrement."}],
  "Gainage & dos":[
@@ -2694,6 +2741,9 @@ function hiitTick(){
   $("#hTime").classList.toggle("warn",left<=5&&(p.type==="work"||p.type==="run"));
   var e=Math.floor((Date.now()-hiit.startedAt)/1000);
   $("#hTotalVal").textContent=Math.floor(e/60)+":"+(e%60<10?"0":"")+(e%60);
+  if((p.type==="work"||p.type==="run")&&p.dur>=30&&left===Math.floor(p.dur/2)&&hiit.encPhase!==hiit.idx){
+    hiit.encPhase=hiit.idx;encourager();
+  }
   if(left===6)baisserMusique(1500);
   if(left<=5&&!hiit.beeped[left]){hiit.beeped[left]=true;beepShort();}
   if(hiit.lockOn)majVerrou();
@@ -2708,7 +2758,7 @@ function hiitStart(){
   hiit.tours=hiitSel.tours;
   hiit.work=state.hiitWork||30;
   hiit.seq=hiitBuildSeq(circ.ex,hiit.tours);
-  hiit.idx=0;hiit.paused=false;hiit.beeped={};
+  hiit.idx=0;hiit.paused=false;hiit.beeped={};hiit.encPhase=-1;
   hiit.startedAt=Date.now();
   var p=hiitPhase();
   hiit.phEnd=Date.now()+p.dur*1000;
@@ -2871,7 +2921,7 @@ function courseStart(){
   hiit.mode="course";
   hiit.reps=state.runReps;hiit.runDur=state.runRun;
   hiit.seq=courseSeq();
-  hiit.idx=0;hiit.paused=false;hiit.beeped={};
+  hiit.idx=0;hiit.paused=false;hiit.beeped={};hiit.encPhase=-1;
   hiit.startedAt=Date.now();
   hiit.phEnd=Date.now()+hiit.seq[0].dur*1000;
   $("#hiitOverlay").classList.add("open");
@@ -3901,6 +3951,7 @@ S("shrugs",{v:"front",K:[P(AN_FR,{hd:[0,-18],af:[150,100],ab:[110,100]}),P(AN_FR
 S("curlez",{eq:[["pupitre",142,92,190,128],["banc",86,146,150]],K:[{hip:[116,144],t:12,lf:[160,184],lb:[156,184],af:[204,140],ab:[200,142]},{hip:[116,144],t:12,lf:[160,184],lb:[156,184],af:[170,62],ab:[166,64]}],s:{af:1,ab:1},dyn:[["disque","mains",7]],ph:["Monte la barre","Redescends en contrôle"]});
 var CU_D=P(AN_ST,{af:[133,160],ab:[128,160]});
 S("curlalt",{K:[CU_D,P(CU_D,{af:[152,48]}),CU_D,P(CU_D,{ab:[148,50]})],dyn:[["hv","af"],["hv","ab"]],ph:["Monte un haltère","Redescends","L’autre bras","Redescends"]});
+S("curlconc",{eq:[["banc",60,150,146]],K:[{hip:[112,136],t:34,lf:[176,184],lb:[170,184],af:[164,176],ab:[166,140]},{hip:[112,136],t:34,lf:[176,184],lb:[170,184],af:[150,110],ab:[166,140]}],s:{af:-1,ab:1},dyn:[["hh","af"]],hl:"dos",move:["af"],m:1.0,h:0.5,ph:["Monte, coude calé sur la cuisse","Redescends lentement"]});
 S("marteau",{K:[CU_D,P(CU_D,{af:[152,48],ab:[148,50]})],dyn:[["hv","af"],["hv","ab"]],ph:["Monte les haltères, prise neutre","Redescends"]});
 S("extez",{eq:[["banc",44,200,146]],K:[P(AN_BANC,{af:[52,112],ab:[48,112]}),P(AN_BANC,{af:[80,78],ab:[76,78]})],s:{af:1,ab:1},dyn:[["disque","mains",7]],ph:["Tends les bras","Redescends vers le front"]});
 S("ext1",{K:[P(AN_ST,{af:[118,24],ab:[128,160]}),P(AN_ST,{af:[132,-28],ab:[128,160]})],s:{af:1},dyn:[["hv","af"]],move:["af"],ph:["Tends le bras au-dessus de la tête","Redescends derrière la tête"]});
@@ -3920,6 +3971,9 @@ S("hiit_montees_de_genoux_sautees",{K:[P(GN,{hip:[130,86],lb:[126,178]}),P(GN2,{
 S("hiit_talons_fesses_courus",{K:[P(TF1,{hip:[130,86],lf:[134,178]}),P(TF2,{hip:[130,86],lb:[128,178]})],m:0.32,h:0.03,ph:["Talons-fesses, rebondis","Change"]});
 var JJ_F=P(AN_FR,{af:[150,98],ab:[110,98]}),JJ_O=P(AN_FR,{hip:[130,90],sh:[130,30],lf:[166,180],lb:[94,180],af:[180,-22],ab:[80,-22]});
 S("hiit_jumping_jacks",{v:"front",K:[JJ_F,JJ_O],m:0.4,h:0.05,ph:["Saute, écarte bras et jambes","Referme"]});
+S("hiit_sauts_pieds_joints_lateraux",{v:"front",K:[P(AN_FR,{hip:[110,97],sh:[110,37],lf:[116,184],lb:[104,184],af:[132,152],ab:[88,152]}),P(AN_FR,{hip:[130,88],sh:[130,28],lf:[136,175],lb:[124,175],af:[154,138],ab:[106,138]}),P(AN_FR,{hip:[150,97],sh:[150,37],lf:[156,184],lb:[144,184],af:[172,152],ab:[128,152]}),P(AN_FR,{hip:[130,88],sh:[130,28],lf:[136,175],lb:[124,175],af:[154,138],ab:[106,138]})],m:0.28,h:0.08,ph:["Saute à gauche","…","Saute à droite","…"]});
+S("hiit_sauts_pieds_joints_avant_arriere",{K:[{hip:[106,102],t:8,lf:[110,184],lb:[104,184],af:[124,150],ab:[120,152]},{hip:[130,86],t:4,lf:[134,172],lb:[128,172],af:[148,130],ab:[144,132]},{hip:[154,102],t:8,lf:[158,184],lb:[152,184],af:[172,150],ab:[168,152]},{hip:[130,86],t:4,lf:[134,172],lb:[128,172],af:[148,130],ab:[144,132]}],m:0.28,h:0.08,ph:["Saute en avant","…","Saute en arrière","…"]});
+S("hiit_sauts_sur_un_pied_gauche_droite",{K:[{hip:[130,96],t:4,lf:[134,184],lb:[104,140],af:[150,124],ab:[112,140]},{hip:[130,86],t:4,lf:[134,174],lb:[104,132],af:[150,116],ab:[112,132]},{hip:[130,96],t:4,lb:[134,184],lf:[104,140],ab:[150,124],af:[112,140]},{hip:[130,86],t:4,lb:[134,174],lf:[104,132],ab:[150,116],af:[112,132]}],m:0.3,h:0.1,ph:["Sur le pied gauche","…","Sur le pied droit","…"]});
 S("hiit_step_jacks",{v:"front",K:[JJ_F,P(JJ_F,{lf:[174,184],af:[180,-22],ab:[80,-22]}),JJ_F,P(JJ_F,{lb:[86,184],af:[180,-22],ab:[80,-22]})],m:0.5,h:0.08,ph:["Pas de côté, bras en l’air","Reviens","De l’autre côté","Reviens"]});
 S("hiit_skaters_pas_du_patineur",{v:"front",K:[{hip:[168,104],sh:[158,46],lf:[178,184],lb:[194,170],af:[112,104],ab:[96,92]},{hip:[92,104],sh:[102,46],lb:[82,184],lf:[66,170],ab:[148,104],af:[164,92]}],s:{lb:-1,lf:1},m:0.55,h:0.12,ph:["Bond sur le côté","Bond de l’autre côté"]});
 S("hiit_corde_a_sauter_sans_corde",{v:"front",K:[P(AN_FR,{af:[166,100],ab:[94,100]}),P(AN_FR,{hip:[130,86],sh:[130,26],lf:[138,176],lb:[122,176],af:[166,94],ab:[94,94]})],m:0.25,h:0.03,ph:["Petits sauts","…"]});
@@ -4016,6 +4070,41 @@ function reprendreFlux(){
   initAudio();
   lancerExercice(w,true);
 }
+
+
+/* ---------- Orientation : portrait normal ou paysage, jamais portrait à l'envers ----------
+   Le manifeste autorise la rotation ; si le téléphone passe tête en bas, on verrouille en
+   portrait normal, puis on libère dès qu'il est couché sur le côté (capteur d'inclinaison). */
+(function(){
+  var so=screen&&screen.orientation;
+  if(!so||typeof so.lock!=="function")return;
+  var verrouille=false;
+  function verifier(){
+    if(so.type==="portrait-secondary"&&!verrouille){
+      so.lock("portrait-primary").then(function(){verrouille=true;}).catch(function(){});
+    }
+  }
+  if(so.addEventListener)so.addEventListener("change",verifier);
+  verifier();
+  window.addEventListener("deviceorientation",function(e){
+    if(!verrouille||e.gamma==null||e.beta==null)return;
+    if(Math.abs(e.gamma)>55&&Math.abs(e.beta)<35){
+      try{so.unlock();}catch(x){}
+      verrouille=false;
+    }
+  });
+})();
+/* ---------- Encouragements vocaux à mi-parcours ----------
+   Effort chronométré de 30 s ou plus (séance, HIIT, course du fractionné) :
+   une phrase à la moitié du temps, jamais la même que les deux précédentes. */
+var ENCOURAGEMENTS=["Allez, c’est la moitié !","Bien, continue comme ça !","Lâche rien, tu tiens le rythme !","Super, garde la forme !","Respire, reste gainé, ça avance !","Encore un effort, tu y es presque !"];
+var encRecents=[];
+function encourager(){
+  var dispo=ENCOURAGEMENTS.filter(function(x){return encRecents.indexOf(x)<0;});
+  var ph=dispo[Math.floor(Math.random()*dispo.length)];
+  encRecents.push(ph);if(encRecents.length>2)encRecents.shift();
+  parler(ph);
+}
 /* ---------- Bouton « retour » d'Android ----------
    Sans gestion, il fermait l'appli, même en pleine séance. Désormais il ferme ce qui
    est ouvert (feuille, panneau, chrono…), demande confirmation pour quitter une séance
@@ -4109,7 +4198,7 @@ var MAT={
   dc:["Barre olympique + disques","Banc plat","Rack (sécurités)"],
   dincl:["Haltères","Banc incliné"], dm:["Haltères","Banc"], elevlat:["Haltères légers"],
   ext1:["Haltère","Banc"], extez:["Barre EZ","Banc plat"], curlez:["Barre EZ","Pupitre"],
-  curlalt:["Haltères"], marteau:["Haltères"], shrugs:["Haltères"], oiseau:["Haltères légers","Banc"],
+  curlalt:["Haltères"], marteau:["Haltères"], curlconc:["Haltère","Banc"], shrugs:["Haltères"], oiseau:["Haltères légers","Banc"],
   chinups:["Barre de traction"], tractions:["Barre de traction"], dips:["Supports de dips"],
   row1:["Haltère","Banc plat"], rowbar:["Barre olympique + disques"],
   gobelet:["Haltère"], squat:["Barre olympique + disques","Rack"], bulg:["Haltères","Banc plat"], fentesm:["Haltères"],
