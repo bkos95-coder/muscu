@@ -240,6 +240,15 @@
   .row-btns{display:flex;gap:10px;margin:16px 0}
   .row-btns .btn{flex:1}
 
+  .rech{position:relative;margin:0 0 10px}
+  .rech input{width:100%;box-sizing:border-box;padding:13px 44px 13px 40px;border:1.5px solid var(--line);border-radius:11px;font-family:'IBM Plex Sans',sans-serif;font-size:16px;background:#fff;color:var(--ink);-webkit-appearance:none;appearance:none}
+  .rech input:focus{outline:none;border-color:var(--red)}
+  .rech input::-webkit-search-cancel-button{display:none}
+  .rech .rech-ic{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;opacity:.6}
+  .rech .rech-x{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:34px;height:34px;border:none;background:none;font-size:18px;color:var(--grey);cursor:pointer;display:none}
+  .rech.plein .rech-x{display:block}
+  .rech-info{font-size:13px;margin:-2px 0 10px}
+  .lib-grp{font-size:11.5px;color:var(--grey);margin-top:2px}
   .groups{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
   .gbtn{padding:14px 6px;border:1.5px solid var(--line);background:#fff;border-radius:11px;cursor:pointer;text-align:center;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.03em;color:var(--ink-2)}
   .gbtn.sel{background:var(--red);border-color:var(--red);color:#fff}
@@ -819,6 +828,7 @@
       <input type="file" id="tplImpFile" accept=".json,application/json" style="display:none">
     </div>
     <p class="muted" style="font-size:12.5px;margin:0 0 10px">Les groupes <b style="color:#2f7a72">🤸 Callisthénie</b> ajoutent du renforcement au poids du corps, les groupes <b style="color:#b8860b">⚡ HIIT</b> des blocs chronométrés (3 × 30 s par défaut, réglables) : mélange-les librement avec tes exercices de muscu.</p>
+    <div class="rech" id="libRechBox"><span class="rech-ic">🔍</span><input type="search" id="libRech" placeholder="Rechercher un exercice par son nom" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search" aria-label="Rechercher un exercice"><button class="rech-x" id="libRechX" aria-label="Effacer la recherche">✕</button></div>
     <div class="groups" id="groupBtns"></div>
     <div id="libList"></div>
     <div class="basket" id="basketWrap" style="display:none">
@@ -873,6 +883,7 @@
       <div class="frow" style="display:flex;gap:8px;margin:8px 0">
         <input type="text" id="hiitTplName" placeholder="Nom du circuit (ex : Mon 7 min pecs)" style="flex:1;padding:11px;border:1px solid var(--line);border-radius:9px;font-family:'IBM Plex Sans';font-size:14px">
       </div>
+      <div class="rech" id="hiitRechBox"><span class="rech-ic">🔍</span><input type="search" id="hiitRech" placeholder="Rechercher un exercice par son nom" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search" aria-label="Rechercher un exercice HIIT"><button class="rech-x" id="hiitRechX" aria-label="Effacer la recherche">✕</button></div>
       <div id="hiitLibList"></div>
       <div class="row-btns" style="margin:10px 0 0">
         <button class="btn ghost" id="hiitBuildCancel">Annuler</button>
@@ -1234,8 +1245,12 @@
 var KEY="monProgMuscu_v3";
 var OLDKEY="monProgMuscu_v2";
 /* ---------- Version de l'application ---------- */
-var APP_VERSION="1.35.0";
+var APP_VERSION="1.36.0";
 var CHANGELOG=[
+ {v:"1.36.0",d:"2026-11-15",n:[
+   "Composer ma séance : recherche d’un exercice par son nom, dans tous les groupes (sans se soucier des accents)",
+   "Même recherche dans « Composer mon circuit » du HIIT"
+ ]},
  {v:"1.35.0",d:"2026-11-14",n:[
    "HIIT : sauts pieds joints latéraux, sauts pieds joints avant-arrière, sauts sur un pied gauche-droite (avec schémas et ⚠)",
    "Encouragements vocaux à mi-parcours de chaque effort de 30 s ou plus, variés",
@@ -2543,10 +2558,14 @@ document.querySelectorAll("#hiitToursSel button").forEach(function(b){
 var hiitBasket=[];
 function renderHiitLib(){
   var wrap=$("#hiitLibList");wrap.innerHTML="";
+  var mots=rechMots(($("#hiitRech")||{}).value||""),trouves=0;
   Object.keys(HIIT_LIB).forEach(function(cat){
+    var exs=HIIT_LIB[cat].filter(function(e){return !mots.length||nomCorrespond(e.n,mots);});
+    if(!exs.length)return;
+    trouves+=exs.length;
     var box=el("div","hiit-prev");
     box.appendChild(el("div","hp-title",esc(cat)));
-    HIIT_LIB[cat].forEach(function(e){
+    exs.forEach(function(e){
       var inB=hiitBasket.some(function(x){return x.n===e.n;});
       var row=el("div","hp-row"+(inB?" inbasket":""));
       var head=el("div","hp-head");
@@ -2571,13 +2590,14 @@ function renderHiitLib(){
     });
     wrap.appendChild(box);
   });
+  if(mots.length)wrap.insertBefore(el("p","muted rech-info",trouves?(trouves+" exercice"+(trouves>1?"s":"")+" trouvé"+(trouves>1?"s":"")):"Aucun exercice HIIT ne contient « "+esc(($("#hiitRech").value||"").trim())+" »."),wrap.firstChild);
   $("#hiitBuildCount").textContent=hiitBasket.length;
 }
 $("#hiitBuildBtn").addEventListener("click",function(){
   var b=$("#hiitBuilder");
   var open=b.style.display!=="none";
   b.style.display=open?"none":"block";
-  if(!open){hiitBasket=[];$("#hiitTplName").value="";renderHiitLib();}
+  if(!open){hiitBasket=[];$("#hiitTplName").value="";$("#hiitRech").value="";$("#hiitRechBox").classList.remove("plein");renderHiitLib();}
 });
 $("#hiitBuildCancel").addEventListener("click",function(){$("#hiitBuilder").style.display="none";});
 $("#hiitBuildSave").addEventListener("click",function(){
@@ -4455,13 +4475,45 @@ function renderPanier(){
   });
 }
 var libOuvert=null;   // fiche d'exercice dépliée dans la liste du Libre
+/* Recherche par nom : tous les mots tapés doivent se trouver dans le nom,
+   sans tenir compte des accents ni des majuscules (« developpe hal » → Développé haltères) */
+function rechMots(q){return normNom(q).split(" ").filter(Boolean);}
+function nomCorrespond(nom,mots){
+  var n=normNom(nom);
+  return mots.every(function(m){return n.indexOf(m)>=0;});
+}
+function brancherRecherche(idIn,idX,idBox,rendre){
+  var inp=$(idIn),x=$(idX),box=$(idBox);
+  function maj(){box.classList.toggle("plein",!!inp.value);rendre();}
+  inp.addEventListener("input",maj);
+  inp.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();inp.blur();}});
+  x.addEventListener("click",function(){inp.value="";maj();inp.focus();});
+}
 function renderLib(){
   var list=$("#libList");list.innerHTML="";
   var sel=[];
-  document.querySelectorAll(".gbtn.sel").forEach(function(b){sel.push(b.getAttribute("data-g"));});
+  var mots=rechMots(($("#libRech")||{}).value||"");
+  var L=allLib();
+  $("#groupBtns").style.display=mots.length?"none":"";
+  var info=$("#libRechInfo");
+  if(!info){info=el("p","muted rech-info");info.id="libRechInfo";$("#groupBtns").parentNode.insertBefore(info,$("#groupBtns"));}
+  var vus={},trouves=0,res={};
+  if(mots.length){
+    // recherche : tous les groupes, chaque exercice une seule fois
+    Object.keys(L).forEach(function(g){
+      var r=L[g].filter(function(it){if(vus[it.k]||!nomCorrespond(it.n,mots))return false;vus[it.k]=1;return true;});
+      if(r.length){sel.push(g);trouves+=r.length;}
+      res[g]=r;
+    });
+    info.style.display="block";
+    info.innerHTML=trouves?(trouves+" exercice"+(trouves>1?"s":"")+" trouvé"+(trouves>1?"s":"")):"Aucun exercice ne contient « "+esc(($("#libRech").value||"").trim())+" ». Essaie un autre mot (ex : pompe, curl, gainage).";
+  }else{
+    info.style.display="none";
+    document.querySelectorAll(".gbtn.sel").forEach(function(b){sel.push(b.getAttribute("data-g"));});
+  }
   sel.forEach(function(g){
     list.appendChild(el("h2",null,esc(g)));
-    (allLib()[g]||[]).forEach(function(it){
+    (mots.length?res[g]:(L[g]||[])).forEach(function(it){
       var added=!!basket[it.k];
       var ouvert=libOuvert===it.k;
       var card=el("div","lib-card"+(added?" added":"")+(ouvert?" open":""));
@@ -6056,6 +6108,8 @@ function renderHisto(){
 
 /* ---------- Init ---------- */
 renderGroups();
+brancherRecherche("#libRech","#libRechX","#libRechBox",renderLib);
+brancherRecherche("#hiitRech","#hiitRechX","#hiitRechBox",renderHiitLib);
 renderLib();
 renderChips();
 renderPlan();
